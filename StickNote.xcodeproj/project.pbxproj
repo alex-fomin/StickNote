@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		2468572D2D0187B4005EDD1F /* RichTextKit in Frameworks */ = {isa = PBXBuildFile; productRef = 2468572C2D0187B4005EDD1F /* RichTextKit */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		2468570F2D017FDF005EDD1F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -35,16 +39,6 @@
 			path = StickNote;
 			sourceTree = "<group>";
 		};
-		246857112D017FDF005EDD1F /* StickNoteTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = StickNoteTests;
-			sourceTree = "<group>";
-		};
-		2468571B2D017FDF005EDD1F /* StickNoteUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = StickNoteUITests;
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,6 +46,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2468572D2D0187B4005EDD1F /* RichTextKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -76,8 +71,6 @@
 			isa = PBXGroup;
 			children = (
 				246856FD2D017FDF005EDD1F /* StickNote */,
-				246857112D017FDF005EDD1F /* StickNoteTests */,
-				2468571B2D017FDF005EDD1F /* StickNoteUITests */,
 				246856FC2D017FDF005EDD1F /* Products */,
 			);
 			sourceTree = "<group>";
@@ -112,6 +105,7 @@
 			);
 			name = StickNote;
 			packageProductDependencies = (
+				2468572C2D0187B4005EDD1F /* RichTextKit */,
 			);
 			productName = StickNote;
 			productReference = 246856FB2D017FDF005EDD1F /* StickNote.app */;
@@ -129,9 +123,6 @@
 			);
 			dependencies = (
 				246857102D017FDF005EDD1F /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				246857112D017FDF005EDD1F /* StickNoteTests */,
 			);
 			name = StickNoteTests;
 			packageProductDependencies = (
@@ -152,9 +143,6 @@
 			);
 			dependencies = (
 				2468571A2D017FDF005EDD1F /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				2468571B2D017FDF005EDD1F /* StickNoteUITests */,
 			);
 			name = StickNoteUITests;
 			packageProductDependencies = (
@@ -195,6 +183,9 @@
 			);
 			mainGroup = 246856F22D017FDF005EDD1F;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				2468572B2D0187B4005EDD1F /* XCRemoteSwiftPackageReference "RichTextKit" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 246856FC2D017FDF005EDD1F /* Products */;
 			projectDirPath = "";
@@ -399,15 +390,21 @@
 				DEVELOPMENT_ASSET_PATHS = "\"StickNote/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_LSBackgroundOnly = YES;
+				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.sane.StickNote;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = NO;
+				SUPPORTED_PLATFORMS = macosx;
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
@@ -425,15 +422,21 @@
 				DEVELOPMENT_ASSET_PATHS = "\"StickNote/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_LSBackgroundOnly = YES;
+				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.sane.StickNote;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = NO;
+				SUPPORTED_PLATFORMS = macosx;
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
@@ -543,6 +546,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		2468572B2D0187B4005EDD1F /* XCRemoteSwiftPackageReference "RichTextKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/danielsaidi/RichTextKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		2468572C2D0187B4005EDD1F /* RichTextKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2468572B2D0187B4005EDD1F /* XCRemoteSwiftPackageReference "RichTextKit" */;
+			productName = RichTextKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 246856F32D017FDF005EDD1F /* Project object */;
 }
