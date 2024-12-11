@@ -13,7 +13,7 @@ struct MainMenu : View{
         Button("Add new note"){
             let window = NSWindow(
                 contentRect: NSRect(x: 0, y: 0, width: 200, height: 100),
-                styleMask: [.titled],
+                styleMask: [.titled, .resizable, .borderless],
                 backing: .buffered,
                 defer: true
             )
@@ -37,28 +37,3 @@ struct MainMenu : View{
             .keyboardShortcut("Q")
     }
 }
-//
-//class CustomWindow: NSWindow {
-//    private let resizeAreaSize: CGFloat = 5.0
-//
-//    override func performDrag(with event: NSEvent) {
-//        print("drag")
-//        let mouseLocation = event.locationInWindow
-//        let windowFrame = self.frame
-//
-//        let resizeArea = NSRect(
-//            x: windowFrame.width - resizeAreaSize,
-//            y: windowFrame.height - resizeAreaSize,
-//            width: resizeAreaSize,
-//            height: resizeAreaSize
-//        )
-//        print("drag \(windowFrame) \(resizeArea)  \(mouseLocation)")
-//
-//        if resizeArea.contains(mouseLocation) {
-//            print("resize")
-//            // Perform custom resize logic
-//        } else {
-//            super.performDrag(with: event)
-//        }
-//    }
-//}

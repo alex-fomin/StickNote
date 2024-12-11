@@ -5,12 +5,12 @@ struct ContentView: View {
     @State private var isEditing: Bool = true
     @State private var text: String = ""
     @FocusState private var isTextEditorFocused: Bool // Track focus on the TextEditor
-    private let sharedFont: Font = .system(size: 16, weight: .regular, design: .default) // Shared font
+    private let sharedFont: Font = .system(size: 14, weight: .regular, design: .default) // Shared font
+    private let sharedColor: Color = Color(red:254/255,green:255/255,blue:156/255)
 
-    
     @Environment(\.dismiss) private var dismiss
-    
-    
+    @State private var textSize: CGSize = CGSize(width: 100, height: 100)
+
     var body: some View {
         ZStack {
             if isEditing {
@@ -20,34 +20,36 @@ struct ContentView: View {
                         isTextEditorFocused = true // Automatically focus
                     }
                     .font(sharedFont)
-                    .background(Color("#feff9c"))
+                    .background(sharedColor)
+                    .scrollContentBackground(.hidden)
                     .onDisappear {
                         if text.isEmpty{
-                    
                             dismiss()
-                    
                         }
                     }
                     .onSubmit {
                         if text.isEmpty{
-                            
                             dismiss()
-                            
                         }
                     }
+                    .fixedSize(horizontal: false, vertical: true)
             } else {
+                Spacer()
                 Text(text)
                     .multilineTextAlignment(.leading)
                     .lineLimit(nil) // Allow multiple lines in display mode
-                    .background(Color("#feff9c"))
+                    .background(sharedColor)
                     .font(sharedFont)
-                    .padding(3)
-                    .overlay(DraggableArea(isEditing: $isEditing)) // Enable window dragging
+                    .padding([.leading], 5)
+                    .padding([.trailing], 5)
+                    .overlay(DraggableArea(isEditing: $isEditing))
+                Spacer()
             }
         }
-        .background(Color("#feff9c"))
-        
+        //.frame(maxWidth: .infinity, maxHeight: .infinity) // Make the content expand
+        .background(sharedColor)
         .background(WindowClickOutsideListener(isEditing: $isEditing))
+        .overlay(DraggableArea(isEditing: $isEditing)) // Enable window dragging
     }
 }
 
