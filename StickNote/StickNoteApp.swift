@@ -16,10 +16,6 @@ struct StickNoteApp: App {
             MainMenu()
         }
         
-        WindowGroup(id:"note"){
-            ContentView()
-        }
-        
         Settings{
             Text("Settings")
         }

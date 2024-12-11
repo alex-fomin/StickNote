@@ -11,20 +11,19 @@ struct MainMenu : View{
     var body: some View {
         
         Button("Add new note"){
-            let contentView = ContentView(            )
             let window = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 800, height: 600),
-                styleMask: [.resizable,.fullSizeContentView,.titled],
+                contentRect: NSRect(x: 0, y: 0, width: 200, height: 100),
+                styleMask: [.titled],
                 backing: .buffered,
                 defer: true
             )
             window.center()
-            window.titleVisibility = .hidden // Hides the title
-            window.titlebarAppearsTransparent = true // Makes the title bar transparent
             
             window.level = .floating
+            window.isReleasedWhenClosed = false
             
-            window.contentView = WindowDragView(rootView: contentView)
+            let contentView = ContentView()
+            window.contentView = NSHostingView(rootView: contentView)
             window.makeKeyAndOrderFront(nil)
             window.styleMask.remove(.titled) // Removes the title bar
             
@@ -38,3 +37,28 @@ struct MainMenu : View{
             .keyboardShortcut("Q")
     }
 }
+//
+//class CustomWindow: NSWindow {
+//    private let resizeAreaSize: CGFloat = 5.0
+//
+//    override func performDrag(with event: NSEvent) {
+//        print("drag")
+//        let mouseLocation = event.locationInWindow
+//        let windowFrame = self.frame
+//
+//        let resizeArea = NSRect(
+//            x: windowFrame.width - resizeAreaSize,
+//            y: windowFrame.height - resizeAreaSize,
+//            width: resizeAreaSize,
+//            height: resizeAreaSize
+//        )
+//        print("drag \(windowFrame) \(resizeArea)  \(mouseLocation)")
+//
+//        if resizeArea.contains(mouseLocation) {
+//            print("resize")
+//            // Perform custom resize logic
+//        } else {
+//            super.performDrag(with: event)
+//        }
+//    }
+//}
