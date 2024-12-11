@@ -12,8 +12,8 @@ struct MainMenu : View{
         
         Button("Add new note"){
             let window = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 200, height: 100),
-                styleMask: [.titled, .resizable, .borderless],
+                contentRect: NSRect(x: 0, y: 0, width: 100, height: 10),
+                styleMask: [.titled, .resizable, .borderless, .fullSizeContentView],
                 backing: .buffered,
                 defer: true
             )

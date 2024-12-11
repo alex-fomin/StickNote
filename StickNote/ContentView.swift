@@ -1,55 +1,58 @@
-import SwiftUI
 import AppKit
+import Cocoa
+import SwiftUI
 
 struct ContentView: View {
     @State private var isEditing: Bool = true
     @State private var text: String = ""
-    @FocusState private var isTextEditorFocused: Bool // Track focus on the TextEditor
-    private let sharedFont: Font = .system(size: 14, weight: .regular, design: .default) // Shared font
-    private let sharedColor: Color = Color(red:254/255,green:255/255,blue:156/255)
+    @FocusState private var isTextEditorFocused: Bool  // Track focus on the TextEditor
+    private let sharedFont: Font = .system(
+        size: 14, weight: .regular, design: .default)  // Shared font
+    private let sharedColor: Color = Color(
+        red: 254 / 255, green: 255 / 255, blue: 156 / 255)
+
+    @State private var selection: TextSelection?
 
     @Environment(\.dismiss) private var dismiss
-    @State private var textSize: CGSize = CGSize(width: 100, height: 100)
 
     var body: some View {
         ZStack {
             if isEditing {
-                TextEditor(text: $text)
-                    .focused($isTextEditorFocused) // Bind focus state
+                TextEditor(text: $text, selection: $selection)
+                    .focused($isTextEditorFocused)  // Bind focus state
                     .onAppear {
-                        isTextEditorFocused = true // Automatically focus
+                        isTextEditorFocused = true  // Automatically focus
+                        selection = TextSelection(
+                            range: text.startIndex..<text.endIndex)
                     }
                     .font(sharedFont)
                     .background(sharedColor)
                     .scrollContentBackground(.hidden)
                     .onDisappear {
-                        if text.isEmpty{
+                        if text.isEmpty {
                             dismiss()
                         }
                     }
                     .onSubmit {
-                        if text.isEmpty{
+                        if text.isEmpty {
                             dismiss()
                         }
                     }
                     .fixedSize(horizontal: false, vertical: true)
             } else {
-                Spacer()
+
                 Text(text)
                     .multilineTextAlignment(.leading)
-                    .lineLimit(nil) // Allow multiple lines in display mode
+                    .lineLimit(nil)  // Allow multiple lines in display mode
                     .background(sharedColor)
                     .font(sharedFont)
-                    .padding([.leading], 5)
-                    .padding([.trailing], 5)
+                    .padding([.horizontal], 5)
                     .overlay(DraggableArea(isEditing: $isEditing))
-                Spacer()
             }
         }
-        //.frame(maxWidth: .infinity, maxHeight: .infinity) // Make the content expand
         .background(sharedColor)
         .background(WindowClickOutsideListener(isEditing: $isEditing))
-        .overlay(DraggableArea(isEditing: $isEditing)) // Enable window dragging
+        .overlay(DraggableArea(isEditing: $isEditing))  // Enable window dragging
     }
 }
 
@@ -73,12 +76,12 @@ struct WindowClickOutsideListener: NSViewRepresentable {
 /// A helper view that enables dragging the entire window
 struct DraggableArea: NSViewRepresentable {
     @Binding var isEditing: Bool
-    
+
     func makeNSView(context: Context) -> NSView {
         let view = DraggableNSView()
         view.area = self
         view.wantsLayer = true
-        view.layer?.backgroundColor = NSColor.clear.cgColor // Transparent layer
+        view.layer?.backgroundColor = NSColor.clear.cgColor  // Transparent layer
         return view
     }
 
@@ -87,17 +90,16 @@ struct DraggableArea: NSViewRepresentable {
 
 /// A custom NSView subclass for detecting mouse events to drag the window
 class DraggableNSView: NSView {
-    var area:DraggableArea?
-    
+    var area: DraggableArea?
+
     override func mouseDown(with event: NSEvent) {
         super.mouseDown(with: event)
-        if (event.clickCount == 2){
+        if event.clickCount == 2 {
             DispatchQueue.main.async {
                 self.area?.isEditing = true
             }
-        }
-        else {
-            self.window?.performDrag(with: event) // Allow window dragging
+        } else {
+            self.window?.performDrag(with: event)  // Allow window dragging
         }
     }
 }
