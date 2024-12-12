@@ -3,8 +3,16 @@ import Cocoa
 import SwiftUI
 
 struct ContentView: View {
-    @State private var isEditing: Bool = true
-    @State private var text: String = ""
+    @Environment(\.modelContext) private var modelContext
+    @Bindable var item: Item
+    
+    init(item: Item, isEditing: Bool = false) {
+        self.item = item
+        self.isEditing = isEditing
+    }
+
+    @State private var isEditing: Bool
+
     @FocusState private var isTextEditorFocused: Bool  // Track focus on the TextEditor
     private let sharedFont: Font = .system(
         size: 14, weight: .regular, design: .default)  // Shared font
@@ -18,30 +26,23 @@ struct ContentView: View {
     var body: some View {
         ZStack {
             if isEditing {
-                TextEditor(text: $text, selection: $selection)
+                TextEditor(text: $item.text, selection: $selection)
                     .focused($isTextEditorFocused)  // Bind focus state
                     .onAppear {
                         isTextEditorFocused = true  // Automatically focus
                         selection = TextSelection(
-                            range: text.startIndex..<text.endIndex)
+                            range: $item.text.wrappedValue
+                                .startIndex..<$item.text.wrappedValue.endIndex)
                     }
                     .font(sharedFont)
+
                     .background(sharedColor)
                     .scrollContentBackground(.hidden)
-                    .onDisappear {
-                        if text.isEmpty {
-                            dismiss()
-                        }
-                    }
-                    .onSubmit {
-                        if text.isEmpty {
-                            dismiss()
-                        }
-                    }
+                    .onDisappear { processNote() }
+                    .onSubmit { processNote() }
                     .fixedSize(horizontal: false, vertical: true)
             } else {
-
-                Text(text)
+                Text($item.text.wrappedValue)
                     .multilineTextAlignment(.leading)
                     .lineLimit(nil)  // Allow multiple lines in display mode
                     .background(sharedColor)
@@ -53,6 +54,13 @@ struct ContentView: View {
         .background(sharedColor)
         .background(WindowClickOutsideListener(isEditing: $isEditing))
         .overlay(DraggableArea(isEditing: $isEditing))  // Enable window dragging
+    }
+
+    func processNote() {
+        if $item.text.wrappedValue.isEmpty {
+            dismiss()
+            modelContext.delete(self.item)
+        }
     }
 }
 
@@ -71,6 +79,7 @@ struct WindowClickOutsideListener: NSViewRepresentable {
     }
 
     func updateNSView(_ nsView: NSView, context: Context) {}
+    
 }
 
 /// A helper view that enables dragging the entire window
@@ -102,8 +111,4 @@ class DraggableNSView: NSView {
             self.window?.performDrag(with: event)  // Allow window dragging
         }
     }
-}
-
-#Preview {
-    ContentView()
 }
