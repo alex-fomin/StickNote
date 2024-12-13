@@ -70,9 +70,7 @@ class NoteService {
         window.contentView = NSHostingView(rootView: contentView)
 
         window.makeKeyAndOrderFront(nil)
-        window.styleMask.remove(.titled)  // Removes the title bar
-
-        window.delegate = WindowPositiontracker(item: item)
+        window.styleMask.remove(.titled) 
     }
     private func getContentRectFromItem(_ item: Item) -> NSRect {
 
@@ -108,25 +106,5 @@ class NoteService {
        
         self.context.delete(item)
         try? self.context.save()
-    }
-}
-
-class WindowPositiontracker: NSObject, NSWindowDelegate {
-    var item: Item
-    init(item: Item) {
-        self.item = item
-    }
-
-    func windowDidResize(_ notification: Notification) {
-        guard let window = notification.object as? NSWindow else { return }
-        item.width = window.frame.size.width
-        item.height = window.frame.size.height
-    }
-
-    // Track when the window is moved
-    func windowDidMove(_ notification: Notification) {
-        guard let window = notification.object as? NSWindow else { return }
-        item.x = window.frame.origin.x
-        item.y = window.frame.origin.y
     }
 }

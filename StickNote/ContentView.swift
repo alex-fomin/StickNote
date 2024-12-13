@@ -5,23 +5,25 @@ import SwiftUI
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @Bindable var item: Item
-    
+    @State var nsWindow: NSWindow?
+
     init(item: Item, isEditing: Bool = false) {
         self.item = item
         self.isEditing = isEditing
+        self.windowTracker = WindowPositiontracker(item: item)
     }
 
     @State private var isEditing: Bool
 
     @FocusState private var isTextEditorFocused: Bool  // Track focus on the TextEditor
-    private let sharedFont: Font = .system(
-        size: 14, weight: .regular, design: .default)  // Shared font
-    private let sharedColor: Color = Color(
-        red: 254 / 255, green: 255 / 255, blue: 156 / 255)
+    private let sharedFont: Font = .system(size: 20, weight: .regular, design: .rounded)  // Shared font
+    private var sharedColor = Color(red: 254 / 255, green: 255 / 255, blue: 156 / 255)
 
     @State private var selection: TextSelection?
 
     @Environment(\.dismiss) private var dismiss
+
+    private var windowTracker: WindowPositiontracker
 
     var body: some View {
         ZStack {
@@ -29,10 +31,14 @@ struct ContentView: View {
                 TextEditor(text: $item.text, selection: $selection)
                     .focused($isTextEditorFocused)  // Bind focus state
                     .onAppear {
+                        self.nsWindow?.styleMask.insert(.titled)
                         isTextEditorFocused = true  // Automatically focus
                         selection = TextSelection(
                             range: $item.text.wrappedValue
                                 .startIndex..<$item.text.wrappedValue.endIndex)
+
+                        self.nsWindow?.makeKey()
+                        self.nsWindow?.styleMask.remove(.titled)
                     }
                     .font(sharedFont)
 
@@ -53,6 +59,16 @@ struct ContentView: View {
         }
         .background(sharedColor)
         .background(WindowClickOutsideListener(isEditing: $isEditing))
+        .background(
+            WindowAccessor { window in
+                self.nsWindow = window
+                window?.styleMask.remove(.titled)  // Removes the title bar
+                window?.backgroundColor = NSColor(self.sharedColor)
+
+                window?.delegate = self.windowTracker
+               // window?.key
+            }
+        )
         .overlay(DraggableArea(isEditing: $isEditing))  // Enable window dragging
     }
 
@@ -79,7 +95,7 @@ struct WindowClickOutsideListener: NSViewRepresentable {
     }
 
     func updateNSView(_ nsView: NSView, context: Context) {}
-    
+
 }
 
 /// A helper view that enables dragging the entire window
@@ -111,4 +127,40 @@ class DraggableNSView: NSView {
             self.window?.performDrag(with: event)  // Allow window dragging
         }
     }
+}
+
+struct WindowAccessor: NSViewRepresentable {
+    var callback: (NSWindow?) -> Void
+
+    func makeNSView(context: Context) -> NSView {
+        let view = NSView()
+        DispatchQueue.main.async {
+            // Retrieve the `NSWindow` after the view is added to the hierarchy
+            callback(view.window)
+        }
+        return view
+    }
+
+    func updateNSView(_ nsView: NSView, context: Context) {}
+}
+
+class WindowPositiontracker: NSObject, NSWindowDelegate {
+    var item: Item
+    init(item: Item) {
+        self.item = item
+    }
+
+    func windowDidResize(_ notification: Notification) {
+        guard let window = notification.object as? NSWindow else { return }
+        item.width = window.frame.size.width
+        item.height = window.frame.size.height
+    }
+
+    // Track when the window is moved
+    func windowDidMove(_ notification: Notification) {
+        guard let window = notification.object as? NSWindow else { return }
+        item.x = window.frame.origin.x
+        item.y = window.frame.origin.y
+    }
+
 }
