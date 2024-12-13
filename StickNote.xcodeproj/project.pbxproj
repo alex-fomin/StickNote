@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		2468572D2D0187B4005EDD1F /* RichTextKit in Frameworks */ = {isa = PBXBuildFile; productRef = 2468572C2D0187B4005EDD1F /* RichTextKit */; };
+		24F832122D0C484C00285731 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 24F832112D0C484C00285731 /* KeyboardShortcuts */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,6 +48,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2468572D2D0187B4005EDD1F /* RichTextKit in Frameworks */,
+				24F832122D0C484C00285731 /* KeyboardShortcuts in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -106,6 +108,7 @@
 			name = StickNote;
 			packageProductDependencies = (
 				2468572C2D0187B4005EDD1F /* RichTextKit */,
+				24F832112D0C484C00285731 /* KeyboardShortcuts */,
 			);
 			productName = StickNote;
 			productReference = 246856FB2D017FDF005EDD1F /* StickNote.app */;
@@ -185,6 +188,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				2468572B2D0187B4005EDD1F /* XCRemoteSwiftPackageReference "RichTextKit" */,
+				24F832102D0C484C00285731 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 246856FC2D017FDF005EDD1F /* Products */;
@@ -556,6 +560,14 @@
 				minimumVersion = 1.1.1;
 			};
 		};
+		24F832102D0C484C00285731 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/KeyboardShortcuts";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.2.3;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -563,6 +575,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 2468572B2D0187B4005EDD1F /* XCRemoteSwiftPackageReference "RichTextKit" */;
 			productName = RichTextKit;
+		};
+		24F832112D0C484C00285731 /* KeyboardShortcuts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 24F832102D0C484C00285731 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
+			productName = KeyboardShortcuts;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -1,5 +1,3 @@
-import AppKit
-import Cocoa
 import SwiftUI
 
 struct ContentView: View {
@@ -66,7 +64,6 @@ struct ContentView: View {
                 window?.backgroundColor = NSColor(self.sharedColor)
 
                 window?.delegate = self.windowTracker
-               // window?.key
             }
         )
         .overlay(DraggableArea(isEditing: $isEditing))  // Enable window dragging

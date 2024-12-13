@@ -1,48 +1,22 @@
-//
-//  StickNoteApp.swift
-//  StickNote
-//
-//  Created by Alex Fomin on 05/12/2024.
-//
-
-import SwiftUI
+import Foundation
+import KeyboardShortcuts
 import SwiftData
-import RichTextKit
+import SwiftUI
 
 @main
 struct StickNoteApp: App {
-    init(){
-        NoteService.shared = NoteService()
-        NoteService.shared?.openAllNotes()
+    init() {
+        AppState.shared.openAllNotes()
     }
     var body: some Scene {
         MenuBarExtra("Sticknote", systemImage: "note.text") {
             MainMenu()
         }
-        
-        Settings{
-            Text("Settings")
+
+        Settings {
+            Form {
+                KeyboardShortcuts.Recorder("Toggle Unicorn Mode:", name: .createNote)
+            }
         }
-    }
-}
-
-import Foundation
-import SwiftData
-
-@Model
-final class Item:Identifiable {
-    var id: UUID = UUID()
-    var x: CGFloat?
-    var y: CGFloat?
-    var width: CGFloat?
-    var height: CGFloat?
-    var text: String = ""
-    
-    init(x: CGFloat? = nil, y: CGFloat? = nil, width: CGFloat? = nil, height: CGFloat? = nil, text: String="") {
-        self.x = x
-        self.y = y
-        self.width = width
-        self.height = height
-        self.text = text
     }
 }

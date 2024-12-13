@@ -1,26 +1,18 @@
-//
-//  NoteService.swift
-//  StickNote
-//
-//  Created by Alex Fomin on 11/12/2024.
-//
-
-import Cocoa
-import RichTextKit
 import SwiftData
 import SwiftUI
+import KeyboardShortcuts
 
 @MainActor
-class NoteService {
+final class AppState {
 
-    static var shared: NoteService?
+    static let shared: AppState = AppState()
 
     var sharedModelContainer: ModelContainer
     var context: ModelContext
 
     var windowCount: Int = 0
 
-    init() {
+    private init() {
         self.sharedModelContainer = {
             let schema = Schema([
                 Item.self
@@ -37,6 +29,10 @@ class NoteService {
         }()
 
         self.context = ModelContext(self.sharedModelContainer)
+        
+        KeyboardShortcuts.onKeyUp(for: .createNote) { [self] in
+            self.openNewNote()
+        }
     }
 
     func openNewNote() {
@@ -47,7 +43,7 @@ class NoteService {
     }
 
     func openNote(_ item: Item, isEditing: Bool) {
-        
+
         windowCount += 1
 
         let contentRect = getContentRectFromItem(item)
@@ -66,10 +62,9 @@ class NoteService {
             .environment(\.modelContext, self.sharedModelContainer.mainContext)
 
         window.contentView = NSHostingView(rootView: contentView)
-     
+
         window.level = .floating
         window.isReleasedWhenClosed = false
-
 
         window.makeKeyAndOrderFront(nil)
         window.styleMask.remove(.titled)
@@ -120,23 +115,23 @@ class NoteWindow: NSWindow {
     override func keyDown(with event: NSEvent) {
         if event.keyCode == 117  // fn+delete
         {
-            NoteService.shared?.deleteNote(item!)
+            AppState.shared.deleteNote(item!)
             self.close()
         }
     }
-    
+
     override func mouseDown(with event: NSEvent) {
         super.mouseDown(with: event)
         self.styleMask.insert(.titled)
         self.makeKey()
         self.styleMask.remove(.titled)
     }
-    
+
     override func becomeKey() {
         super.becomeKey()
         self.hasShadow = true
     }
-    
+
     override func resignKey() {
         super.resignKey()
         self.hasShadow = false

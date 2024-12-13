@@ -1,24 +1,20 @@
+import KeyboardShortcuts
 import SwiftUI
-import SwiftData
-import RichTextKit
-import Cocoa
 
-struct MainMenu : View{
+struct MainMenu: View {
     @Environment(\.openSettings) private var openSettings
-    
+
     var body: some View {
-        
-        Button("Add new note"){
-            NoteService.shared?.openNewNote()
+
+        Button("Add new note") {
+            AppState.shared.openNewNote()
         }
-        .keyboardShortcut("N")
-        
+        .keyboardShortcut(
+            KeyboardShortcuts.Shortcut(name: .createNote)?.toKeyboardShortcut()
+        )
         Divider()
-        Button("Settings"){openSettings()}
-        
+        Button("Settings") { openSettings() }
         Button("Exit") { NSApplication.shared.terminate(nil) }
             .keyboardShortcut("Q")
     }
 }
-
-
