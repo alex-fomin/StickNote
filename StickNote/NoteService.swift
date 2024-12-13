@@ -16,8 +16,8 @@ class NoteService {
     static var shared: NoteService?
 
     var sharedModelContainer: ModelContainer
-    var context:ModelContext
-   
+    var context: ModelContext
+
     var windowCount: Int = 0
 
     init() {
@@ -35,7 +35,7 @@ class NoteService {
                 fatalError("Could not create ModelContainer: \(error)")
             }
         }()
-        
+
         self.context = ModelContext(self.sharedModelContainer)
     }
 
@@ -47,11 +47,12 @@ class NoteService {
     }
 
     func openNote(_ item: Item, isEditing: Bool) {
+        
         windowCount += 1
 
         let contentRect = getContentRectFromItem(item)
 
-        let window = NSWindow(
+        let window = NoteWindow(
             contentRect: contentRect,
             styleMask: [
                 .titled, .resizable, .borderless, .fullSizeContentView,
@@ -59,18 +60,19 @@ class NoteService {
             backing: .buffered,
             defer: true
         )
-
-        window.level = .floating
-        window.isReleasedWhenClosed = false
-
+        window.item = item
         let contentView = ContentView(item: item, isEditing: isEditing)
             .preferredColorScheme(.light)
             .environment(\.modelContext, self.sharedModelContainer.mainContext)
 
         window.contentView = NSHostingView(rootView: contentView)
+     
+        window.level = .floating
+        window.isReleasedWhenClosed = false
+
 
         window.makeKeyAndOrderFront(nil)
-        window.styleMask.remove(.titled) 
+        window.styleMask.remove(.titled)
     }
     private func getContentRectFromItem(_ item: Item) -> NSRect {
 
@@ -85,7 +87,7 @@ class NoteService {
 
             return NSRect(
                 x: screenFrame.midX - 200 + CGFloat(self.windowCount) * 20,
-                y: screenFrame.midY - 150 - CGFloat(self.windowCount) * 20,
+                y: screenFrame.midY + 150 - CGFloat(self.windowCount) * 20,
                 width: 100, height: 300)
         }
     }
@@ -97,14 +99,46 @@ class NoteService {
 
         if let items {
             for item in items {
-                self.openNote(item, isEditing: false)
+                if item.text.isEmpty {
+                    self.deleteNote(item)
+                } else {
+                    self.openNote(item, isEditing: false)
+                }
             }
         }
     }
 
     func deleteNote(_ item: Item) {
-       
         self.context.delete(item)
         try? self.context.save()
+    }
+}
+
+class NoteWindow: NSWindow {
+    var item: Item?
+
+    override func keyDown(with event: NSEvent) {
+        if event.keyCode == 117  // fn+delete
+        {
+            NoteService.shared?.deleteNote(item!)
+            self.close()
+        }
+    }
+    
+    override func mouseDown(with event: NSEvent) {
+        super.mouseDown(with: event)
+        self.styleMask.insert(.titled)
+        self.makeKey()
+        self.styleMask.remove(.titled)
+    }
+    
+    override func becomeKey() {
+        super.becomeKey()
+        self.hasShadow = true
+    }
+    
+    override func resignKey() {
+        super.resignKey()
+        self.hasShadow = false
     }
 }
