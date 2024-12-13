@@ -12,10 +12,15 @@ struct StickNoteApp: App {
         MenuBarExtra("Sticknote", systemImage: "note.text") {
             MainMenu()
         }
-
+        
         Settings {
-            Form {
-                KeyboardShortcuts.Recorder("Toggle Unicorn Mode:", name: .createNote)
+            HStack {
+                Spacer()
+                Form {
+                    KeyboardShortcuts.Recorder("Add new note", name: .createNote)
+                    KeyboardShortcuts.Recorder("Paste note from clipboard", name: .createNoteFromClipboard)
+                }
+                Spacer()
             }
         }
     }

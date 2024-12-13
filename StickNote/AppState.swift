@@ -1,6 +1,7 @@
+import AppKit
+import KeyboardShortcuts
 import SwiftData
 import SwiftUI
-import KeyboardShortcuts
 
 @MainActor
 final class AppState {
@@ -29,9 +30,12 @@ final class AppState {
         }()
 
         self.context = ModelContext(self.sharedModelContainer)
-        
+
         KeyboardShortcuts.onKeyUp(for: .createNote) { [self] in
             self.openNewNote()
+        }
+        KeyboardShortcuts.onKeyUp(for: .createNoteFromClipboard) { [self] in
+            self.openNewNoteFromClipboard()
         }
     }
 
@@ -40,6 +44,14 @@ final class AppState {
         self.context.insert(item)
 
         self.openNote(item, isEditing: true)
+    }
+
+    func openNewNoteFromClipboard() {
+        if let url = NSPasteboard.general.string(forType: .string) {
+            let item = Item(text: url)
+            self.context.insert(item)
+            self.openNote(item, isEditing: false)
+        }
     }
 
     func openNote(_ item: Item, isEditing: Bool) {
@@ -109,31 +121,4 @@ final class AppState {
     }
 }
 
-class NoteWindow: NSWindow {
-    var item: Item?
 
-    override func keyDown(with event: NSEvent) {
-        if event.keyCode == 117  // fn+delete
-        {
-            AppState.shared.deleteNote(item!)
-            self.close()
-        }
-    }
-
-    override func mouseDown(with event: NSEvent) {
-        super.mouseDown(with: event)
-        self.styleMask.insert(.titled)
-        self.makeKey()
-        self.styleMask.remove(.titled)
-    }
-
-    override func becomeKey() {
-        super.becomeKey()
-        self.hasShadow = true
-    }
-
-    override func resignKey() {
-        super.resignKey()
-        self.hasShadow = false
-    }
-}
