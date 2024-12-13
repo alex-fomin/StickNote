@@ -9,6 +9,14 @@ class NoteWindow: NSWindow {
             AppState.shared.deleteNote(item!)
             self.close()
         }
+        else if event.keyCode == 8 &&
+                    event.modifierFlags.intersection(.deviceIndependentFlagsMask) == .command// Cmd+c
+        {
+            if let text = item?.text {
+                NSPasteboard.general.clearContents()
+                NSPasteboard.general.setString(text, forType: .string)
+            }
+        }
     }
 
     override func mouseDown(with event: NSEvent) {

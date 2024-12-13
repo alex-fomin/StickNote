@@ -9,16 +9,22 @@ struct StickNoteApp: App {
         AppState.shared.openAllNotes()
     }
     var body: some Scene {
-        MenuBarExtra("Sticknote", systemImage: "note.text") {
+        MenuBarExtra {
             MainMenu()
+        } label: {
+            HStack {
+                Image(systemName: "bird.fill")
+                Text("A message")
+            }
         }
-        
+
         Settings {
             HStack {
                 Spacer()
                 Form {
                     KeyboardShortcuts.Recorder("Add new note", name: .createNote)
-                    KeyboardShortcuts.Recorder("Paste note from clipboard", name: .createNoteFromClipboard)
+                    KeyboardShortcuts.Recorder(
+                        "Paste note from clipboard", name: .createNoteFromClipboard)
                 }
                 Spacer()
             }
