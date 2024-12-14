@@ -4,18 +4,14 @@ class NoteWindow: NSWindow {
     var item: Item?
 
     override func keyDown(with event: NSEvent) {
+        guard let item = item else { return }
         if event.keyCode == 117  // fn+delete
         {
-            AppState.shared.deleteNote(item!)
-            self.close()
-        }
-        else if event.keyCode == 8 &&
-                    event.modifierFlags.intersection(.deviceIndependentFlagsMask) == .command// Cmd+c
+            AppState.shared.deleteNote(item)
+        } else if event.keyCode == 8
+            && event.modifierFlags.intersection(.deviceIndependentFlagsMask) == .command  // Cmd+c
         {
-            if let text = item?.text {
-                NSPasteboard.general.clearContents()
-                NSPasteboard.general.setString(text, forType: .string)
-            }
+            AppState.shared.copyToClipboard(item)
         }
     }
 
@@ -27,12 +23,12 @@ class NoteWindow: NSWindow {
     }
 
     override func becomeKey() {
-        super.becomeKey()
         self.hasShadow = true
+        super.becomeKey()
     }
 
     override func resignKey() {
-        super.resignKey()
         self.hasShadow = false
+        super.resignKey()
     }
 }

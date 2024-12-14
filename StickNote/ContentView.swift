@@ -18,6 +18,7 @@ struct ContentView: View {
     private var sharedColor = Color(red: 254 / 255, green: 255 / 255, blue: 156 / 255)
 
     @State private var selection: TextSelection?
+    @State private var showConfirmation = false
 
     @Environment(\.dismiss) private var dismiss
 
@@ -53,6 +54,31 @@ struct ContentView: View {
                     .font(sharedFont)
                     .padding([.horizontal], 5)
                     .overlay(DraggableArea(isEditing: $isEditing))
+                    .contextMenu {
+                        Button {
+                            showConfirmation = true
+                        } label: {
+                            Label("Delete", systemImage: "delete")
+                        }
+                        Button {
+                            AppState.shared.copyToClipboard(item)
+                        } label: {
+                            Label("Copy to clipboard", systemImage: "copy")
+                        }
+                    }
+            }
+        }
+        .confirmationDialog(
+            #"Are you sure you want to delete "\#(item.text.truncate(15))"?"#,
+            isPresented: $showConfirmation
+        ) {
+            Button {
+                AppState.shared.deleteNote(self.item)
+            } label: {
+                Text("Delete")
+            }
+            Button("Cancel", role: .cancel) {
+
             }
         }
         .background(sharedColor)
@@ -66,13 +92,11 @@ struct ContentView: View {
                 window?.delegate = self.windowTracker
             }
         )
-        .overlay(DraggableArea(isEditing: $isEditing))  // Enable window dragging
     }
 
     func processNote() {
         if $item.text.wrappedValue.isEmpty {
-            dismiss()
-            modelContext.delete(self.item)
+            AppState.shared.deleteNote(self.item)
         }
     }
 }
@@ -116,6 +140,7 @@ class DraggableNSView: NSView {
 
     override func mouseDown(with event: NSEvent) {
         super.mouseDown(with: event)
+        print(event)
         if event.clickCount == 2 {
             DispatchQueue.main.async {
                 self.area?.isEditing = true
