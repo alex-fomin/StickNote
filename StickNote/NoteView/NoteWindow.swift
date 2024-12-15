@@ -7,7 +7,16 @@ class NoteWindow: NSWindow {
         guard let item = item else { return }
         if event.keyCode == 117  // fn+delete
         {
-            AppState.shared.deleteNote(item)
+            let alert: NSAlert = NSAlert()
+            alert.messageText = #"Are you sure you want to delete "\#(item.text.truncate(15))"?"#
+            alert.alertStyle = .warning
+
+            alert.addButton(withTitle: "Delete")
+            alert.addButton(withTitle: "Cancel")
+            let res = alert.runModal()
+            if res == .alertFirstButtonReturn {
+                AppState.shared.deleteNote(item)
+            }
         } else if event.keyCode == 8
             && event.modifierFlags.intersection(.deviceIndependentFlagsMask) == .command  // Cmd+c
         {

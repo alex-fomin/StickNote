@@ -14,7 +14,6 @@ class DraggableNSView: NSView {
 
     override func mouseDown(with event: NSEvent) {
         super.mouseDown(with: event)
-        print(event)
         if event.clickCount == 2 {
             DispatchQueue.main.async {
                 self.area?.isEditing = true
