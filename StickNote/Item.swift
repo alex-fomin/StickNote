@@ -10,7 +10,7 @@ final class Item: Identifiable {
     var height: CGFloat?
     var text: String = ""
     
-    var color = "NoteYellow"
+    var color = "Yellow"
 
     init(
         x: CGFloat? = nil, y: CGFloat? = nil, width: CGFloat? = nil, height: CGFloat? = nil,

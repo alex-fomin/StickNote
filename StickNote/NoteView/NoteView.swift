@@ -14,7 +14,7 @@ struct NoteView: View {
     @State private var isEditing: Bool
 
     @FocusState private var isTextEditorFocused: Bool  // Track focus on the TextEditor
-    private let sharedFont: Font = .system(size: 20, weight: .regular, design: .rounded)  // Shared font
+    private let sharedFont: Font = .system(size: 18, weight: .regular, design: .monospaced)  // Shared font
     @State var color: Color
 
     @State private var selection: TextSelection?
