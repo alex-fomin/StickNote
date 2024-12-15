@@ -73,6 +73,7 @@ final class AppState {
             defer: true
         )
         window.item = item
+        
         let contentView = NoteView(item: item, isEditing: isEditing)
             .preferredColorScheme(.light)
             .environment(\.modelContext, self.sharedModelContainer.mainContext)
@@ -80,8 +81,9 @@ final class AppState {
         window.contentView = NSHostingView(rootView: contentView)
         
         window.level = .floating
-        window.isReleasedWhenClosed = false
         
+        window.isReleasedWhenClosed = false
+        window.collectionBehavior = [.canJoinAllSpaces]
         window.makeKeyAndOrderFront(nil)
         window.styleMask.remove(.titled)
         itemsToWindows[item.id] = window

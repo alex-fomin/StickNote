@@ -13,11 +13,10 @@ struct StickNoteApp: App {
             MainMenu()
         } label: {
             HStack {
-                Image(systemName: "bird.fill")
-                Text("A message")
+                Image(systemName: "note.text")
             }
         }
-
+        
         Settings {
             HStack {
                 Spacer()
