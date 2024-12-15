@@ -73,7 +73,7 @@ final class AppState {
             defer: true
         )
         window.item = item
-        let contentView = ContentView(item: item, isEditing: isEditing)
+        let contentView = NoteView(item: item, isEditing: isEditing)
             .preferredColorScheme(.light)
             .environment(\.modelContext, self.sharedModelContainer.mainContext)
         
