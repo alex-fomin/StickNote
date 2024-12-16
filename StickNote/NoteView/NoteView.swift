@@ -1,3 +1,4 @@
+import SwiftData
 import SwiftUI
 
 struct NoteView: View {
@@ -5,8 +6,11 @@ struct NoteView: View {
         self.item = item
         self.isEditing = isEditing
         self.windowTracker = WindowPositionTracker(item: item)
-        self.color = Color("Note" + item.color)
-        self.sharedFont = NSFont(name:item.fontName, size:item.fontSize) ?? NSFont.systemFont(ofSize: item.fontSize)
+        self.color = Color.fromString(item.color)
+        self.font =
+            NSFont(name: item.fontName, size: item.fontSize)
+            ?? NSFont.systemFont(ofSize: item.fontSize)
+        self.fontColor = Color.fromString(item.fontColor)
     }
 
     @Bindable var item: Item
@@ -15,8 +19,9 @@ struct NoteView: View {
     @State private var isEditing: Bool
 
     @FocusState private var isTextEditorFocused: Bool  // Track focus on the TextEditor
-    @State var sharedFont: NSFont
+    @State var font: NSFont
     @State var color: Color
+    @State var fontColor: Color
 
     @State private var selection: TextSelection?
     @State private var showConfirmation = false
@@ -38,8 +43,9 @@ struct NoteView: View {
                         self.nsWindow?.makeKey()
                         self.nsWindow?.styleMask.remove(.titled)
                     }
-                    .font(Font(sharedFont))
+                    .font(Font(font))
                     .background(color)
+                    .foregroundStyle(fontColor)
                     .scrollContentBackground(.hidden)
                     .onDisappear { processNote() }
                     .onSubmit { processNote() }
@@ -49,7 +55,8 @@ struct NoteView: View {
                     .multilineTextAlignment(.leading)
                     .lineLimit(nil)  // Allow multiple lines in display mode
                     .background(color)
-                    .font(Font(sharedFont))
+                    .foregroundStyle(fontColor)
+                    .font(Font(font))
                     .padding([.horizontal], 5)
                     .overlay(DraggableArea(isEditing: $isEditing))
                     .contextMenu {
@@ -59,16 +66,17 @@ struct NoteView: View {
                             Label("Copy to clipboard", systemImage: "copy")
                         }
                         Divider()
-                        Menu("Change color") {
-                            ColorMenu(color: $color, item: item)
+                        Menu("Layout") {
+                            LayoutMenu(
+                                color: $color, fontColor: $fontColor, font: $font, item: item)
                         }
                         Button {
                             let fontPicker = FontPicker(self)
                             fontPicker.changeFont()
-                        }label: {
+                        } label: {
                             Label("Change font...", systemImage: "")
                         }
-                        
+
                         Divider()
                         Button {
                             showConfirmation = true
@@ -102,7 +110,7 @@ struct NoteView: View {
         .onChange(of: color) { _, newValue in
             self.nsWindow?.backgroundColor = NSColor(self.color)
         }
-        .onChange(of: sharedFont){ _, newValue in
+        .onChange(of: font) { _, newValue in
             self.item.fontName = newValue.fontName
             self.item.fontSize = newValue.pointSize
         }
@@ -115,29 +123,4 @@ struct NoteView: View {
     }
 }
 
-struct ColorMenu: View {
-    @Binding var color: Color
-    var item: Item
 
-    var body: some View {
-        HStack {
-
-            ForEach(NoteColors.allCases.map { $0.rawValue }, id: \.self) { colorName in
-                Button {
-                    item.color = colorName
-                    self.color = Color("Note" + colorName)
-                } label: {
-                    Image(
-                        systemName: item.color == colorName
-                            ? "checkmark.square.fill" : "square.fill"
-                    )
-                    .foregroundStyle(
-                        item.color == colorName ? .primary : Color("Note" + colorName),
-                        Color("Note" + colorName))
-
-                    Label(colorName, systemImage: "")
-                }
-            }
-        }
-    }
-}

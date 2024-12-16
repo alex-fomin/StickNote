@@ -10,7 +10,7 @@ class FontPicker {
     }
 
     func fontSelected() {
-        self.view.sharedFont = NSFontPanel.shared.convert(self.view.sharedFont)
+        self.view.font = NSFontPanel.shared.convert(self.view.font)
     }
 
     func changeFont() {
@@ -24,7 +24,7 @@ class FontPicker {
 
         self.fontPickerDelegate = FontPickerDelegate(self)
         NSFontManager.shared.target = self.fontPickerDelegate
-        NSFontPanel.shared.setPanelFont(self.view.sharedFont, isMultiple: false)
+        NSFontPanel.shared.setPanelFont(self.view.font, isMultiple: false)
         NSFontPanel.shared.orderBack(nil)
     }
 }
