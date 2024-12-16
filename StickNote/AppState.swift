@@ -13,7 +13,7 @@ final class AppState {
 
     var windowCount: Int = 0
 
-    var notesToWindows: [UUID: NSWindow] = [:]
+    var notesToWindows: [PersistentIdentifier: NSWindow] = [:]
 
     private init() {
         self.sharedModelContainer = {

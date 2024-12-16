@@ -6,27 +6,34 @@ struct NoteView: View {
         self.note = note
         self.isEditing = isEditing
         self.windowTracker = WindowPositionTracker(note: note)
-        self.color = Color.fromString(note.color)
-        self.font =
-            NSFont(name: note.fontName, size: note.fontSize)
-            ?? NSFont.systemFont(ofSize: note.fontSize)
-        self.fontColor = Color.fromString(note.fontColor)
+
+        //        self.fontColor = Color.fromString(note.fontColor)
     }
 
-    @Bindable var note: Note
+    @State var note: Note
     @State var nsWindow: NSWindow?
 
     @State private var isEditing: Bool
 
     @FocusState private var isTextEditorFocused: Bool  // Track focus on the TextEditor
-    @State var font: NSFont
-    @State var color: Color
-    @State var fontColor: Color
+    //    @State var font: NSFont
+    //    @State var fontColor: Color
 
     @State private var selection: TextSelection?
     @State private var showConfirmation = false
 
     private var windowTracker: WindowPositionTracker
+
+    func getFont() -> Font {
+        let nsFont =
+            NSFont(name: $note.fontName.wrappedValue, size: $note.fontSize.wrappedValue)
+            ?? NSFont.systemFont(ofSize: $note.fontSize.wrappedValue)
+        return Font(nsFont)
+    }
+
+    func getFontColor() -> Color { Color.fromString($note.fontColor.wrappedValue) }
+
+    func getColor() -> Color { Color.fromString($note.color.wrappedValue) }
 
     var body: some View {
         ZStack {
@@ -43,9 +50,9 @@ struct NoteView: View {
                         self.nsWindow?.makeKey()
                         self.nsWindow?.styleMask.remove(.titled)
                     }
-                    .font(Font(font))
-                    .background(color)
-                    .foregroundStyle(fontColor)
+                    .font(getFont())
+                    .background(getColor())
+                    .foregroundStyle(getFontColor())
                     .scrollContentBackground(.hidden)
                     .onDisappear { processNote() }
                     .onSubmit { processNote() }
@@ -54,9 +61,9 @@ struct NoteView: View {
                 Text($note.text.wrappedValue)
                     .multilineTextAlignment(.leading)
                     .lineLimit(nil)  // Allow multiple lines in display mode
-                    .background(color)
-                    .foregroundStyle(fontColor)
-                    .font(Font(font))
+                    .background(getColor())
+                    .foregroundStyle(getFontColor())
+                    .font(getFont())
                     .padding([.horizontal], 5)
                     .overlay(DraggableArea(isEditing: $isEditing))
                     .contextMenu {
@@ -67,16 +74,8 @@ struct NoteView: View {
                         }
                         Divider()
                         Menu("Layout") {
-                            LayoutMenu(
-                                color: $color, fontColor: $fontColor, font: $font, note: note)
+                            LayoutMenu(note: $note)
                         }
-                        Button {
-                            let fontPicker = FontPicker(self)
-                            fontPicker.changeFont()
-                        } label: {
-                            Label("Change font...", systemImage: "")
-                        }
-
                         Divider()
                         Button {
                             showConfirmation = true
@@ -97,23 +96,16 @@ struct NoteView: View {
             }
             Button("Cancel", role: .cancel) {}
         }
-        .background(color)
+        .background(Color.fromString($note.color.wrappedValue))
         .background(WindowClickOutsideListener(isEditing: $isEditing))
         .background(
             WindowAccessor { window in
                 self.nsWindow = window
                 window?.styleMask.remove(.titled)
-                window?.backgroundColor = NSColor(self.color)
+                window?.backgroundColor = NSColor.fromString($note.color.wrappedValue)
                 window?.delegate = self.windowTracker
             }
         )
-        .onChange(of: color) { _, newValue in
-            self.nsWindow?.backgroundColor = NSColor(self.color)
-        }
-        .onChange(of: font) { _, newValue in
-            self.note.fontName = newValue.fontName
-            self.note.fontSize = newValue.pointSize
-        }
     }
 
     func processNote() {
@@ -122,5 +114,3 @@ struct NoteView: View {
         }
     }
 }
-
-

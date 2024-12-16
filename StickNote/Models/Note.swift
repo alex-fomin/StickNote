@@ -1,10 +1,10 @@
 import SwiftData
 import SwiftUI
 
-@Model
-final class Note: Identifiable {
-    var id: UUID = UUID()
 
+
+@Model
+final class Note: NoteAppearance, Identifiable {
     var x: CGFloat?
     var y: CGFloat?
     var width: CGFloat?

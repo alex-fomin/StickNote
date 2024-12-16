@@ -16,6 +16,16 @@ struct StickNoteApp: App {
                 Image(systemName: "note.text")
             }
         }
+    
+        WindowGroup(id:"note-layout", for:Note.ID.self) { $id in
+            
+            if let id=id, let note = (try? AppState.shared.context.fetch<Category>(
+                FetchDescriptor<Note>(predicate: #Predicate { $0.persistentModelID == id })))?.first
+            {
+                NoteLayoutView(note:note)
+            }
+            
+        }
         
         Settings {
             HStack {

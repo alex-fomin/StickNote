@@ -2,7 +2,7 @@ import SwiftData
 import SwiftUI
 
 @Model
-final class Layout: Identifiable {
+final class Layout: Identifiable, NoteAppearance {
     var id: UUID = UUID()
 
     var name: String

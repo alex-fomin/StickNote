@@ -1,6 +1,15 @@
 {
-  "originHash" : "b8ba6d4b8dfd5bd4e56e1ac32b38305f1ad88bf1d9d589d217f06d8e4624f35a",
+  "originHash" : "4e2721021bd404bfc1df6ee6930ddcc662b16a8de0f59d6b92de6d049e994ae1",
   "pins" : [
+    {
+      "identity" : "fontpicker",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/tyagishi/FontPicker",
+      "state" : {
+        "revision" : "b11a5c4334c7b130d4e7463d637e7ba2a725e90b",
+        "version" : "1.2.0"
+      }
+    },
     {
       "identity" : "keyboardshortcuts",
       "kind" : "remoteSourceControl",
@@ -8,15 +17,6 @@
       "state" : {
         "revision" : "323d9f882ea060e28183ad67d9a9053317751071",
         "version" : "2.2.3"
-      }
-    },
-    {
-      "identity" : "richtextkit",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/danielsaidi/RichTextKit.git",
-      "state" : {
-        "revision" : "c1f94420b6f3cd5aa2aa20e916fe4f44540c9ec8",
-        "version" : "1.1.1"
       }
     }
   ],

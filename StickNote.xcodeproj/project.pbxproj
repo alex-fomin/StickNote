@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2468572D2D0187B4005EDD1F /* RichTextKit in Frameworks */ = {isa = PBXBuildFile; productRef = 2468572C2D0187B4005EDD1F /* RichTextKit */; };
+		245B77452D103C0E00AC8ECF /* FontPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 245B77442D103C0E00AC8ECF /* FontPicker */; };
 		24F832122D0C484C00285731 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 24F832112D0C484C00285731 /* KeyboardShortcuts */; };
 /* End PBXBuildFile section */
 
@@ -47,8 +47,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2468572D2D0187B4005EDD1F /* RichTextKit in Frameworks */,
 				24F832122D0C484C00285731 /* KeyboardShortcuts in Frameworks */,
+				245B77452D103C0E00AC8ECF /* FontPicker in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -107,8 +107,8 @@
 			);
 			name = StickNote;
 			packageProductDependencies = (
-				2468572C2D0187B4005EDD1F /* RichTextKit */,
 				24F832112D0C484C00285731 /* KeyboardShortcuts */,
+				245B77442D103C0E00AC8ECF /* FontPicker */,
 			);
 			productName = StickNote;
 			productReference = 246856FB2D017FDF005EDD1F /* StickNote.app */;
@@ -187,8 +187,8 @@
 			mainGroup = 246856F22D017FDF005EDD1F;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				2468572B2D0187B4005EDD1F /* XCRemoteSwiftPackageReference "RichTextKit" */,
 				24F832102D0C484C00285731 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
+				245B77432D103C0E00AC8ECF /* XCRemoteSwiftPackageReference "FontPicker" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 246856FC2D017FDF005EDD1F /* Products */;
@@ -566,12 +566,12 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		2468572B2D0187B4005EDD1F /* XCRemoteSwiftPackageReference "RichTextKit" */ = {
+		245B77432D103C0E00AC8ECF /* XCRemoteSwiftPackageReference "FontPicker" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/danielsaidi/RichTextKit.git";
+			repositoryURL = "https://github.com/tyagishi/FontPicker";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.1.1;
+				minimumVersion = 1.2.0;
 			};
 		};
 		24F832102D0C484C00285731 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */ = {
@@ -585,10 +585,10 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		2468572C2D0187B4005EDD1F /* RichTextKit */ = {
+		245B77442D103C0E00AC8ECF /* FontPicker */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 2468572B2D0187B4005EDD1F /* XCRemoteSwiftPackageReference "RichTextKit" */;
-			productName = RichTextKit;
+			package = 245B77432D103C0E00AC8ECF /* XCRemoteSwiftPackageReference "FontPicker" */;
+			productName = FontPicker;
 		};
 		24F832112D0C484C00285731 /* KeyboardShortcuts */ = {
 			isa = XCSwiftPackageProductDependency;
