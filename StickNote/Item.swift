@@ -18,7 +18,7 @@ final class Item: Identifiable {
 
     init(
         x: CGFloat? = nil, y: CGFloat? = nil, width: CGFloat? = nil, height: CGFloat? = nil,
-        text: String = "", color: String = "Yellow", fontName: String = "", fontSize: CGFloat = 16
+        text: String = "", color: String = "Yellow", fontName: String = "", fontSize: Int = 16
     ) {
         self.x = x
         self.y = y
