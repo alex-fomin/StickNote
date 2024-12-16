@@ -2,7 +2,7 @@ import SwiftData
 import SwiftUI
 
 @Model
-final class Item: Identifiable {
+final class Note: Identifiable {
     var id: UUID = UUID()
 
     var x: CGFloat?
@@ -29,8 +29,8 @@ final class Item: Identifiable {
         self.fontColor = fontColor
     }
     
-    convenience init(category:Layout, text:String = "") {
-        self.init(text:text, color: category.color, fontName: category.fontName, fontSize: category.fontSize, fontColor: category.fontColor)
+    convenience init(layout:Layout, text:String = "") {
+        self.init(text:text, color: layout.color, fontName: layout.fontName, fontSize: layout.fontSize, fontColor: layout.fontColor)
     }
     
     func apply(layout:Layout){

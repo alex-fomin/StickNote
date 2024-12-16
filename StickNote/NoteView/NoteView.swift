@@ -2,18 +2,18 @@ import SwiftData
 import SwiftUI
 
 struct NoteView: View {
-    init(item: Item, isEditing: Bool = false) {
-        self.item = item
+    init(note: Note, isEditing: Bool = false) {
+        self.note = note
         self.isEditing = isEditing
-        self.windowTracker = WindowPositionTracker(item: item)
-        self.color = Color.fromString(item.color)
+        self.windowTracker = WindowPositionTracker(note: note)
+        self.color = Color.fromString(note.color)
         self.font =
-            NSFont(name: item.fontName, size: item.fontSize)
-            ?? NSFont.systemFont(ofSize: item.fontSize)
-        self.fontColor = Color.fromString(item.fontColor)
+            NSFont(name: note.fontName, size: note.fontSize)
+            ?? NSFont.systemFont(ofSize: note.fontSize)
+        self.fontColor = Color.fromString(note.fontColor)
     }
 
-    @Bindable var item: Item
+    @Bindable var note: Note
     @State var nsWindow: NSWindow?
 
     @State private var isEditing: Bool
@@ -31,14 +31,14 @@ struct NoteView: View {
     var body: some View {
         ZStack {
             if isEditing {
-                TextEditor(text: $item.text, selection: $selection)
+                TextEditor(text: $note.text, selection: $selection)
                     .focused($isTextEditorFocused)  // Bind focus state
                     .onAppear {
                         self.nsWindow?.styleMask.insert(.titled)
                         isTextEditorFocused = true  // Automatically focus
                         selection = TextSelection(
-                            range: $item.text.wrappedValue
-                                .startIndex..<$item.text.wrappedValue.endIndex)
+                            range: $note.text.wrappedValue
+                                .startIndex..<$note.text.wrappedValue.endIndex)
 
                         self.nsWindow?.makeKey()
                         self.nsWindow?.styleMask.remove(.titled)
@@ -51,7 +51,7 @@ struct NoteView: View {
                     .onSubmit { processNote() }
                     .fixedSize(horizontal: false, vertical: true)
             } else {
-                Text($item.text.wrappedValue)
+                Text($note.text.wrappedValue)
                     .multilineTextAlignment(.leading)
                     .lineLimit(nil)  // Allow multiple lines in display mode
                     .background(color)
@@ -61,14 +61,14 @@ struct NoteView: View {
                     .overlay(DraggableArea(isEditing: $isEditing))
                     .contextMenu {
                         Button {
-                            AppState.shared.copyToClipboard(item)
+                            AppState.shared.copyToClipboard(note)
                         } label: {
                             Label("Copy to clipboard", systemImage: "copy")
                         }
                         Divider()
                         Menu("Layout") {
                             LayoutMenu(
-                                color: $color, fontColor: $fontColor, font: $font, item: item)
+                                color: $color, fontColor: $fontColor, font: $font, note: note)
                         }
                         Button {
                             let fontPicker = FontPicker(self)
@@ -87,11 +87,11 @@ struct NoteView: View {
             }
         }
         .confirmationDialog(
-            #"Are you sure you want to delete "\#(item.text.truncate(15))"?"#,
+            #"Are you sure you want to delete "\#(note.text.truncate(15))"?"#,
             isPresented: $showConfirmation
         ) {
             Button {
-                AppState.shared.deleteNote(self.item)
+                AppState.shared.deleteNote(self.note)
             } label: {
                 Text("Delete")
             }
@@ -111,14 +111,14 @@ struct NoteView: View {
             self.nsWindow?.backgroundColor = NSColor(self.color)
         }
         .onChange(of: font) { _, newValue in
-            self.item.fontName = newValue.fontName
-            self.item.fontSize = newValue.pointSize
+            self.note.fontName = newValue.fontName
+            self.note.fontSize = newValue.pointSize
         }
     }
 
     func processNote() {
-        if $item.text.wrappedValue.isEmpty {
-            AppState.shared.deleteNote(self.item)
+        if $note.text.wrappedValue.isEmpty {
+            AppState.shared.deleteNote(self.note)
         }
     }
 }

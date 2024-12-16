@@ -9,22 +9,22 @@
 import SwiftUI
 
 class WindowPositionTracker: NSObject, NSWindowDelegate {
-    var item: Item
-    init(item: Item) {
-        self.item = item
+    var note: Note
+    init(note: Note) {
+        self.note = note
     }
 
     func windowDidResize(_ notification: Notification) {
         guard let window = notification.object as? NSWindow else { return }
-        item.width = window.frame.size.width
-        item.height = window.frame.size.height
+        note.width = window.frame.size.width
+        note.height = window.frame.size.height
     }
 
     // Track when the window is moved
     func windowDidMove(_ notification: Notification) {
         guard let window = notification.object as? NSWindow else { return }
-        item.x = window.frame.origin.x
-        item.y = window.frame.origin.y
+        note.x = window.frame.origin.x
+        note.y = window.frame.origin.y
     }
 
 }

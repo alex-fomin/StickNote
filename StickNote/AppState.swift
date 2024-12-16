@@ -13,12 +13,12 @@ final class AppState {
 
     var windowCount: Int = 0
 
-    var itemsToWindows: [UUID: NSWindow] = [:]
+    var notesToWindows: [UUID: NSWindow] = [:]
 
     private init() {
         self.sharedModelContainer = {
             let schema = Schema([
-                Item.self,
+                Note.self,
                 Layout.self,
             ])
             let modelConfiguration = ModelConfiguration(
@@ -61,27 +61,27 @@ final class AppState {
     }
 
     func openNewNote() {
-        let item = Item(category: getDefaultLayout())
-        self.context.insert(item)
+        let note = Note(layout: getDefaultLayout())
+        self.context.insert(note)
 
-        self.openNote(item, isEditing: true)
+        self.openNote(note, isEditing: true)
     }
 
     func openNewNoteFromClipboard() {
         if let text = NSPasteboard.general.string(forType: .string) {
             if !text.isEmpty {
-                let item = Item(category: getDefaultLayout(), text: text)
-                self.context.insert(item)
-                self.openNote(item, isEditing: false)
+                let note = Note(layout: getDefaultLayout(), text: text)
+                self.context.insert(note)
+                self.openNote(note, isEditing: false)
             }
         }
     }
 
-    private func openNote(_ item: Item, isEditing: Bool) {
+    private func openNote(_ note: Note, isEditing: Bool) {
 
         windowCount += 1
 
-        let contentRect = getContentRectFromItem(item)
+        let contentRect = getContentRectFromNote(note)
 
         let window = NoteWindow(
             contentRect: contentRect,
@@ -91,9 +91,9 @@ final class AppState {
             backing: .buffered,
             defer: true
         )
-        window.item = item
+        window.note = note
 
-        let contentView = NoteView(item: item, isEditing: isEditing)
+        let contentView = NoteView(note: note, isEditing: isEditing)
             .preferredColorScheme(.light)
             .environment(\.modelContext, self.sharedModelContainer.mainContext)
 
@@ -105,15 +105,15 @@ final class AppState {
         window.collectionBehavior = [.canJoinAllSpaces]
         window.makeKeyAndOrderFront(nil)
         window.styleMask.remove(.titled)
-        itemsToWindows[item.id] = window
+        notesToWindows[note.id] = window
     }
 
-    private func getContentRectFromItem(_ item: Item) -> NSRect {
+    private func getContentRectFromNote(_ note: Note) -> NSRect {
 
-        if let x = item.x,
-            let y = item.y,
-            let width = item.width,
-            let height = item.height
+        if let x = note.x,
+            let y = note.y,
+            let width = note.width,
+            let height = note.height
         {
             return NSRect(x: x, y: y, width: width, height: height)
         } else {
@@ -127,28 +127,28 @@ final class AppState {
     }
 
     func openAllNotes() {
-        let items = try? self.context.fetch<Item>(FetchDescriptor<Item>())
+        let notes = try? self.context.fetch<Note>(FetchDescriptor<Note>())
 
-        if let items {
-            for item in items {
-                if item.text.isEmpty {
-                    self.deleteNote(item)
+        if let notes {
+            for note in notes {
+                if note.text.isEmpty {
+                    self.deleteNote(note)
                 } else {
-                    self.openNote(item, isEditing: false)
+                    self.openNote(note, isEditing: false)
                 }
             }
         }
     }
 
-    func deleteNote(_ item: Item) {
-        self.context.delete(item)
+    func deleteNote(_ note: Note) {
+        self.context.delete(note)
         try? self.context.save()
-        let window = itemsToWindows.removeValue(forKey: item.id)
+        let window = notesToWindows.removeValue(forKey: note.id)
         window?.close()
     }
 
-    func copyToClipboard(_ item: Item) {
+    func copyToClipboard(_ note: Note) {
         NSPasteboard.general.clearContents()
-        NSPasteboard.general.setString(item.text, forType: .string)
+        NSPasteboard.general.setString(note.text, forType: .string)
     }
 }
