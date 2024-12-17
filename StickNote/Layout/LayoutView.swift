@@ -16,7 +16,6 @@ struct NoteLayoutView: View {
 struct LayoutInfo: Hashable {
     var text: String
     var color: String? = nil
-
 }
 
 struct LayoutView: View {
