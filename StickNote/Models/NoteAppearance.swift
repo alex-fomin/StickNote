@@ -6,7 +6,6 @@ protocol NoteAppearance {
     var fontName: String{get set}
     var fontSize: CGFloat{get set}
     var fontColor: String{get set}
-//    func update()
 }
 
 

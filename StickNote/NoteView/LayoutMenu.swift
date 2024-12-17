@@ -13,40 +13,25 @@ struct LayoutMenu: View {
             ForEach(layouts.sorted { a, b in a.isDefault }, id: \.self) { layout in
                 Button {
                     note.apply(layout: layout)
-//                    self.color = Color.fromString(layout.color)
-//                    self.fontColor = Color.fromString(layout.fontColor)
-//                    self.font = NSFont(note)
                 } label: {
+                    let sameLayout =
+                        note.color == layout.color && note.fontName == layout.fontName
+                        && note.fontSize == layout.fontSize && note.fontColor == layout.fontColor
                     Image(
-                        systemName: note.color == layout.color
+                        systemName: sameLayout
                             ? "checkmark.square.fill" : "square.fill"
                     )
                     .foregroundStyle(
-                        note.color == layout.color ? .primary : Color.fromString(layout.color),
+                        sameLayout ? .primary : Color.fromString(layout.color),
                         Color.fromString(layout.color))
 
-                    Label(layout.name, systemImage: "")
+                    Text(layout.name)
                 }
             }
             Divider()
-            Button("Custom..."){
+            Button("Custom...") {
                 openWindow(value: note.persistentModelID)
             }
         }
     }
 }
-//
-//#Preview {
-//    @Previewable @State var note = Note(
-//        text: "NoteYellow", color: "#FFF68B", fontName: "", fontSize: 14, fontColor: "#000000")
-//
-//    let config = ModelConfiguration(isStoredInMemoryOnly: true)
-//    let container = try! ModelContainer(for: Layout.self, configurations: config)
-//
-//    for layout in Layout.defaultLayouts() {
-//        container.mainContext.insert(layout)
-//    }
-//    
-////    return LayoutMenu(        note:note)
-////    .modelContainer(container)
-//}

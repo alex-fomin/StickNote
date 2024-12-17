@@ -1,4 +1,5 @@
 import SwiftUI
+import AppKit
 
 extension Color {
     static func fromString(_ hex: String) -> Color {
@@ -41,6 +42,27 @@ extension Color {
             // Format as hex string
             return String(format: "#%02X%02X%02X", r, g, b)
         }
+    
+    func isLight() -> Bool {
+        // Convert Color to RGB components
+        let uiColor = NSColor(self)
+        var red: CGFloat = 0
+        var green: CGFloat = 0
+        var blue: CGFloat = 0
+        var alpha: CGFloat = 0
+        
+        uiColor.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+        
+        // Convert to 0-255 range
+        let r = red * 255
+        let g = green * 255
+        let b = blue * 255
+        
+        // Calculate luminance
+        let luminance = 0.299 * r + 0.587 * g + 0.114 * b
+        
+        return luminance > 128 // Returns true if light, false if dark
+    }
 }
 
 extension NSColor {
