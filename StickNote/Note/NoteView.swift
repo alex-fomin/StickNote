@@ -1,14 +1,12 @@
+import Defaults
 import SwiftData
 import SwiftUI
-import Defaults
 
 struct NoteView: View {
     init(note: Note, isEditing: Bool = false) {
         self.note = note
         self.isEditing = isEditing
         self.windowTracker = WindowPositionTracker(note: note)
-
-        //        self.fontColor = Color.fromString(note.fontColor)
     }
     @Default(.confirmOnDelete) var confirmOnDelete
 
@@ -18,8 +16,6 @@ struct NoteView: View {
     @State private var isEditing: Bool
 
     @FocusState private var isTextEditorFocused: Bool  // Track focus on the TextEditor
-    //    @State var font: NSFont
-    //    @State var fontColor: Color
 
     @State private var selection: TextSelection?
     @State private var showConfirmation = false
@@ -38,7 +34,7 @@ struct NoteView: View {
     func getColor() -> Color { Color.fromString($note.color.wrappedValue) }
 
     var body: some View {
-        ZStack {
+        ZStack(alignment: .topLeading) {
             if isEditing {
                 TextEditor(text: $note.text, selection: $selection)
                     .focused($isTextEditorFocused)  // Bind focus state
@@ -51,6 +47,8 @@ struct NoteView: View {
 
                         self.nsWindow?.makeKey()
                         self.nsWindow?.styleMask.remove(.titled)
+
+                        self.minMaxWindow()
                     }
                     .font(getFont())
                     .background(getColor())
@@ -70,6 +68,17 @@ struct NoteView: View {
                     .overlay(DraggableArea(isEditing: $isEditing))
                     .contextMenu {
                         Button {
+                            self.minMaxWindow(minimize: true)
+                        } label: {
+                            Label("Minimize", systemImage: "")
+                        }
+                        Button {
+                            self.minMaxWindow()
+                        } label: {
+                            Label("Maximize", systemImage: "")
+                        }
+                        Divider()
+                        Button {
                             AppState.shared.copyToClipboard(note)
                         } label: {
                             Label("Copy to clipboard", systemImage: "copy")
@@ -80,10 +89,9 @@ struct NoteView: View {
                         }
                         Divider()
                         Button {
-                            if (confirmOnDelete){
+                            if confirmOnDelete {
                                 showConfirmation = true
-                            }
-                            else{
+                            } else {
                                 AppState.shared.deleteNote(note)
                             }
                         } label: {
@@ -119,5 +127,21 @@ struct NoteView: View {
         if $note.text.wrappedValue.isEmpty {
             AppState.shared.deleteNote(self.note)
         }
+    }
+
+    func minMaxWindow(minimize: Bool = false) {
+        let text = minimize ? "ABC" : note.text
+        let size = text.sizeUsingFont(usingFont: note.nsFont)
+
+        let newY = note.y! + note.height! - size.height
+        let newWidth = size.width + 10
+        let newFrame = NSRect(
+            x: note.x!, y: newY, width: newWidth,
+            height: size.height)
+        self.nsWindow?.setFrame(newFrame, display: true, animate: true)
+
+        note.width = newWidth
+        note.height = size.height
+        note.y = newY
     }
 }

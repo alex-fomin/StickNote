@@ -16,6 +16,8 @@ class WindowPositionTracker: NSObject, NSWindowDelegate {
 
     func windowDidResize(_ notification: Notification) {
         guard let window = notification.object as? NSWindow else { return }
+        note.x = window.frame.origin.x
+        note.y = window.frame.origin.y
         note.width = window.frame.size.width
         note.height = window.frame.size.height
     }
@@ -23,6 +25,8 @@ class WindowPositionTracker: NSObject, NSWindowDelegate {
     // Track when the window is moved
     func windowDidMove(_ notification: Notification) {
         guard let window = notification.object as? NSWindow else { return }
+        note.x = window.frame.origin.x
+        note.y = window.frame.origin.y
         note.x = window.frame.origin.x
         note.y = window.frame.origin.y
     }
