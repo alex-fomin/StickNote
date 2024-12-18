@@ -1,5 +1,3 @@
-import Foundation
-import KeyboardShortcuts
 import SwiftData
 import SwiftUI
 
@@ -26,6 +24,9 @@ struct StickNoteApp: App {
                     .first
             {
                 NoteLayoutView(note: note)
+                    .frame(
+                        minWidth: 400, maxWidth: 400,
+                        minHeight: 200, maxHeight: 200)
             }
 
         }
@@ -33,19 +34,8 @@ struct StickNoteApp: App {
         .modelContext(AppState.shared.context)
 
         Settings {
-            HStack {
-                Spacer()
-                Form {
-                    KeyboardShortcuts.Recorder("Add new note", name: .createNote)
-                    KeyboardShortcuts.Recorder(
-                        "Paste note from clipboard", name: .createNoteFromClipboard)
-                }
-                
-                Button("Reset all") {
-                    try? AppState.shared.sharedModelContainer.erase()
-                }
-                Spacer()
-            }
+            SettingsView()
         }
+        .modelContext(AppState.shared.context)
     }
 }

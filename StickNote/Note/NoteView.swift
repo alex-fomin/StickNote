@@ -1,5 +1,6 @@
 import SwiftData
 import SwiftUI
+import Defaults
 
 struct NoteView: View {
     init(note: Note, isEditing: Bool = false) {
@@ -9,6 +10,7 @@ struct NoteView: View {
 
         //        self.fontColor = Color.fromString(note.fontColor)
     }
+    @Default(.confirmOnDelete) var confirmOnDelete
 
     @State var note: Note
     @State var nsWindow: NSWindow?
@@ -78,7 +80,12 @@ struct NoteView: View {
                         }
                         Divider()
                         Button {
-                            showConfirmation = true
+                            if (confirmOnDelete){
+                                showConfirmation = true
+                            }
+                            else{
+                                AppState.shared.deleteNote(note)
+                            }
                         } label: {
                             Label("Delete", systemImage: "delete")
                         }

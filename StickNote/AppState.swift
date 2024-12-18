@@ -71,6 +71,9 @@ final class AppState {
         if let text = NSPasteboard.general.string(forType: .string) {
             if !text.isEmpty {
                 let note = Note(layout: getDefaultLayout(), text: text)
+                let size = text.sizeUsingFont(usingFont: note.nsFont)
+                note.width = size.width + 16
+                note.height = size.height
                 self.context.insert(note)
                 self.openNote(note, isEditing: false)
             }
@@ -78,7 +81,6 @@ final class AppState {
     }
 
     private func openNote(_ note: Note, isEditing: Bool) {
-
         windowCount += 1
 
         let contentRect = getContentRectFromNote(note)
@@ -109,21 +111,17 @@ final class AppState {
     }
 
     private func getContentRectFromNote(_ note: Note) -> NSRect {
+        let screenFrame = NSScreen.main?.frame ?? NSRect.zero
 
-        if let x = note.x,
-            let y = note.y,
-            let width = note.width,
-            let height = note.height
-        {
-            return NSRect(x: x, y: y, width: width, height: height)
-        } else {
-            let screenFrame = NSScreen.main?.frame ?? NSRect.zero
+        let x = note.x ?? screenFrame.midX - 200 + CGFloat(self.windowCount) * 20
+        let y = note.y ?? screenFrame.midY + 150 - CGFloat(self.windowCount) * 20
+        let width = note.width ?? 100
+        let height = note.height ?? 160
 
-            return NSRect(
-                x: screenFrame.midX - 200 + CGFloat(self.windowCount) * 20,
-                y: screenFrame.midY + 150 - CGFloat(self.windowCount) * 20,
-                width: 100, height: 300)
-        }
+        return NSRect(
+            x: x,
+            y: y,
+            width: width, height: height)
     }
 
     func openAllNotes() {

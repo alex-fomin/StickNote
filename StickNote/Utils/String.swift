@@ -1,3 +1,5 @@
+import AppKit
+
 extension String {
     public func truncate(_ maxLength: Int) -> String {
         if self.count == 0 {
@@ -14,7 +16,9 @@ extension String {
         }
         return String(result)
     }
+
+    func sizeUsingFont(usingFont font: NSFont) -> CGSize {
+        let fontAttributes = [NSAttributedString.Key.font: font]
+        return self.size(withAttributes: fontAttributes)
+    }
 }
-
-
-

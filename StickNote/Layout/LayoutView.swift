@@ -46,7 +46,7 @@ struct LayoutView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading) {
+        Form {
             HStack(alignment: .center) {
                 VStack(alignment: .trailing) {
                     FontPicker("Font", selection: $font)
