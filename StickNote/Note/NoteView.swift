@@ -7,33 +7,28 @@ struct NoteView: View {
         self.note = note
         self.isEditing = isEditing
         self.windowTracker = WindowPositionTracker(note: note)
+        width = note.width!
+        height = note.height!
     }
+
     @Default(.confirmOnDelete) var confirmOnDelete
 
     @State var note: Note
     @State var nsWindow: NSWindow?
-
     @State private var isEditing: Bool
-
-    @FocusState private var isTextEditorFocused: Bool  // Track focus on the TextEditor
-
+    @FocusState private var isTextEditorFocused: Bool
     @State private var selection: TextSelection?
     @State private var showConfirmation = false
+    @State var width: CGFloat
+    @State var height: CGFloat
 
     private var windowTracker: WindowPositionTracker
 
-    func getFont() -> Font {
-        let nsFont =
-            NSFont(name: $note.fontName.wrappedValue, size: $note.fontSize.wrappedValue)
-            ?? NSFont.systemFont(ofSize: $note.fontSize.wrappedValue)
-        return Font(nsFont)
-    }
-
-    func getFontColor() -> Color { Color.fromString($note.fontColor.wrappedValue) }
-
-    func getColor() -> Color { Color.fromString($note.color.wrappedValue) }
-
     var body: some View {
+        let font = Font(note.nsFont)
+        let fontColor = Color.fromString(note.fontColor)
+        let color = Color.fromString(note.color)
+
         ZStack(alignment: .topLeading) {
             if isEditing {
                 TextEditor(text: $note.text, selection: $selection)
@@ -44,26 +39,32 @@ struct NoteView: View {
                         selection = TextSelection(
                             range: $note.text.wrappedValue
                                 .startIndex..<$note.text.wrappedValue.endIndex)
-
                         self.nsWindow?.makeKey()
                         self.nsWindow?.styleMask.remove(.titled)
-
                         self.minMaxWindow()
                     }
-                    .font(getFont())
-                    .background(getColor())
-                    .foregroundStyle(getFontColor())
+                    .lineSpacing(note.nsFont.leading)
+                    .font(font)
+                    .background(color)
+                    .foregroundStyle(fontColor)
                     .scrollContentBackground(.hidden)
+                    .scrollDisabled(true)
                     .onDisappear { processNote() }
                     .onSubmit { processNote() }
-                    .fixedSize(horizontal: false, vertical: true)
+                    .onChange(of: note.text) { _, _ in
+                        self.minMaxWindow()
+                    }
+                    .frame(
+                        width: $width.wrappedValue, height: $height.wrappedValue,
+                        alignment: .topLeading)
+
             } else {
                 Text($note.text.wrappedValue)
                     .multilineTextAlignment(.leading)
                     .lineLimit(nil)  // Allow multiple lines in display mode
-                    .background(getColor())
-                    .foregroundStyle(getFontColor())
-                    .font(getFont())
+                    .background(color)
+                    .foregroundStyle(fontColor)
+                    .font(font)
                     .padding([.horizontal], 5)
                     .overlay(DraggableArea(isEditing: $isEditing))
                     .contextMenu {
@@ -92,6 +93,7 @@ struct NoteView: View {
                             if confirmOnDelete {
                                 showConfirmation = true
                             } else {
+                                self.nsWindow?.close()
                                 AppState.shared.deleteNote(note)
                             }
                         } label: {
@@ -121,6 +123,7 @@ struct NoteView: View {
                 window?.delegate = self.windowTracker
             }
         )
+        .frame(width: $width.wrappedValue, height: $height.wrappedValue, alignment: .topLeading)
     }
 
     func processNote() {
@@ -130,18 +133,19 @@ struct NoteView: View {
     }
 
     func minMaxWindow(minimize: Bool = false) {
-        let text = minimize ? "ABC" : note.text
+        let text = minimize ? note.text.truncate(5) : note.text
         let size = text.sizeUsingFont(usingFont: note.nsFont)
 
-        let newY = note.y! + note.height! - size.height
-        let newWidth = size.width + 10
-        let newFrame = NSRect(
-            x: note.x!, y: newY, width: newWidth,
-            height: size.height)
-        self.nsWindow?.setFrame(newFrame, display: true, animate: true)
+        let newX = note.x!
+        let newHeight = size.height + (minimize ? 0 : note.nsFont.maximumAdvancement.height)
+        let newY = note.y! + note.height! - newHeight
+        let newWidth = size.width + note.nsFont.maximumAdvancement.width * 2
 
         note.width = newWidth
-        note.height = size.height
+        note.height = newHeight
+        note.x = newX
         note.y = newY
+        width = newWidth
+        height = newHeight
     }
 }

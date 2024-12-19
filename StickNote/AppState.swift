@@ -85,10 +85,15 @@ final class AppState {
 
         let contentRect = getContentRectFromNote(note)
 
+        note.x = contentRect.minX
+        note.y = contentRect.minY
+        note.width = contentRect.width
+        note.height = contentRect.height
+        
         let window = NoteWindow(
             contentRect: contentRect,
             styleMask: [
-                .titled, .resizable, .borderless, .fullSizeContentView,
+                .titled
             ],
             backing: .buffered,
             defer: true

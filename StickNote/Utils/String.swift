@@ -7,7 +7,7 @@ extension String {
         }
 
         let lines = self.split(separator: "\n", maxSplits: 2)
-        let firstLine = lines.first!
+        let firstLine = lines.first ?? ""
         let needElipses = lines.count > 1 || firstLine.count > maxLength
 
         var result = firstLine.prefix(maxLength)
