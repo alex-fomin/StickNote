@@ -1,4 +1,5 @@
 import AppKit
+import Defaults
 import KeyboardShortcuts
 import SwiftData
 import SwiftUI
@@ -19,7 +20,7 @@ final class AppState {
         self.sharedModelContainer = {
             let schema = Schema([
                 Note.self,
-                Layout.self,
+                NoteLayout.self,
             ])
             let modelConfiguration = ModelConfiguration(
                 schema: schema, isStoredInMemoryOnly: false)
@@ -34,9 +35,9 @@ final class AppState {
 
         self.context = ModelContext(self.sharedModelContainer)
 
-        let layouts = try? self.context.fetch<Category>(FetchDescriptor<Layout>())
+        let layouts = try? self.context.fetch<Category>(FetchDescriptor<NoteLayout>())
         if layouts == nil || layouts?.isEmpty == true {
-            let defaultLayouts = Layout.defaultLayouts()
+            let defaultLayouts = NoteLayout.defaultLayouts()
 
             for defaultLayout in defaultLayouts {
                 self.context.insert(defaultLayout)
@@ -53,15 +54,16 @@ final class AppState {
         }
     }
 
-    func getDefaultLayout() -> Layout {
+    func getDefaultLayout() -> NoteLayout {
         return
             (try? self.context.fetch<Category>(
-                FetchDescriptor<Layout>(predicate: #Predicate { $0.isDefault == true })))?.first
-            ?? Layout.defaultLayout
+                FetchDescriptor<NoteLayout>(predicate: #Predicate { $0.isDefault == true })))?.first
+            ?? NoteLayout.defaultLayout
     }
 
     func openNewNote() {
         let note = Note(layout: getDefaultLayout())
+        note.showOnAllSpaces = Defaults[.showOnAllSpaces]
         self.context.insert(note)
 
         self.openNote(note, isEditing: true)
@@ -71,6 +73,7 @@ final class AppState {
         if let text = NSPasteboard.general.string(forType: .string) {
             if !text.isEmpty {
                 let note = Note(layout: getDefaultLayout(), text: text)
+                note.showOnAllSpaces = Defaults[.showOnAllSpaces]
                 let size = text.sizeUsingFont(usingFont: note.nsFont)
                 note.width = size.width + 16
                 note.height = size.height
@@ -89,11 +92,11 @@ final class AppState {
         note.y = contentRect.minY
         note.width = contentRect.width
         note.height = contentRect.height
-        
+
         let window = NoteWindow(
             contentRect: contentRect,
             styleMask: [
-                .titled
+                .titled, .hudWindow, .resizable,
             ],
             backing: .buffered,
             defer: true
@@ -107,12 +110,22 @@ final class AppState {
         window.contentView = NSHostingView(rootView: contentView)
 
         window.level = .floating
-
+        window.hasShadow = isEditing
         window.isReleasedWhenClosed = false
-        window.collectionBehavior = [.canJoinAllSpaces]
-        window.makeKeyAndOrderFront(nil)
+
+        if note.showOnAllSpaces {
+            window.collectionBehavior = [.canJoinAllSpaces]
+        }
+
+        window.orderFront(nil)
+        if (isEditing){
+            window.makeKey()
+        }
         window.styleMask.remove(.titled)
         notesToWindows[note.id] = window
+
+     
+
     }
 
     private func getContentRectFromNote(_ note: Note) -> NSRect {

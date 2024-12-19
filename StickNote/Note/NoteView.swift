@@ -7,8 +7,6 @@ struct NoteView: View {
         self.note = note
         self.isEditing = isEditing
         self.windowTracker = WindowPositionTracker(note: note)
-        width = note.width!
-        height = note.height!
     }
 
     @Default(.confirmOnDelete) var confirmOnDelete
@@ -19,8 +17,6 @@ struct NoteView: View {
     @FocusState private var isTextEditorFocused: Bool
     @State private var selection: TextSelection?
     @State private var showConfirmation = false
-    @State var width: CGFloat
-    @State var height: CGFloat
 
     private var windowTracker: WindowPositionTracker
 
@@ -55,8 +51,9 @@ struct NoteView: View {
                         self.minMaxWindow()
                     }
                     .frame(
-                        width: $width.wrappedValue, height: $height.wrappedValue,
+                        width: note.width, height: note.height,
                         alignment: .topLeading)
+                    //.border(.red)
 
             } else {
                 Text($note.text.wrappedValue)
@@ -65,7 +62,6 @@ struct NoteView: View {
                     .background(color)
                     .foregroundStyle(fontColor)
                     .font(font)
-                    .padding([.horizontal], 5)
                     .overlay(DraggableArea(isEditing: $isEditing))
                     .contextMenu {
                         Button {
@@ -77,6 +73,17 @@ struct NoteView: View {
                             self.minMaxWindow()
                         } label: {
                             Label("Maximize", systemImage: "")
+                        }
+                        Divider()
+                        Button {
+                            note.showOnAllSpaces = !note.showOnAllSpaces
+                            if (note.showOnAllSpaces){
+                                self.nsWindow?.collectionBehavior.insert(.canJoinAllSpaces)
+                            } else {
+                                self.nsWindow?.collectionBehavior.remove(.canJoinAllSpaces)
+                            }
+                        } label: {
+                            Label((note.showOnAllSpaces ?"✓ " :"" )+"Show on all spaces", systemImage: "rectangle.on.rectangle")
                         }
                         Divider()
                         Button {
@@ -99,7 +106,7 @@ struct NoteView: View {
                         } label: {
                             Label("Delete", systemImage: "delete")
                         }
-                    }
+                    }.padding([.horizontal], 5)
             }
         }
         .confirmationDialog(
@@ -123,7 +130,7 @@ struct NoteView: View {
                 window?.delegate = self.windowTracker
             }
         )
-        .frame(width: $width.wrappedValue, height: $height.wrappedValue, alignment: .topLeading)
+        .frame(width: note.width, height: note.height, alignment: .leading)
     }
 
     func processNote() {
@@ -139,13 +146,11 @@ struct NoteView: View {
         let newX = note.x!
         let newHeight = size.height + (minimize ? 0 : note.nsFont.maximumAdvancement.height)
         let newY = note.y! + note.height! - newHeight
-        let newWidth = size.width + note.nsFont.maximumAdvancement.width * 2
+        let newWidth = size.width + "m".sizeUsingFont(usingFont: note.nsFont).width*2
 
         note.width = newWidth
         note.height = newHeight
         note.x = newX
         note.y = newY
-        width = newWidth
-        height = newHeight
     }
 }

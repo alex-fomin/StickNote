@@ -2,7 +2,7 @@ import SwiftData
 import SwiftUI
 
 @Model
-final class Layout: Identifiable, NoteAppearance {
+final class NoteLayout: Identifiable, NoteAppearance {
     var id: UUID = UUID()
 
     var name: String
@@ -24,7 +24,7 @@ final class Layout: Identifiable, NoteAppearance {
         self.isDefault = isDefault
     }
 
-    static func defaultLayouts() -> [Layout] {
+    static func defaultLayouts() -> [NoteLayout] {
         let defaultLayout = defaultLayout
         return [
             defaultLayout,
@@ -46,7 +46,7 @@ final class Layout: Identifiable, NoteAppearance {
         ]
     }
     
-    static var defaultLayout: Layout {
+    static var defaultLayout: NoteLayout {
         let systemFont = NSFont.systemFont(ofSize: 16)
         return .init(
             name: "Yellow", color: "#FFF68B", fontName: systemFont.fontName,

@@ -4,7 +4,7 @@ import SwiftUI
 struct LayoutMenu: View {
     @Environment(\.modelContext) var modelContext
     @Environment(\.openWindow) var openWindow
-    @Query(sort: \Layout.name) var layouts: [Layout]
+    @Query(sort: \NoteLayout.name) var layouts: [NoteLayout]
 
     @Binding var note: Note
 
@@ -38,5 +38,5 @@ struct LayoutMenu: View {
 
 
 #Preview {
-    LayoutMenu(note:.constant(Note(layout: Layout.defaultLayout, text: "note")))
+    LayoutMenu(note:.constant(Note(layout: NoteLayout.defaultLayout, text: "note")))
 }

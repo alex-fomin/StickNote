@@ -15,6 +15,8 @@ final class Note: NoteAppearance, Identifiable {
     var fontName: String
     var fontSize: CGFloat
     var fontColor: String
+    
+    var showOnAllSpaces: Bool = true
 
     init(
         x: CGFloat? = nil, y: CGFloat? = nil, width: CGFloat? = nil, height: CGFloat? = nil,
@@ -31,13 +33,13 @@ final class Note: NoteAppearance, Identifiable {
         self.fontColor = fontColor
     }
 
-    convenience init(layout: Layout, text: String = "") {
+    convenience init(layout: NoteLayout, text: String = "") {
         self.init(
             text: text, color: layout.color, fontName: layout.fontName, fontSize: layout.fontSize,
             fontColor: layout.fontColor)
     }
 
-    func apply(layout: Layout) {
+    func apply(layout: NoteLayout) {
         self.color = layout.color
         self.fontColor = layout.fontColor
         self.fontName = layout.fontName

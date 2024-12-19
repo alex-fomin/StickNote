@@ -20,7 +20,7 @@ struct LayoutInfo: Hashable {
 
 struct LayoutView: View {
     @Environment(\.modelContext) var modelContext
-    @Query var layouts: [Layout]
+    @Query var layouts: [NoteLayout]
 
     @State var info: NoteAppearance
     @State var font: NSFont
@@ -92,7 +92,7 @@ struct LayoutView: View {
                 .alert("Enter layout name", isPresented: $showingAlert) {
                     TextField("Enter layout name", text: $newLayoutName)
                     Button("Save") {
-                        let layout = Layout(
+                        let layout = NoteLayout(
                             name: $newLayoutName.wrappedValue,
                             color: $color.wrappedValue.toHex(),
                             fontName: $font.wrappedValue.fontName,
@@ -132,5 +132,5 @@ struct LayoutView: View {
 }
 
 #Preview {
-    LayoutView(info: Layout.defaultLayout)
+    LayoutView(info: NoteLayout.defaultLayout)
 }

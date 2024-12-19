@@ -19,10 +19,12 @@ class NoteWindow: NSWindow {
                 alert.addButton(withTitle: "Cancel")
                 let res = alert.runModal()
                 if res == .alertFirstButtonReturn {
+                    self.close()
                     AppState.shared.deleteNote(note)
                 }
             }
             else {
+                self.close()
                 AppState.shared.deleteNote(note)
             }
         } else if event.keyCode == 8

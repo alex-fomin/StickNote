@@ -14,6 +14,12 @@ enum SettingsTab {
 
 struct SettingsView: View {
     @Default(.confirmOnDelete) var confirmOnDelete
+    @Default(.showOnAllSpaces) var showOnAllSpaces
+
+    @Environment(\.modelContext) var modelContext
+    @Query var layouts: [NoteLayout]
+
+    @State private var defaultLayout: NoteLayout = NoteLayout.defaultLayouts().first!
 
     var body: some View {
         HStack {
@@ -23,18 +29,43 @@ struct SettingsView: View {
                     KeyboardShortcuts.Recorder(
                         "Paste note from clipboard", name: .createNoteFromClipboard)
                 }
+                Section("New note") {
+                    Toggle("Show on all spaces", isOn: $showOnAllSpaces)
+                    Picker("Default layout", selection: $defaultLayout) {
+                        ForEach(layouts) { layout in
+                            let nsFont = NSFont(layout).withSize(NSFont.systemFontSize)
+                            
+                            return HStack{
+                                Image(
+                                    systemName: "square.fill"
+                                )
+                                .foregroundStyle(
+                                    Color.fromString(layout.color),
+                                    Color.fromString(layout.color))
+                                
+                                Text(layout.name)
+                                    .font(Font(nsFont))
+
+                            }.tag(layout)
+                        }
+                    }
+                    .onAppear {
+                        defaultLayout = layouts.first { $0.isDefault }!
+                    }
+                    .onChange(of: defaultLayout) { old, new in
+                        try? self.modelContext.transaction {
+                            old.isDefault = false
+                            new.isDefault = true
+                        }
+                    }
+
+                }
                 Section {
                     LaunchAtLogin.Toggle()
                     Toggle("Confirm on delete", isOn: $confirmOnDelete)
-                    
                 }
-                Button("Reset all") {
-                    try? AppState.shared.sharedModelContainer.erase()
-                }
-                
-                //                Se
             }
-            
+
             .padding(20)
             .formStyle(.grouped)
         }
