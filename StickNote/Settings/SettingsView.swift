@@ -28,6 +28,8 @@ struct SettingsView: View {
                     KeyboardShortcuts.Recorder("Add new note", name: .createNote)
                     KeyboardShortcuts.Recorder(
                         "Paste note from clipboard", name: .createNoteFromClipboard)
+                    KeyboardShortcuts.Recorder(
+                        "Show/Hide notes", name: .showHideNotes)
                 }
                 Section("New note") {
                     Toggle("Show on all spaces", isOn: $showOnAllSpaces)

@@ -52,8 +52,11 @@ final class AppState {
         KeyboardShortcuts.onKeyUp(for: .createNoteFromClipboard) { [self] in
             self.openNewNoteFromClipboard()
         }
+        KeyboardShortcuts.onKeyUp(for: .showHideNotes) { [self] in
+            self.toggleNotesVisibility()
+        }
     }
-
+    
     func getDefaultLayout() -> NoteLayout {
         return
             (try? self.context.fetch<Category>(
@@ -123,9 +126,6 @@ final class AppState {
         }
         window.styleMask.remove(.titled)
         notesToWindows[note.id] = window
-
-     
-
     }
 
     private func getContentRectFromNote(_ note: Note) -> NSRect {
@@ -167,4 +167,23 @@ final class AppState {
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(note.text, forType: .string)
     }
+
+    func toggleNotesVisibility(){
+        for (_, window) in notesToWindows {
+            if (model.isNotesHidden){
+                window.orderFront(nil)
+
+            }
+            else{
+                window.orderOut(nil)
+            }
+        }
+        model.isNotesHidden = !model.isNotesHidden
+    }
+    
+    var model: AppStateModel = AppStateModel()
+}
+
+@Observable class AppStateModel: ObservableObject {
+    public var isNotesHidden: Bool = false
 }
