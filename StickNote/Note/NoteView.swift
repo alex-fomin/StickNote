@@ -37,7 +37,6 @@ struct NoteView: View {
                     }
                     .lineSpacing(note.nsFont.leading)
                     .modifier(NoteModifier(note:note))
-                    .scrollContentBackground(.hidden)
                     .scrollDisabled(true)
                     .onDisappear { processNote() }
                     .onSubmit { processNote() }

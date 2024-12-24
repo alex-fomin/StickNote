@@ -54,7 +54,7 @@ struct NoteListView: View {
                 List(selection: $selectedNote) {
                     ForEach(noteList, id: \.self) { item in
                         NavigationLink(value: item) {
-                            Text(item.text)
+                            Text(item.text.truncate(50, maxLines: 2))
                         }
                     }
                 }
@@ -69,6 +69,7 @@ struct NoteListView: View {
                     }
                     Button("Restore") {
                         note.isInTrashBin = false
+                        AppState.shared.openNote(note, isEditing: false)
                         selectedNote = note
                         selectedFolder = .Notes
                     }
@@ -101,13 +102,16 @@ struct NoteInfoView: View {
     @Bindable var note: Note
     var body: some View {
         VStack {
-            NoteTextView(note: note)
+            TextEditor(text: $note.text)
+                .modifier(NoteModifier(note: note))
+                
+            
             Toggle("Show on all spaces", isOn: $note.showOnAllSpaces)
                 .onChange(of: $note.showOnAllSpaces.wrappedValue) {
                     _, newValue in
                     AppState.shared.applyShowOnAllSpaces(note: note)
                 }
-        }
+        }.padding()
     }
 }
 

@@ -11,5 +11,7 @@ struct NoteModifier: ViewModifier {
             .background(color)
             .foregroundStyle(fontColor)
             .font(font)
+            .scrollContentBackground(.hidden)
+            //.lineSpacing(note.nsFont.leading)
     }
 }

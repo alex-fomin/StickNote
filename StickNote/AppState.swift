@@ -87,7 +87,7 @@ final class AppState {
         }
     }
 
-    private func openNote(_ note: Note, isEditing: Bool) {
+    func openNote(_ note: Note, isEditing: Bool) {
         windowCount += 1
 
         let contentRect = getContentRectFromNote(note)
@@ -100,7 +100,7 @@ final class AppState {
         let window = NoteWindow(
             contentRect: contentRect,
             styleMask: [
-                .titled, .hudWindow, .resizable,
+                .titled, .borderless
             ],
             backing: .buffered,
             defer: true

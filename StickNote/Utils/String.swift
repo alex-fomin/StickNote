@@ -1,13 +1,13 @@
 import AppKit
 
 extension String {
-    public func truncate(_ maxLength: Int) -> String {
+    public func truncate(_ maxLength: Int, maxLines: Int = 1) -> String {
         if self.count == 0 {
             return self
         }
 
-        let lines = self.split(separator: "\n", maxSplits: 2)
-        let firstLine = lines.first ?? ""
+        let lines = self.split(separator: "\n", maxSplits: maxLines + 1)
+        let firstLine = lines.prefix(maxLines).map{$0.trimmingCharacters(in: .whitespacesAndNewlines)}.joined(separator: "… ")
         let needElipses = lines.count > 1 || firstLine.count > maxLength
 
         var result = firstLine.prefix(maxLength)
