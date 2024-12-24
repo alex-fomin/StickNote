@@ -40,7 +40,9 @@ struct StickNoteApp: App {
         
         Settings {
             SettingsView()
+                .fixedSize()
         }
+        .windowResizability(.contentSize)
         .modelContext(AppState.shared.context)
     }
 }
