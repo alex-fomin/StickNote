@@ -17,6 +17,8 @@ final class Note: NoteAppearance, Identifiable {
     var fontColor: String
     
     var showOnAllSpaces: Bool = true
+    
+    var isInTrashBin: Bool = false
 
     init(
         x: CGFloat? = nil, y: CGFloat? = nil, width: CGFloat? = nil, height: CGFloat? = nil,

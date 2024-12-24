@@ -8,6 +8,7 @@ import SwiftUI
 final class AppState {
 
     static let shared: AppState = AppState()
+    @Default(.deleteToTrashBin) var deleteToTrashBin
 
     var sharedModelContainer: ModelContainer
     var context: ModelContext
@@ -56,7 +57,7 @@ final class AppState {
             self.toggleNotesVisibility()
         }
     }
-    
+
     func getDefaultLayout() -> NoteLayout {
         return
             (try? self.context.fetch<Category>(
@@ -105,6 +106,7 @@ final class AppState {
             defer: true
         )
         window.note = note
+        notesToWindows[note.id] = window
 
         let contentView = NoteView(note: note, isEditing: isEditing)
             .preferredColorScheme(.light)
@@ -116,16 +118,14 @@ final class AppState {
         window.hasShadow = isEditing
         window.isReleasedWhenClosed = false
 
-        if note.showOnAllSpaces {
-            window.collectionBehavior = [.canJoinAllSpaces]
-        }
+        applyShowOnAllSpaces(note: note)
 
         window.orderFront(nil)
-        if (isEditing){
+        if isEditing {
             window.makeKey()
         }
         window.styleMask.remove(.titled)
-        notesToWindows[note.id] = window
+
     }
 
     private func getContentRectFromNote(_ note: Note) -> NSRect {
@@ -143,7 +143,8 @@ final class AppState {
     }
 
     func openAllNotes() {
-        let notes = try? self.context.fetch<Note>(FetchDescriptor<Note>())
+        let notes = try? self.context.fetch<Note>(
+            FetchDescriptor<Note>(predicate: #Predicate { $0.isInTrashBin == false }))
 
         if let notes {
             for note in notes {
@@ -157,7 +158,11 @@ final class AppState {
     }
 
     func deleteNote(_ note: Note) {
-        self.context.delete(note)
+        if deleteToTrashBin {
+            note.isInTrashBin = true
+        } else {
+            self.context.delete(note)
+        }
         try? self.context.save()
         let window = notesToWindows.removeValue(forKey: note.id)
         window?.close()
@@ -168,19 +173,26 @@ final class AppState {
         NSPasteboard.general.setString(note.text, forType: .string)
     }
 
-    func toggleNotesVisibility(){
+    func toggleNotesVisibility() {
         for (_, window) in notesToWindows {
-            if (model.isNotesHidden){
+            if model.isNotesHidden {
                 window.orderFront(nil)
-
-            }
-            else{
+            } else {
                 window.orderOut(nil)
             }
         }
         model.isNotesHidden = !model.isNotesHidden
     }
-    
+
+    func applyShowOnAllSpaces(note: Note) {
+        guard let nsWindow = notesToWindows[note.persistentModelID] else { return }
+        if note.showOnAllSpaces {
+            nsWindow.collectionBehavior.insert(.canJoinAllSpaces)
+        } else {
+            nsWindow.collectionBehavior.remove(.canJoinAllSpaces)
+        }
+    }
+
     var model: AppStateModel = AppStateModel()
 }
 

@@ -21,10 +21,6 @@ struct NoteView: View {
     private var windowTracker: WindowPositionTracker
 
     var body: some View {
-        let font = Font(note.nsFont)
-        let fontColor = Color.fromString(note.fontColor)
-        let color = Color.fromString(note.color)
-
         ZStack(alignment: .topLeading) {
             if isEditing {
                 TextEditor(text: $note.text, selection: $selection)
@@ -40,9 +36,7 @@ struct NoteView: View {
                         self.minMaxWindow()
                     }
                     .lineSpacing(note.nsFont.leading)
-                    .font(font)
-                    .background(color)
-                    .foregroundStyle(fontColor)
+                    .modifier(NoteModifier(note:note))
                     .scrollContentBackground(.hidden)
                     .scrollDisabled(true)
                     .onDisappear { processNote() }
@@ -50,18 +44,13 @@ struct NoteView: View {
                     .onChange(of: note.text) { _, _ in
                         self.minMaxWindow()
                     }
+                
                     .frame(
                         width: note.width, height: note.height,
                         alignment: .topLeading)
-                    //.border(.red)
-
+                    
             } else {
-                Text($note.text.wrappedValue)
-                    .multilineTextAlignment(.leading)
-                    .lineLimit(nil)  // Allow multiple lines in display mode
-                    .background(color)
-                    .foregroundStyle(fontColor)
-                    .font(font)
+                NoteTextView(note:note)
                     .overlay(DraggableArea(isEditing: $isEditing))
                     .contextMenu {
                         Button {
@@ -77,11 +66,7 @@ struct NoteView: View {
                         Divider()
                         Button {
                             note.showOnAllSpaces = !note.showOnAllSpaces
-                            if (note.showOnAllSpaces){
-                                self.nsWindow?.collectionBehavior.insert(.canJoinAllSpaces)
-                            } else {
-                                self.nsWindow?.collectionBehavior.remove(.canJoinAllSpaces)
-                            }
+                            AppState.shared.applyShowOnAllSpaces(note: note)
                         } label: {
                             Label((note.showOnAllSpaces ?"✓ " :"" )+"Show on all spaces", systemImage: "rectangle.on.rectangle")
                         }
@@ -154,3 +139,15 @@ struct NoteView: View {
         note.y = newY
     }
 }
+
+extension NSTextView {
+    open override var frame: CGRect {
+        didSet {
+            self.isAutomaticQuoteSubstitutionEnabled = false
+            self.isAutomaticDashSubstitutionEnabled = false
+        }
+    }
+}
+
+
+

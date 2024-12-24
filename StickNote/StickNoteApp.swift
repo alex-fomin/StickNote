@@ -14,9 +14,7 @@ struct StickNoteApp: App {
             MainMenu(model:AppState.shared.model)
                 .environment(appStateModel)
         } label: {
-            HStack {
-                Image(systemName: (appStateModel.isNotesHidden ? "note" : "note.text"))
-            }
+            Image(systemName: (appStateModel.isNotesHidden ? "note" : "note.text"))
         }
 
         WindowGroup(id: "note-layout", for: Note.ID.self) { $id in
@@ -31,11 +29,15 @@ struct StickNoteApp: App {
                         minWidth: 400, maxWidth: 400,
                         minHeight: 200, maxHeight: 200)
             }
-
         }
         .windowResizability(.contentSize)
         .modelContext(AppState.shared.context)
 
+        Window("Note list", id:"note-list"){
+            NoteListView()
+        }
+        .modelContext(AppState.shared.context)
+        
         Settings {
             SettingsView()
         }

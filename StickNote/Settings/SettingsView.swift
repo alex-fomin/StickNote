@@ -15,6 +15,7 @@ enum SettingsTab {
 struct SettingsView: View {
     @Default(.confirmOnDelete) var confirmOnDelete
     @Default(.showOnAllSpaces) var showOnAllSpaces
+    @Default(.deleteToTrashBin) var deleteToTrashBin
 
     @Environment(\.modelContext) var modelContext
     @Query var layouts: [NoteLayout]
@@ -65,6 +66,7 @@ struct SettingsView: View {
                 Section {
                     LaunchAtLogin.Toggle()
                     Toggle("Confirm on delete", isOn: $confirmOnDelete)
+                    Toggle("Delete to trash bin", isOn: $deleteToTrashBin)
                 }
             }
 

@@ -3,18 +3,19 @@ import SwiftUI
 
 struct MainMenu: View {
     @Environment(\.openSettings) private var openSettings
+    @Environment(\.openWindow) private var openWindow
 
     @State var model: AppStateModel
 
     var body: some View {
-        Button("Add new note") {
+        Button("New note") {
             AppState.shared.openNewNote()
         }
         .keyboardShortcut(
             KeyboardShortcuts.Shortcut(name: .createNote)?.toKeyboardShortcut()
         )
 
-        Button("Pasre note from clipboard") {
+        Button("Paste note") {
             AppState.shared.openNewNoteFromClipboard()
         }
         .disabled(
@@ -26,13 +27,17 @@ struct MainMenu: View {
             KeyboardShortcuts.Shortcut(name: .createNoteFromClipboard)?.toKeyboardShortcut()
         )
         Divider()
+        Button("Note list..."){
+            openWindow(id: "note-list")
+        }
+        Divider()
         Button($model.isNotesHidden.wrappedValue ? "Show notes" : "Hide notes") {
             AppState.shared.toggleNotesVisibility()
         }
         .keyboardShortcut(
             KeyboardShortcuts.Shortcut(name: .showHideNotes)?.toKeyboardShortcut()
         )
-        Button("Settings") { openSettings() }
+        Button("Settings...") { openSettings() }
         Button("Exit") { NSApplication.shared.terminate(nil) }
             .keyboardShortcut("Q")
     }
