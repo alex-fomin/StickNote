@@ -79,11 +79,10 @@ struct NoteListView: View {
                 }
             }
         }
-        .toolbar{
-            if let selectedFolder{
+        .toolbar {
+            if let selectedFolder {
                 if selectedFolder == .TrashBin {
-                    Button("Empty")
-                    {
+                    Button("Empty") {
                         showEmptyTrashConfirmation = true
                     }
                     .disabled(getNoteList(selectedFolder).isEmpty)
@@ -94,12 +93,12 @@ struct NoteListView: View {
             "Are you sure you want to permanently erase the notes in the Trash?",
             isPresented: $showEmptyTrashConfirmation
         ) {
-            Button {
+            Button("Empty Trash") {
                 AppState.shared.emptyTrashBin()
-            } label: {
-                Text("Delete")
             }
             Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("You can’t undo this action.")
         }
     }
 
@@ -129,7 +128,7 @@ struct NoteInfoView: View {
     @State var layout: NoteLayout? = nil
 
     var body: some View {
-        VStack(alignment: .trailing){
+        VStack(alignment: .trailing) {
             TextEditor(text: $note.text)
                 .modifier(NoteModifier(note: note))
 
