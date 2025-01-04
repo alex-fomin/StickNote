@@ -99,19 +99,39 @@ struct NoteListView: View {
 }
 
 struct NoteInfoView: View {
+    @Environment(\.modelContext) var modelContext
+    @Query var layouts: [NoteLayout]
+
     @Bindable var note: Note
+    @State var layout: NoteLayout? = nil
+
     var body: some View {
-        VStack {
+        VStack(alignment: .trailing){
             TextEditor(text: $note.text)
                 .modifier(NoteModifier(note: note))
-                
-            
-            Toggle("Show on all spaces", isOn: $note.showOnAllSpaces)
-                .onChange(of: $note.showOnAllSpaces.wrappedValue) {
-                    _, newValue in
-                    AppState.shared.applyShowOnAllSpaces(note: note)
+
+            Form {
+                Toggle("Show on all spaces", isOn: $note.showOnAllSpaces)
+                    .onChange(of: $note.showOnAllSpaces.wrappedValue) {
+                        _, newValue in
+                        AppState.shared.applyShowOnAllSpaces(note: note)
+                    }
+                LayoutPickerView("Layout", selectedLayout: $layout, layouts: layouts)
+            }
+            .formStyle(.grouped)
+            .onChange(of: layout) { _, newValue in
+                if let newValue {
+                    if !note.isSameAppearance(newValue) {
+                        note.apply(layout: newValue)
+                    }
                 }
-        }.padding()
+            }
+        }
+        .onChange(of: note) {
+            layout = layouts.first(where: { $0.isSameAppearance(note) })
+        }
+
+        .padding()
     }
 }
 

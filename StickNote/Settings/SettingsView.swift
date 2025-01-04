@@ -20,7 +20,7 @@ struct SettingsView: View {
     @Environment(\.modelContext) var modelContext
     @Query var layouts: [NoteLayout]
 
-    @State private var defaultLayout: NoteLayout = NoteLayout.defaultLayouts().first!
+    @State private var defaultLayout: NoteLayout? = NoteLayout.defaultLayouts().first!
 
     var body: some View {
         TabView {
@@ -45,28 +45,14 @@ struct SettingsView: View {
                     }
                     Section("New note") {
                         Toggle("Show on all spaces", isOn: $showOnAllSpaces)
-                        Picker("Default layout", selection: $defaultLayout) {
-                            ForEach(layouts) { layout in
-                                let nsFont = NSFont(layout).withSize(NSFont.systemFontSize)
-
-                                return HStack {
-                                    Image(
-                                        systemName: "square.fill"
-                                    )
-                                    .foregroundStyle(
-                                        Color.fromString(layout.color),
-                                        Color.fromString(layout.color))
-
-                                    Text(layout.name)
-                                        .font(Font(nsFont))
-
-                                }.tag(layout)
-                            }
-                        }
+                        LayoutPickerView(
+                            "Default layout", selectedLayout: $defaultLayout,
+                            layouts: layouts
+                        )
                         .onAppear {
                             defaultLayout = layouts.first { $0.isDefault }!
                         }
-                        .onChange(of: defaultLayout) { old, new in
+                        .onChange(of: defaultLayout!) { old, new in
                             try? self.modelContext.transaction {
                                 old.isDefault = false
                                 new.isDefault = true
@@ -86,3 +72,5 @@ struct SettingsView: View {
 #Preview {
     SettingsView()
 }
+
+

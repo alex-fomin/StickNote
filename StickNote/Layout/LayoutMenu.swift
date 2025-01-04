@@ -14,9 +14,7 @@ struct LayoutMenu: View {
                 Button {
                     note.apply(layout: layout)
                 } label: {
-                    let sameLayout =
-                        note.color == layout.color && note.fontName == layout.fontName
-                        && note.fontSize == layout.fontSize && note.fontColor == layout.fontColor
+                    let sameLayout = note.isSameAppearance(layout)
                     Image(
                         systemName: sameLayout
                             ? "checkmark.square.fill" : "square.fill"
