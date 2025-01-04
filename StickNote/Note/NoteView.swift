@@ -119,7 +119,8 @@ struct NoteView: View {
 
     func processNote() {
         if $note.text.wrappedValue.isEmpty {
-            AppState.shared.deleteNote(self.note)
+            AppState.shared.deleteNote(self.note, forceDelete: true)
+            nsWindow?.close()
         }
     }
 
