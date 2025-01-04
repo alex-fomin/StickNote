@@ -49,7 +49,7 @@ final class NoteLayout: Identifiable, NoteAppearance {
     static var defaultLayout: NoteLayout {
         let systemFont = NSFont.systemFont(ofSize: 16)
         return .init(
-            name: "Yellow", color: "#FFF68B", fontName: systemFont.fontName,
+            name: "Yellow", color: "#FFF68B", fontName: "SFCompact-Regular",
             fontSize: systemFont.pointSize, fontColor: "#000000", isDefault: true)
     }
 }

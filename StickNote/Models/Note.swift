@@ -15,9 +15,9 @@ final class Note: NoteAppearance, Identifiable {
     var fontName: String
     var fontSize: CGFloat
     var fontColor: String
-    
+
     var showOnAllSpaces: Bool = true
-    
+
     var isInTrashBin: Bool = false
 
     init(
@@ -46,9 +46,5 @@ final class Note: NoteAppearance, Identifiable {
         self.fontColor = layout.fontColor
         self.fontName = layout.fontName
         self.fontSize = layout.fontSize
-    }
-
-    var nsFont: NSFont {
-        return NSFont(name: fontName, size: fontSize)!
     }
 }

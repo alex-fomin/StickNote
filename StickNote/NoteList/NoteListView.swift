@@ -53,7 +53,7 @@ struct NoteListView: View {
             if let selectedFolder {
                 let noteList = filteredNotes(notes: getNoteList(selectedFolder))
                 List(selection: $selectedNote) {
-                    ForEach(noteList, id: \.self) { item in
+                    ForEach(noteList, id: \.id) { item in
                         NavigationLink(value: item) {
                             Text(item.text.truncate(50, maxLines: 2))
                         }
@@ -82,24 +82,27 @@ struct NoteListView: View {
         .toolbar {
             if let selectedFolder {
                 if selectedFolder == .TrashBin {
-                    Button("Empty") {
-                        showEmptyTrashConfirmation = true
+                    ToolbarItemGroup(placement: .primaryAction) {
+                        Button("Empty") {
+                            showEmptyTrashConfirmation = true
+                        }
+                        .disabled(getNoteList(selectedFolder).isEmpty)
+                        .confirmationDialog(
+                            "Are you sure you want to permanently erase the notes in the Trash?",
+                            isPresented: $showEmptyTrashConfirmation
+                        ) {
+                            Button("Empty Trash") {
+                                AppState.shared.emptyTrashBin()
+                            }
+                            Button("Cancel", role: .cancel) {}
+                        } message: {
+                            Text("You can’t undo this action.")
+                        }
                     }
-                    .disabled(getNoteList(selectedFolder).isEmpty)
                 }
             }
         }
-        .confirmationDialog(
-            "Are you sure you want to permanently erase the notes in the Trash?",
-            isPresented: $showEmptyTrashConfirmation
-        ) {
-            Button("Empty Trash") {
-                AppState.shared.emptyTrashBin()
-            }
-            Button("Cancel", role: .cancel) {}
-        } message: {
-            Text("You can’t undo this action.")
-        }
+
     }
 
     func filteredNotes(notes: [Note]) -> [Note] {
@@ -140,6 +143,13 @@ struct NoteInfoView: View {
                     }
                 LayoutPickerView("Layout", selectedLayout: $layout, layouts: layouts)
             }
+            .toolbar{
+                Button{}
+                label:{
+                    Image(systemName: "trash")
+                }
+                
+            }
             .formStyle(.grouped)
             .onChange(of: layout) { _, newValue in
                 if let newValue {
@@ -158,6 +168,15 @@ struct NoteInfoView: View {
 }
 
 #Preview {
-    NoteListView()
-        .modelContainer(for: Note.self, inMemory: true)
+    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+    let container = try! ModelContainer(for: Note.self, configurations: config)
+
+    let note = Note(layout: NoteLayout.defaultLayout, text: "This is note")
+    container.mainContext.insert(note)
+    let deletedNote = Note(layout: NoteLayout.defaultLayout, text: "DeletedNote")
+    deletedNote.isInTrashBin = true
+    container.mainContext.insert(deletedNote)
+
+    return NoteListView()
+        .modelContainer(container)
 }

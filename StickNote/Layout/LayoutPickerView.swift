@@ -13,7 +13,7 @@ struct LayoutPickerView: View {
     var body: some View {
         Picker(title, selection: $selectedLayout) {
             ForEach(layouts) { layout in
-                let nsFont = NSFont(layout).withSize(NSFont.systemFontSize)
+                let nsFont = layout.nsFont.withSize(NSFont.systemFontSize)
 
                 return HStack {
                     Image(

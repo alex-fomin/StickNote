@@ -36,7 +36,7 @@ struct LayoutView: View {
 
     init(info: NoteAppearance, text: String? = nil) {
         self.info = info
-        self.font = NSFont(info)
+        self.font = info.nsFont
         self.color = Color.fromString(info.color)
         self.fontColor = Color.fromString(info.fontColor)
         self.text =
