@@ -143,13 +143,6 @@ struct NoteInfoView: View {
                     }
                 LayoutPickerView("Layout", selectedLayout: $layout, layouts: layouts)
             }
-            .toolbar{
-                Button{}
-                label:{
-                    Image(systemName: "trash")
-                }
-                
-            }
             .formStyle(.grouped)
             .onChange(of: layout) { _, newValue in
                 if let newValue {

@@ -99,6 +99,7 @@ struct NoteView: View {
         ) {
             Button {
                 AppState.shared.deleteNote(self.note)
+                nsWindow?.close()
             } label: {
                 Text("Delete")
             }
