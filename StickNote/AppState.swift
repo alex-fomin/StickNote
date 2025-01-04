@@ -149,7 +149,7 @@ final class AppState {
         if let notes {
             for note in notes {
                 if note.text.isEmpty {
-                    self.deleteNote(note)
+                    self.deleteNote(note, forceDelete: true)
                 } else {
                     self.openNote(note, isEditing: false)
                 }
@@ -157,11 +157,11 @@ final class AppState {
         }
     }
 
-    func deleteNote(_ note: Note) {
-        if deleteToTrashBin {
-            note.isInTrashBin = true
-        } else {
+    func deleteNote(_ note: Note, forceDelete: Bool = false) {
+        if forceDelete || !deleteToTrashBin {
             self.context.delete(note)
+        } else {
+            note.isInTrashBin = true
         }
         try? self.context.save()
         let window = notesToWindows.removeValue(forKey: note.id)
@@ -190,6 +190,17 @@ final class AppState {
             nsWindow.collectionBehavior.insert(.canJoinAllSpaces)
         } else {
             nsWindow.collectionBehavior.remove(.canJoinAllSpaces)
+        }
+    }
+    
+    func emptyTrashBin(){
+        let notes = try? self.context.fetch<Note>(
+            FetchDescriptor<Note>(predicate: #Predicate { $0.isInTrashBin == true }))
+
+        if let notes {
+            for note in notes {
+                self.deleteNote(note, forceDelete: true)
+            }
         }
     }
 

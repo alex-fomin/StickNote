@@ -10,6 +10,7 @@ struct NoteListView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(filter: #Predicate<Note> { $0.isInTrashBin == false }) private var notes: [Note]
     @Query(filter: #Predicate<Note> { $0.isInTrashBin == true }) private var deleted: [Note]
+    @State private var showEmptyTrashConfirmation = false
 
     @State private var selectedFolder: SelectedFolder?
     @State private var selectedNote: Note?
@@ -77,6 +78,28 @@ struct NoteListView: View {
                     NoteInfoView(note: note)
                 }
             }
+        }
+        .toolbar{
+            if let selectedFolder{
+                if selectedFolder == .TrashBin {
+                    Button("Empty")
+                    {
+                        showEmptyTrashConfirmation = true
+                    }
+                    .disabled(getNoteList(selectedFolder).isEmpty)
+                }
+            }
+        }
+        .confirmationDialog(
+            "Are you sure you want to permanently erase the notes in the Trash?",
+            isPresented: $showEmptyTrashConfirmation
+        ) {
+            Button {
+                AppState.shared.emptyTrashBin()
+            } label: {
+                Text("Delete")
+            }
+            Button("Cancel", role: .cancel) {}
         }
     }
 
