@@ -139,6 +139,12 @@ struct NoteView: View {
             default: break
             }
         }
+        .onChange(of: note.fontSize){
+            minMaxWindow()
+        }
+        .onChange(of: note.fontName){
+            minMaxWindow()
+        }
     }
 
     func processNote() {
