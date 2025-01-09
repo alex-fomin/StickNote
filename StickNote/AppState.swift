@@ -78,9 +78,6 @@ final class AppState {
             if !text.isEmpty {
                 let note = Note(layout: getDefaultLayout(), text: text)
                 note.showOnAllSpaces = Defaults[.showOnAllSpaces]
-                let size = text.sizeUsingFont(usingFont: note.nsFont)
-                note.width = size.width + 16
-                note.height = size.height
                 self.context.insert(note)
                 self.openNote(note, isEditing: false)
             }
@@ -94,13 +91,11 @@ final class AppState {
 
         note.x = contentRect.minX
         note.y = contentRect.minY
-        note.width = contentRect.width
-        note.height = contentRect.height
 
         let window = NoteWindow(
             contentRect: contentRect,
             styleMask: [
-                .titled, .borderless
+                .titled, .borderless,
             ],
             backing: .buffered,
             defer: true
@@ -131,15 +126,13 @@ final class AppState {
     private func getContentRectFromNote(_ note: Note) -> NSRect {
         let screenFrame = NSScreen.main?.frame ?? NSRect.zero
 
-        let x = note.x ?? screenFrame.midX - 200 + CGFloat(self.windowCount) * 20
-        let y = note.y ?? screenFrame.midY + 150 - CGFloat(self.windowCount) * 20
-        let width = note.width ?? 100
-        let height = note.height ?? 160
+        let x = note.x ?? (screenFrame.midX - 200 + CGFloat(self.windowCount) * 20)
+        let y = note.y ?? (screenFrame.midY + 150 - CGFloat(self.windowCount) * 20)
 
         return NSRect(
             x: x,
             y: y,
-            width: width, height: height)
+            width: 10, height: 10)
     }
 
     func openAllNotes() {
@@ -192,8 +185,8 @@ final class AppState {
             nsWindow.collectionBehavior.remove(.canJoinAllSpaces)
         }
     }
-    
-    func emptyTrashBin(){
+
+    func emptyTrashBin() {
         let notes = try? self.context.fetch<Note>(
             FetchDescriptor<Note>(predicate: #Predicate { $0.isInTrashBin == true }))
 

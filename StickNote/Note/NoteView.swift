@@ -18,6 +18,9 @@ struct NoteView: View {
     @State private var selection: TextSelection?
     @State private var showConfirmation = false
 
+    @State var width: CGFloat = 0
+    @State var height: CGFloat = 0
+
     private var windowTracker: WindowPositionTracker
 
     var body: some View {
@@ -32,42 +35,47 @@ struct NoteView: View {
                             range: $note.text.wrappedValue
                                 .startIndex..<$note.text.wrappedValue.endIndex)
                         self.nsWindow?.makeKey()
+                        //    self.minMaxWindow()
                         self.nsWindow?.styleMask.remove(.titled)
-                        self.minMaxWindow()
+
                     }
                     .lineSpacing(note.nsFont.leading)
-                    .modifier(NoteModifier(note:note))
+                    .modifier(NoteModifier(note: note))
                     .scrollDisabled(true)
                     .onDisappear { processNote() }
                     .onSubmit { processNote() }
                     .onChange(of: note.text) { _, _ in
-                        self.minMaxWindow()
+                        self.minMaxWindow(minimize: false)
                     }
-                
+
                     .frame(
-                        width: note.width, height: note.height,
+                        width: width, height: height,
                         alignment: .topLeading)
-                    
+
             } else {
-                NoteTextView(note:note)
+                NoteTextView(note: note)
                     .overlay(DraggableArea(isEditing: $isEditing))
                     .contextMenu {
                         Button {
-                            self.minMaxWindow(minimize: true)
+                            self.minMaxWindow(minimize: !note.isMinimized)
+                            note.isMinimized = !note.isMinimized
                         } label: {
-                            Label("Minimize", systemImage: "")
+                            Label(note.isMinimized ? "Maximize" : "Minimize", systemImage: "")
                         }
-                        Button {
-                            self.minMaxWindow()
-                        } label: {
-                            Label("Maximize", systemImage: "")
-                        }
+                        //                        Button {
+                        //                            self.minMaxWindow()
+                        //                            note.isMinimized = false
+                        //                        } label: {
+                        //                            Label("Maximize", systemImage: "")
+                        //                        }
                         Divider()
                         Button {
                             note.showOnAllSpaces = !note.showOnAllSpaces
                             AppState.shared.applyShowOnAllSpaces(note: note)
                         } label: {
-                            Label((note.showOnAllSpaces ?"✓ " :"" )+"Show on all spaces", systemImage: "rectangle.on.rectangle")
+                            Label(
+                                (note.showOnAllSpaces ? "✓ " : "") + "Show on all spaces",
+                                systemImage: "rectangle.on.rectangle")
                         }
                         Divider()
                         Button {
@@ -115,7 +123,10 @@ struct NoteView: View {
                 window?.delegate = self.windowTracker
             }
         )
-        .frame(width: note.width, height: note.height, alignment: .leading)
+        .frame(width: width, height: height, alignment: .leading)
+        .onAppear {
+            minMaxWindow(minimize: note.isMinimized && !isEditing)
+        }
     }
 
     func processNote() {
@@ -123,20 +134,19 @@ struct NoteView: View {
             AppState.shared.deleteNote(self.note, forceDelete: true)
             nsWindow?.close()
         }
+        minMaxWindow(minimize: note.isMinimized)
     }
 
     func minMaxWindow(minimize: Bool = false) {
         let text = minimize ? note.text.truncate(5) : note.text
         let size = text.sizeUsingFont(usingFont: note.nsFont)
 
-        let newX = note.x!
-        let newHeight = size.height + (minimize ? 0 : note.nsFont.maximumAdvancement.height)
-        let newY = note.y! + note.height! - newHeight
-        let newWidth = size.width + "m".sizeUsingFont(usingFont: note.nsFont).width*2
+        let newHeight = size.height
+        let newY = height == 0 ? note.y : (note.y! + height - newHeight)
+        let newWidth = size.width + "m".sizeUsingFont(usingFont: note.nsFont).width * 2
 
-        note.width = newWidth
-        note.height = newHeight
-        note.x = newX
+        width = newWidth
+        height = newHeight
         note.y = newY
     }
 }
@@ -149,6 +159,3 @@ extension NSTextView {
         }
     }
 }
-
-
-

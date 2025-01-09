@@ -6,8 +6,7 @@ import SwiftUI
 final class Note: NoteAppearance, Identifiable {
     var x: CGFloat?
     var y: CGFloat?
-    var width: CGFloat?
-    var height: CGFloat?
+    var isMinimized: Bool = false
 
     var text: String = ""
     var color: String
@@ -21,13 +20,11 @@ final class Note: NoteAppearance, Identifiable {
     var isInTrashBin: Bool = false
 
     init(
-        x: CGFloat? = nil, y: CGFloat? = nil, width: CGFloat? = nil, height: CGFloat? = nil,
+        x: CGFloat? = nil, y: CGFloat? = nil, isMinimized: Bool = false,
         text: String, color: String, fontName: String, fontSize: CGFloat, fontColor: String
     ) {
         self.x = x
         self.y = y
-        self.width = width
-        self.height = height
         self.text = text
         self.color = color
         self.fontName = fontName

@@ -5,7 +5,6 @@
 //  Created by Alex Fomin on 15/12/2024.
 //
 
-
 import SwiftUI
 
 class WindowPositionTracker: NSObject, NSWindowDelegate {
@@ -18,8 +17,6 @@ class WindowPositionTracker: NSObject, NSWindowDelegate {
         guard let window = notification.object as? NSWindow else { return }
         note.x = window.frame.origin.x
         note.y = window.frame.origin.y
-        note.width = window.frame.size.width
-        note.height = window.frame.size.height
     }
 
     // Track when the window is moved
