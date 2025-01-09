@@ -10,6 +10,7 @@ struct NoteView: View {
     }
 
     @Default(.confirmOnDelete) var confirmOnDelete
+    @Default(.onHover) var onHover
 
     @State var note: Note
     @State var nsWindow: NSWindow?
@@ -20,6 +21,8 @@ struct NoteView: View {
 
     @State var width: CGFloat = 0
     @State var height: CGFloat = 0
+
+    @State var showTooltip: Bool = false
 
     private var windowTracker: WindowPositionTracker
 
@@ -35,9 +38,7 @@ struct NoteView: View {
                             range: $note.text.wrappedValue
                                 .startIndex..<$note.text.wrappedValue.endIndex)
                         self.nsWindow?.makeKey()
-                        //    self.minMaxWindow()
                         self.nsWindow?.styleMask.remove(.titled)
-
                     }
                     .lineSpacing(note.nsFont.leading)
                     .modifier(NoteModifier(note: note))
@@ -55,6 +56,11 @@ struct NoteView: View {
             } else {
                 NoteTextView(note: note)
                     .overlay(DraggableArea(isEditing: $isEditing))
+                    .popover(isPresented: $showTooltip, arrowEdge: .bottom) {
+                        Text(note.text)
+                            .padding(8)
+                            .presentationCompactAdaptation(.popover)
+                    }
                     .contextMenu {
                         Button {
                             self.minMaxWindow(minimize: !note.isMinimized)
@@ -62,12 +68,6 @@ struct NoteView: View {
                         } label: {
                             Label(note.isMinimized ? "Maximize" : "Minimize", systemImage: "")
                         }
-                        //                        Button {
-                        //                            self.minMaxWindow()
-                        //                            note.isMinimized = false
-                        //                        } label: {
-                        //                            Label("Maximize", systemImage: "")
-                        //                        }
                         Divider()
                         Button {
                             note.showOnAllSpaces = !note.showOnAllSpaces
@@ -98,7 +98,8 @@ struct NoteView: View {
                         } label: {
                             Label("Delete", systemImage: "delete")
                         }
-                    }.padding([.horizontal], 5)
+                    }
+                    .padding([.horizontal], 5)
             }
         }
         .confirmationDialog(
@@ -126,6 +127,17 @@ struct NoteView: View {
         .frame(width: width, height: height, alignment: .leading)
         .onAppear {
             minMaxWindow(minimize: note.isMinimized && !isEditing)
+        }
+        .onHover { hover in
+            if !note.isMinimized {
+                return
+            }
+
+            switch onHover {
+            case .maximize: minMaxWindow(minimize: !hover)
+            case .showTooltip: showTooltip = hover
+            default: break
+            }
         }
     }
 
