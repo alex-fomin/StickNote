@@ -16,10 +16,8 @@ extension NoteAppearance {
     
     var nsFont: NSFont {
         if let nsFont = NSFont(name: fontName, size: NSFont.systemFontSize) {
-            print ("Bote", fontName)
             return nsFont.withSize(fontSize)
         } else {
-            print("system", NSFont.systemFont(ofSize: NSFont.systemFontSize).fontName)
             return NSFont.systemFont(ofSize: NSFont.systemFontSize)
         }
     }
