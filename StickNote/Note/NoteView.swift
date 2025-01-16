@@ -10,7 +10,8 @@ struct NoteView: View {
     }
 
     @Default(.confirmOnDelete) var confirmOnDelete
-    @Default(.onHover) var onHover
+    @Default(.maximizeOnEdit) var maximizeOnEdit
+    @Default(.maximizeOnHover) var maximizeOnHover
 
     @State var note: Note
     @State var nsWindow: NSWindow?
@@ -21,9 +22,7 @@ struct NoteView: View {
 
     @State var width: CGFloat = 0
     @State var height: CGFloat = 0
-
-    @State var showTooltip: Bool = false
-
+    
     private var windowTracker: WindowPositionTracker
 
     var body: some View {
@@ -56,11 +55,6 @@ struct NoteView: View {
             } else {
                 NoteTextView(note: note)
                     .overlay(DraggableArea(isEditing: $isEditing))
-                    .popover(isPresented: $showTooltip, arrowEdge: .bottom) {
-                        Text(note.text)
-                            .padding(8)
-                            .presentationCompactAdaptation(.popover)
-                    }
                     .contextMenu {
                         Button {
                             self.minMaxWindow(minimize: !note.isMinimized)
@@ -132,17 +126,14 @@ struct NoteView: View {
             if !note.isMinimized {
                 return
             }
-
-            switch onHover {
-            case .maximize: minMaxWindow(minimize: !hover)
-            case .showTooltip: showTooltip = hover
-            default: break
+            if maximizeOnHover {
+                minMaxWindow(minimize: !hover)
             }
         }
-        .onChange(of: note.fontSize){
+        .onChange(of: note.fontSize) {
             minMaxWindow()
         }
-        .onChange(of: note.fontName){
+        .onChange(of: note.fontName) {
             minMaxWindow()
         }
     }
@@ -151,8 +142,12 @@ struct NoteView: View {
         if $note.text.wrappedValue.isEmpty {
             AppState.shared.deleteNote(self.note, forceDelete: true)
             nsWindow?.close()
+        } else {
+            if maximizeOnEdit {
+                note.isMinimized = false
+            }
+            minMaxWindow(minimize: note.isMinimized)
         }
-        minMaxWindow(minimize: note.isMinimized)
     }
 
     func minMaxWindow(minimize: Bool = false) {
@@ -174,6 +169,7 @@ extension NSTextView {
         didSet {
             self.isAutomaticQuoteSubstitutionEnabled = false
             self.isAutomaticDashSubstitutionEnabled = false
+            self.isAutomaticTextCompletionEnabled = false
         }
     }
 }

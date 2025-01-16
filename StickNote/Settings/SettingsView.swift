@@ -16,7 +16,8 @@ struct SettingsView: View {
     @Default(.confirmOnDelete) var confirmOnDelete
     @Default(.showOnAllSpaces) var showOnAllSpaces
     @Default(.deleteToTrashBin) var deleteToTrashBin
-    @Default(.onHover) var onHover
+    @Default(.maximizeOnHover) var maximizeOnHover
+    @Default(.maximizeOnEdit) var maximizeOnEdit
 
     @Environment(\.modelContext) var modelContext
     @Query var layouts: [NoteLayout]
@@ -43,11 +44,8 @@ struct SettingsView: View {
                     Section {
                         Toggle("Confirm on delete", isOn: $confirmOnDelete)
                         Toggle("Delete to trash bin", isOn: $deleteToTrashBin)
-                        Picker(selection: $onHover, label: Text("On hover over minimized note")) {
-                            Text("Do nothing").tag(OnHover.nothing)
-                            Text("Show tooltip").tag(OnHover.showTooltip)
-                            Text("Maximize").tag(OnHover.maximize)
-                        }
+                        Toggle("Maximize on hover", isOn: $maximizeOnHover)
+                        Toggle("Maximize after edit", isOn: $maximizeOnEdit)
                     }
                     Section("New note") {
                         Toggle("Show on all spaces", isOn: $showOnAllSpaces)

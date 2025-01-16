@@ -20,7 +20,9 @@ struct MainMenu: View {
         }
         .disabled(
             !NSPasteboard.general.canReadItem(withDataConformingToTypes: [
-                NSPasteboard.PasteboardType.string.rawValue
+                NSPasteboard.PasteboardType.string.rawValue,
+                NSPasteboard.PasteboardType.rtf.rawValue,
+                NSPasteboard.PasteboardType.rtfd.rawValue
             ])
         )
         .keyboardShortcut(
