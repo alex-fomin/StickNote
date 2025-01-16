@@ -57,7 +57,6 @@ struct NoteView: View {
                     .overlay(DraggableArea(isEditing: $isEditing))
                     .contextMenu {
                         Button {
-                            self.minMaxWindow(minimize: !note.isMinimized)
                             note.isMinimized = !note.isMinimized
                         } label: {
                             Label(note.isMinimized ? "Maximize" : "Minimize", systemImage: "")
@@ -131,10 +130,18 @@ struct NoteView: View {
             }
         }
         .onChange(of: note.fontSize) {
-            minMaxWindow()
+            minMaxWindow(minimize:note.isMinimized)
         }
         .onChange(of: note.fontName) {
-            minMaxWindow()
+            minMaxWindow(minimize:note.isMinimized)
+        }
+        .onChange(of: note.isMinimized) {
+            minMaxWindow(minimize:note.isMinimized)
+        }
+        .onChange(of: note.text) {
+            if !note.isMinimized {
+                minMaxWindow(minimize:note.isMinimized)
+            }
         }
     }
 
@@ -146,7 +153,6 @@ struct NoteView: View {
             if maximizeOnEdit {
                 note.isMinimized = false
             }
-            minMaxWindow(minimize: note.isMinimized)
         }
     }
 

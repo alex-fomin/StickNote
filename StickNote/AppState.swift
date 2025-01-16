@@ -184,6 +184,7 @@ final class AppState {
         } else {
             nsWindow.collectionBehavior.remove(.canJoinAllSpaces)
         }
+        nsWindow.update()
     }
 
     func emptyTrashBin() {

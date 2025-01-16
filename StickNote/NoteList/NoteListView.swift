@@ -1,5 +1,6 @@
 import SwiftData
 import SwiftUI
+import Defaults
 
 enum SelectedFolder {
     case Notes
@@ -15,6 +16,9 @@ struct NoteListView: View {
     @State private var selectedFolder: SelectedFolder?
     @State private var selectedNote: Note?
     @State private var searchText: String = ""
+    
+    @State private var showConfirmation = false
+    @Default(.confirmOnDelete) var confirmOnDelete
 
     var body: some View {
         NavigationSplitView {
@@ -53,27 +57,48 @@ struct NoteListView: View {
             if let selectedFolder {
                 let noteList = filteredNotes(notes: getNoteList(selectedFolder))
                 List(selection: $selectedNote) {
+                    if selectedFolder == .TrashBin {
+                        HStack {
+                            Spacer()
+                            Button("Empty") {
+                                showEmptyTrashConfirmation = true
+                            }
+                            .disabled(getNoteList(selectedFolder).isEmpty)
+                            .confirmationDialog(
+                                "Are you sure you want to permanently erase the notes in the Trash?",
+                                isPresented: $showEmptyTrashConfirmation
+                            ) {
+                                Button("Empty Trash") {
+                                    AppState.shared.emptyTrashBin()
+                                }
+                                Button("Cancel", role: .cancel) {}
+                            } message: {
+                                Text("You can’t undo this action.")
+                            }
+                            .controlSize(.small)
+                        }
+                        .listRowInsets(
+                            .init(
+                                top: 1,
+                                leading: 0,
+                                bottom: 10,
+                                trailing: 0))
+                    }
                     ForEach(noteList, id: \.id) { item in
                         NavigationLink(value: item) {
                             Text(item.text.truncate(50, maxLines: 2))
                         }
                     }
                 }
+
             } else {
                 Text("Select note list")
             }
         } detail: {
             if let note = selectedNote {
                 if note.isInTrashBin {
-                    VStack {
-                        NoteTextView(note: note, allowSelection: true)
-                    }
-                    Button("Restore") {
-                        note.isInTrashBin = false
-                        AppState.shared.openNote(note, isEditing: false)
-                        selectedNote = note
-                        selectedFolder = .Notes
-                    }
+                    TextEditor(text: .constant(note.text))
+                        .modifier(NoteModifier(note: note))
                 } else {
                     NoteInfoView(note: note)
                 }
@@ -81,25 +106,41 @@ struct NoteListView: View {
         }
         .toolbar {
             if let selectedFolder {
-                if selectedFolder == .TrashBin {
-                    ToolbarItemGroup(placement: .primaryAction) {
-                        Button("Empty") {
-                            showEmptyTrashConfirmation = true
-                        }
-                        .disabled(getNoteList(selectedFolder).isEmpty)
-                        .confirmationDialog(
-                            "Are you sure you want to permanently erase the notes in the Trash?",
-                            isPresented: $showEmptyTrashConfirmation
-                        ) {
-                            Button("Empty Trash") {
-                                AppState.shared.emptyTrashBin()
+                ToolbarItemGroup(placement: .secondaryAction) {
+                    if let note = selectedNote {
+                        if selectedFolder == .TrashBin {
+                            Button("Restore", systemImage: "arrow.up.trash") {
+                                note.isInTrashBin = false
+                                AppState.shared.openNote(note, isEditing: false)
+                                self.selectedFolder = .Notes
+                                self.selectedNote = note
                             }
-                            Button("Cancel", role: .cancel) {}
-                        } message: {
-                            Text("You can’t undo this action.")
+                        } else {
+                            Button("Delete", systemImage: "trash") {
+                                if confirmOnDelete {
+                                    showConfirmation = true
+                                } else {
+            
+                                    AppState.shared.deleteNote(note)
+                                    self.selectedNote = nil
+                                }
+                            }
+                            .confirmationDialog(
+                                #"Are you sure you want to delete "\#(note.text.truncate(15))"?"#,
+                                isPresented: $showConfirmation
+                            ) {
+                                Button {
+                                    AppState.shared.deleteNote(note)
+                                    self.selectedNote = nil
+                                } label: {
+                                    Text("Delete")
+                                }
+                                Button("Cancel", role: .cancel) {}
+                            }
                         }
                     }
                 }
+               
             }
         }
 
@@ -141,7 +182,15 @@ struct NoteInfoView: View {
                         _, newValue in
                         AppState.shared.applyShowOnAllSpaces(note: note)
                     }
+                Toggle("Maximized", isOn: !$note.isMinimized)
+                    .onChange(of: $note.isMinimized.wrappedValue) {
+                        _, newValue in
+                        AppState.shared.applyShowOnAllSpaces(note: note)
+                    }
                 LayoutPickerView("Layout", selectedLayout: $layout, layouts: layouts)
+                    .onAppear {
+                        layout = layouts.first(where: { $0.isSameAppearance(note) })
+                    }
             }
             .formStyle(.grouped)
             .onChange(of: layout) { _, newValue in
@@ -155,7 +204,6 @@ struct NoteInfoView: View {
         .onChange(of: note) {
             layout = layouts.first(where: { $0.isSameAppearance(note) })
         }
-
         .padding()
     }
 }
