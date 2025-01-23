@@ -101,8 +101,7 @@ final class AppState {
             defer: true
         )
         window.note = note
-        notesToWindows[note.id] = window
-
+ 
         let contentView = NoteView(note: note, isEditing: isEditing)
             .preferredColorScheme(.light)
             .environment(\.modelContext, self.sharedModelContainer.mainContext)
@@ -120,7 +119,9 @@ final class AppState {
             window.makeKey()
         }
         window.styleMask.remove(.titled)
-
+        
+        try? context.save()
+        notesToWindows[note.id] = window
     }
 
     private func getContentRectFromNote(_ note: Note) -> NSRect {
@@ -151,14 +152,18 @@ final class AppState {
     }
 
     func deleteNote(_ note: Note, forceDelete: Bool = false) {
+
+        let window = notesToWindows.removeValue(forKey: note.id)
+        window?.close()
+        
         if forceDelete || !deleteToTrashBin {
             self.context.delete(note)
         } else {
             note.isInTrashBin = true
+            note.updatedAt = Date.now
         }
         try? self.context.save()
-        let window = notesToWindows.removeValue(forKey: note.id)
-        window?.close()
+ 
     }
 
     func copyToClipboard(_ note: Note) {
@@ -178,7 +183,7 @@ final class AppState {
     }
 
     func applyShowOnAllSpaces(note: Note) {
-        guard let nsWindow = notesToWindows[note.persistentModelID] else { return }
+        guard let nsWindow = notesToWindows[note.id] else { return }
         if note.showOnAllSpaces {
             nsWindow.collectionBehavior.insert(.canJoinAllSpaces)
         } else {

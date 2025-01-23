@@ -8,7 +8,16 @@ final class Note: NoteAppearance, Identifiable {
     var y: CGFloat?
     var isMinimized: Bool = false
 
-    var text: String = ""
+    private var _text: String
+    var text: String {
+        get{_text}
+        set(newText){
+            _text=newText
+            updatedAt=Date.now
+        }
+        
+    }
+    
     var color: String
 
     var fontName: String
@@ -18,6 +27,8 @@ final class Note: NoteAppearance, Identifiable {
     var showOnAllSpaces: Bool = true
 
     var isInTrashBin: Bool = false
+    var createdAt: Date = Date()
+    var updatedAt: Date = Date()
 
     init(
         x: CGFloat? = nil, y: CGFloat? = nil, isMinimized: Bool = false,
@@ -25,7 +36,7 @@ final class Note: NoteAppearance, Identifiable {
     ) {
         self.x = x
         self.y = y
-        self.text = text
+        self._text = text
         self.color = color
         self.fontName = fontName
         self.fontSize = fontSize

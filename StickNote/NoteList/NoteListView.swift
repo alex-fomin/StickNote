@@ -19,6 +19,14 @@ struct NoteListView: View {
     
     @State private var showConfirmation = false
     @Default(.confirmOnDelete) var confirmOnDelete
+    
+    private let dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .short
+        return formatter
+    }()
+    
 
     var body: some View {
         NavigationSplitView {
@@ -86,7 +94,13 @@ struct NoteListView: View {
                     }
                     ForEach(noteList, id: \.id) { item in
                         NavigationLink(value: item) {
-                            Text(item.text.truncate(50, maxLines: 2))
+                            VStack(alignment: .leading){
+                                Text(item.text.truncate(50, maxLines: 2))
+                                Text("Created \(dateFormatter.string(from: item.createdAt))")
+                                    .controlSize(.mini)
+                                Text("\(item.isInTrashBin ? "Deleted" : "Updated") \(dateFormatter.string(from: item.updatedAt))")
+                                    .controlSize(.mini)
+                            }
                         }
                     }
                 }
@@ -111,6 +125,7 @@ struct NoteListView: View {
                         if selectedFolder == .TrashBin {
                             Button("Restore", systemImage: "arrow.up.trash") {
                                 note.isInTrashBin = false
+                                note.updatedAt = Date.now
                                 AppState.shared.openNote(note, isEditing: false)
                                 self.selectedFolder = .Notes
                                 self.selectedNote = note
@@ -204,7 +219,7 @@ struct NoteInfoView: View {
         .onChange(of: note) {
             layout = layouts.first(where: { $0.isSameAppearance(note) })
         }
-        .padding()
+        .padding(6)
     }
 }
 
