@@ -1,12 +1,11 @@
 import SwiftData
 import SwiftUI
+import AppKit
 
 @main
 struct StickNoteApp: App {
-    init() {
-        AppState.shared.openAllNotes()
-    }
-
+    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    
     @StateObject private var appStateModel = AppState.shared.model
 
     var body: some Scene {
