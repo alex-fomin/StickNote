@@ -1,9 +1,6 @@
-import AppKit
 import Defaults
-import KeyboardShortcuts
 import SwiftData
 import SwiftUI
-
 
 final class AppState {
 
@@ -46,16 +43,6 @@ final class AppState {
 
             try? self.context.save()
         }
-
-        KeyboardShortcuts.onKeyUp(for: .createNote) { [self] in
-            self.openNewNote()
-        }
-        KeyboardShortcuts.onKeyUp(for: .createNoteFromClipboard) { [self] in
-            self.openNewNoteFromClipboard()
-        }
-        KeyboardShortcuts.onKeyUp(for: .showHideNotes) { [self] in
-            self.toggleNotesVisibility()
-        }
     }
 
     func getDefaultLayout() -> NoteLayout {
@@ -95,7 +82,7 @@ final class AppState {
         let window = NoteWindow(
             contentRect: contentRect,
             styleMask: [
-                .titled, .borderless,
+                .titled
             ],
             backing: .buffered,
             defer: true
@@ -116,6 +103,7 @@ final class AppState {
 
         window.orderFront(nil)
         if isEditing {
+            NSApplication.shared.activate(ignoringOtherApps: true)
             window.makeKey()
         }
         window.styleMask.remove(.titled)
@@ -127,8 +115,8 @@ final class AppState {
     private func getContentRectFromNote(_ note: Note) -> NSRect {
         let screenFrame = NSScreen.main?.frame ?? NSRect.zero
 
-        let x = note.x ?? (screenFrame.midX - 200 + CGFloat(self.windowCount) * 20)
-        let y = note.y ?? (screenFrame.midY + 150 - CGFloat(self.windowCount) * 20)
+        let x = note.x ?? (screenFrame.midX - 500 + CGFloat(self.windowCount) * 20)
+        let y = note.y ?? (screenFrame.midY + 450 - CGFloat(self.windowCount) * 20)
 
         return NSRect(
             x: x,

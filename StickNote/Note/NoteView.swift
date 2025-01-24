@@ -47,7 +47,15 @@ struct NoteView: View {
                     .onChange(of: note.text) { _, _ in
                         self.minMaxWindow(minimize: false)
                     }
-
+                    .submitLabel(.done)
+                    .onKeyPress {
+                        key in
+                        if key.characters == "\r" && key.modifiers == EventModifiers.command {
+                            isEditing = false
+                            return KeyPress.Result.handled
+                        }
+                        return KeyPress.Result.ignored
+                    }
                     .frame(
                         width: width, height: height,
                         alignment: .topLeading)
@@ -146,6 +154,7 @@ struct NoteView: View {
     }
 
     func processNote() {
+        note.text = $note.text.wrappedValue.removeTrailingEmptyLines()
         if $note.text.wrappedValue.isEmpty {
             AppState.shared.deleteNote(self.note, forceDelete: true)
             nsWindow?.close()

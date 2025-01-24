@@ -23,4 +23,12 @@ extension String {
         let fontAttributes = [NSAttributedString.Key.font: font]
         return self.size(withAttributes: fontAttributes)
     }
+
+    func removeTrailingEmptyLines() -> String {
+        let pattern = "(?m)\\s*\\n\\z"
+        let regex = try! NSRegularExpression(pattern: pattern, options: [])
+        let range = NSRange(self.startIndex..<self.endIndex, in: self)
+        return regex.stringByReplacingMatches(in: self, options: [], range: range, withTemplate: "")
+    }
+
 }

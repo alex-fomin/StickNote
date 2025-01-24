@@ -1,12 +1,20 @@
-import AppKit
 import Cocoa
-
-let updater = Updater(github: "exelban/stats", url: "https://api.mac-stats.com/release/latest")
-
+import Defaults
+import KeyboardShortcuts
 
 class AppDelegate: NSObject, NSApplicationDelegate {
- 
-    func applicationWillFinishLaunching(_ notification: Notification){
+    func applicationWillFinishLaunching(_ notification: Notification) {
+
+        KeyboardShortcuts.onKeyUp(for: .createNote) {
+            AppState.shared.openNewNote()
+        }
+        KeyboardShortcuts.onKeyUp(for: .createNoteFromClipboard) {
+            AppState.shared.openNewNoteFromClipboard()
+        }
+        KeyboardShortcuts.onKeyUp(for: .showHideNotes) {
+            AppState.shared.toggleNotesVisibility()
+        }
+
         AppState.shared.openAllNotes()
     }
 }
