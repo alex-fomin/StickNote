@@ -34,7 +34,6 @@ struct LayoutMenu: View {
     }
 }
 
-
 #Preview {
-    LayoutMenu(note:.constant(Note(layout: NoteLayout.defaultLayout, text: "note")))
+    LayoutMenu(note: .constant(Note(layout: NoteLayout.defaultLayout, text: "note")))
 }

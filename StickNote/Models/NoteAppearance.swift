@@ -13,7 +13,7 @@ extension NoteAppearance {
         self.color == ap.color && self.fontColor == ap.fontColor && self.fontName == ap.fontName
             && self.fontSize == ap.fontSize
     }
-    
+
     var nsFont: NSFont {
         if let nsFont = NSFont(name: fontName, size: NSFont.systemFontSize) {
             return nsFont.withSize(fontSize)

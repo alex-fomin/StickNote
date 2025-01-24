@@ -11,11 +11,11 @@ struct LayoutPickerView: View {
         self.layouts = layouts
     }
     var body: some View {
-       return Picker(title, selection: $selectedLayout) {
+        return Picker(title, selection: $selectedLayout) {
             ForEach(layouts) { layout in
                 let nsFont = layout.nsFont.withSize(NSFont.systemFontSize)
 
-                 HStack {
+                HStack {
                     Image(
                         systemName: "square.fill"
                     )
@@ -28,10 +28,17 @@ struct LayoutPickerView: View {
 
                 }.tag(layout)
             }
-           if (selectedLayout == nil){
-               Divider()
-               Text("Custom").tag(nil as NoteLayout?)
-           }
+            if selectedLayout == nil {
+                Divider()
+                Text("Custom").tag(nil as NoteLayout?)
+            }
         }
     }
+}
+#Preview {
+    LayoutPickerView(
+        "Picker",
+        selectedLayout: .constant(NoteLayout.defaultLayout),
+        layouts: NoteLayout.defaultLayouts()
+    )
 }

@@ -101,7 +101,7 @@ final class AppState {
             defer: true
         )
         window.note = note
- 
+
         let contentView = NoteView(note: note, isEditing: isEditing)
             .preferredColorScheme(.light)
             .environment(\.modelContext, self.sharedModelContainer.mainContext)
@@ -119,7 +119,7 @@ final class AppState {
             window.makeKey()
         }
         window.styleMask.remove(.titled)
-        
+
         try? context.save()
         notesToWindows[note.id] = window
     }
@@ -155,7 +155,7 @@ final class AppState {
 
         let window = notesToWindows.removeValue(forKey: note.id)
         window?.close()
-        
+
         if forceDelete || !deleteToTrashBin {
             self.context.delete(note)
         } else {
@@ -163,7 +163,7 @@ final class AppState {
             note.updatedAt = Date.now
         }
         try? self.context.save()
- 
+
     }
 
     func copyToClipboard(_ note: Note) {

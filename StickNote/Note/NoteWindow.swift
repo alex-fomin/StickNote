@@ -22,8 +22,7 @@ class NoteWindow: NSWindow {
                     self.close()
                     AppState.shared.deleteNote(note)
                 }
-            }
-            else {
+            } else {
                 self.close()
                 AppState.shared.deleteNote(note)
             }

@@ -45,7 +45,7 @@ final class NoteLayout: Identifiable, NoteAppearance {
                 fontColor: "#FFFFFF"),
         ]
     }
-    
+
     static var defaultLayout: NoteLayout {
         let systemFont = NSFont.systemFont(ofSize: 16)
         return .init(

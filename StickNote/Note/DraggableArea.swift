@@ -5,7 +5,6 @@
 //  Created by Alex Fomin on 15/12/2024.
 //
 
-
 import SwiftUI
 
 /// A helper view that enables dragging the entire window

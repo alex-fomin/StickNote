@@ -10,14 +10,14 @@ final class Note: NoteAppearance, Identifiable {
 
     private var _text: String
     var text: String {
-        get{_text}
-        set(newText){
-            _text=newText
-            updatedAt=Date.now
+        get { _text }
+        set(newText) {
+            _text = newText
+            updatedAt = Date.now
         }
-        
+
     }
-    
+
     var color: String
 
     var fontName: String

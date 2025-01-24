@@ -5,7 +5,6 @@
 //  Created by Alex Fomin on 15/12/2024.
 //
 
-
 import SwiftUI
 
 /// A custom NSView subclass for detecting mouse events to drag the window

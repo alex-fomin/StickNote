@@ -7,7 +7,9 @@ extension String {
         }
 
         let lines = self.split(separator: "\n", maxSplits: maxLines + 1)
-        let firstLine = lines.prefix(maxLines).map{$0.trimmingCharacters(in: .whitespacesAndNewlines)}.joined(separator: "… ")
+        let firstLine = lines.prefix(maxLines).map {
+            $0.trimmingCharacters(in: .whitespacesAndNewlines)
+        }.joined(separator: "… ")
         let needElipses = lines.count > 1 || firstLine.count > maxLength
 
         var result = firstLine.prefix(maxLength)

@@ -6,16 +6,18 @@ struct StickNoteApp: App {
     init() {
         AppState.shared.openAllNotes()
     }
-    
+
     @StateObject private var appStateModel = AppState.shared.model
-    
+
     var body: some Scene {
-        MenuBarExtra {
-            MainMenu(model:AppState.shared.model)
-                .environment(appStateModel)
-        } label: {
-            Image(systemName: (appStateModel.isNotesHidden ? "note" : "note.text"))
-        }
+        #if !targetEnvironment(simulator)
+            MenuBarExtra {
+                MainMenu(model: AppState.shared.model)
+                    .environment(appStateModel)
+            } label: {
+                Image(systemName: (appStateModel.isNotesHidden ? "note" : "note.text"))
+            }
+        #endif
 
         WindowGroup(id: "note-layout", for: Note.ID.self) { $id in
             if let id = id,
@@ -33,11 +35,11 @@ struct StickNoteApp: App {
         .windowResizability(.contentSize)
         .modelContext(AppState.shared.context)
 
-        Window("Note list", id:"note-list"){
+        Window("Note list", id: "note-list") {
             NoteListView()
         }
         .modelContext(AppState.shared.context)
-        
+
         Settings {
             SettingsView()
                 .fixedSize()

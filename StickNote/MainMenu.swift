@@ -22,14 +22,14 @@ struct MainMenu: View {
             !NSPasteboard.general.canReadItem(withDataConformingToTypes: [
                 NSPasteboard.PasteboardType.string.rawValue,
                 NSPasteboard.PasteboardType.rtf.rawValue,
-                NSPasteboard.PasteboardType.rtfd.rawValue
+                NSPasteboard.PasteboardType.rtfd.rawValue,
             ])
         )
         .keyboardShortcut(
             KeyboardShortcuts.Shortcut(name: .createNoteFromClipboard)?.toKeyboardShortcut()
         )
         Divider()
-        Button("Note list..."){
+        Button("Note list...") {
             openWindow(id: "note-list")
         }
         Divider()

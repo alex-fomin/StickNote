@@ -22,7 +22,7 @@ struct NoteView: View {
 
     @State var width: CGFloat = 0
     @State var height: CGFloat = 0
-    
+
     private var windowTracker: WindowPositionTracker
 
     var body: some View {
@@ -130,17 +130,17 @@ struct NoteView: View {
             }
         }
         .onChange(of: note.fontSize) {
-            minMaxWindow(minimize:note.isMinimized)
+            minMaxWindow(minimize: note.isMinimized)
         }
         .onChange(of: note.fontName) {
-            minMaxWindow(minimize:note.isMinimized)
+            minMaxWindow(minimize: note.isMinimized)
         }
         .onChange(of: note.isMinimized) {
-            minMaxWindow(minimize:note.isMinimized)
+            minMaxWindow(minimize: note.isMinimized)
         }
         .onChange(of: note.text) {
             if !note.isMinimized {
-                minMaxWindow(minimize:note.isMinimized)
+                minMaxWindow(minimize: note.isMinimized)
             }
         }
     }
