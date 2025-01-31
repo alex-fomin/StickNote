@@ -89,6 +89,10 @@ final class AppState {
         )
         window.note = note
 
+        
+        
+        notesToWindows[note.id] = window
+
         let contentView = NoteView(note: note, isEditing: isEditing)
             .preferredColorScheme(.light)
             .environment(\.modelContext, self.sharedModelContainer.mainContext)
@@ -106,10 +110,10 @@ final class AppState {
             NSApplication.shared.activate(ignoringOtherApps: true)
             window.makeKey()
         }
+
         window.styleMask.remove(.titled)
 
         try? context.save()
-        notesToWindows[note.id] = window
     }
 
     private func getContentRectFromNote(_ note: Note) -> NSRect {
