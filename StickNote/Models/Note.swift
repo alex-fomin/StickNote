@@ -55,4 +55,11 @@ final class Note: NoteAppearance, Identifiable {
         self.fontName = layout.fontName
         self.fontSize = layout.fontSize
     }
+    
+    func trim() {
+        text = text
+            .components(separatedBy: .newlines)
+            .map { $0.trimmingCharacters(in: .whitespaces) }
+            .joined(separator: "\n")
+    }
 }

@@ -6,6 +6,7 @@ final class AppState {
 
     static let shared: AppState = AppState()
     @Default(.deleteToTrashBin) var deleteToTrashBin
+    @Default(.trimAfterPaste) var trimAfterPaste
 
     var sharedModelContainer: ModelContainer
     var context: ModelContext
@@ -64,6 +65,9 @@ final class AppState {
         if let text = NSPasteboard.general.string(forType: .string) {
             if !text.isEmpty {
                 let note = Note(layout: getDefaultLayout(), text: text)
+                if (trimAfterPaste){
+                    note.trim()
+                }
                 note.showOnAllSpaces = Defaults[.showOnAllSpaces]
                 self.context.insert(note)
                 self.openNote(note, isEditing: false)

@@ -14,6 +14,7 @@ enum SettingsTab {
 
 struct SettingsView: View {
     @Default(.confirmOnDelete) var confirmOnDelete
+    @Default(.trimAfterPaste) var trimAfterPaste
     @Default(.showOnAllSpaces) var showOnAllSpaces
     @Default(.deleteToTrashBin) var deleteToTrashBin
     @Default(.maximizeOnHover) var maximizeOnHover
@@ -50,7 +51,7 @@ struct SettingsView: View {
                     Section("New note") {
                         Toggle("Show on all spaces", isOn: $showOnAllSpaces)
                         LayoutPickerView(
-                            "Default layout", selectedLayout: $defaultLayout,
+                            "Layout", selectedLayout: $defaultLayout,
                             layouts: layouts
                         )
                         .onAppear {
@@ -63,6 +64,9 @@ struct SettingsView: View {
                             }
                         }
 
+                    }
+                    Section("Paste note") {
+                        Toggle("Trim whitespaces", isOn: $trimAfterPaste)
                     }
                 }
                 .formStyle(.grouped)
