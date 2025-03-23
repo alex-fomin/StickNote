@@ -19,7 +19,6 @@ struct NoteView: View {
     @State private var height: CGFloat = 0
     
     private let windowTracker: WindowPositionTracker
-    private let minPadding: CGFloat = 5
     
     // MARK: - Initialization
     init(note: Note, isEditing: Bool = false) {
@@ -31,7 +30,7 @@ struct NoteView: View {
     
     // MARK: - Body
     var body: some View {
-        HStack() {
+        VStack() {
             if isEditing {
                 editingView
             } else {
@@ -44,10 +43,12 @@ struct NoteView: View {
         ) {
             deleteConfirmationButtons
         }
-        .background(Color.fromString($note.color.wrappedValue))
+//        .background(Color.fromString($note.color.wrappedValue))
+        .background(.red)
+
         .background(WindowClickOutsideListener(isEditing: $isEditing))
         .background(windowAccessor)
-        .frame(width: width, height: height, alignment: .leading)
+        .frame(width: width, height: height)
         .onHover { handleHover($0) }
         .onChange(of: note.fontSize, initial: false) { updateWindowSize() }
         .onChange(of: note.fontName, initial: false) { updateWindowSize() }
@@ -85,15 +86,20 @@ struct NoteView: View {
             }
             .submitLabel(.done)
             //.onKeyPress(handleKeyPress)
-            .frame(width: width, height: height, alignment: .topLeading)
     }
+    
+    var horizonalPadding: CGFloat = 2
+    var verticalPadding: CGFloat = 2
     
     @ViewBuilder
     private var displayView: some View {
-        NoteTextView(note: note)
+        NoteTextView(note: note, isCollapsed: $isCollapsed)
             .overlay(DraggableArea(isEditing: $isEditing))
             .contextMenu { contextMenuContent }
-            .padding(.horizontal, minPadding)
+            .padding(.horizontal, horizonalPadding)
+            .padding(.vertical, verticalPadding)
+            .frame(width: width, height: height, alignment: .topLeading)
+
     }
     
     @ViewBuilder
@@ -215,12 +221,12 @@ struct NoteView: View {
     
     private func minMaxWindow() {
         print("min max with \(isCollapsed)")
-        let text = isCollapsed ? note.text.truncate(5) : note.text
+        let text = isCollapsed ? note.text.truncate(2)+"…" : note.text
         let size = text.sizeUsingFont(usingFont: note.nsFont)
         
-        let newHeight = size.height
+        let newHeight = size.height + verticalPadding * 2
         let newY = height == 0 ? note.y : (note.y! + height - newHeight)
-        let newWidth = size.width + "m".sizeUsingFont(usingFont: note.nsFont).width * 2
+        let newWidth = size.width + horizonalPadding * 2
         
         width = newWidth
         height = newHeight
