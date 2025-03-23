@@ -9,6 +9,7 @@ struct NoteView: View {
     @Default(.maximizeOnHover) var maximizeOnHover
 
     @State private var note: Note
+    @State private var isCollapsed: Bool = false
     @State private var nsWindow: NSWindow?
     @State private var isEditing: Bool
     @FocusState private var isTextEditorFocused: Bool
@@ -25,6 +26,7 @@ struct NoteView: View {
         self._note = State(initialValue: note)
         self._isEditing = State(initialValue: isEditing)
         self.windowTracker = WindowPositionTracker(note: note)
+        isCollapsed = note.isMinimized && !isEditing
     }
     
     // MARK: - Body
@@ -34,9 +36,6 @@ struct NoteView: View {
                 editingView
             } else {
                 displayView
-            }
-            if (note.isMinimized){
-                Text("...")
             }
         }
         .confirmationDialog(
@@ -49,12 +48,21 @@ struct NoteView: View {
         .background(WindowClickOutsideListener(isEditing: $isEditing))
         .background(windowAccessor)
         .frame(width: width, height: height, alignment: .leading)
-        .onAppear { minMaxWindow(minimize: note.isMinimized && !isEditing) }
         .onHover { handleHover($0) }
         .onChange(of: note.fontSize, initial: false) { updateWindowSize() }
         .onChange(of: note.fontName, initial: false) { updateWindowSize() }
-        .onChange(of: note.isMinimized, initial: false) { updateWindowSize() }
         .onChange(of: note.text, initial: false) { handleTextChange() }
+        .onChange(of: isCollapsed, initial: true) { updateWindowSize() }
+        .onChange(of: isEditing, initial: true) {old, new in
+            if new {
+                print("edit - set is collapsed to false")
+                isCollapsed = false
+               
+            } else {
+                print("edit finish - set is collapsed to \(note.isMinimized)")
+                isCollapsed = note.isMinimized
+            }
+        }
     }
     
     // MARK: - Subviews
@@ -62,14 +70,18 @@ struct NoteView: View {
     private var editingView: some View {
         TextEditor(text: $note.text, selection: $selection)
             .focused($isTextEditorFocused)
-            .onAppear(perform: configureEditingMode)
+            .onAppear{
+                print("text editor appear - set is collapsed to false")
+                isCollapsed = false
+                configureEditingMode()
+            }
             .lineSpacing(note.nsFont.leading)
             .modifier(NoteModifier(note: note))
             .scrollDisabled(true)
             .onDisappear { processNote() }
             .onSubmit { processNote() }
             .onChange(of: note.text) { _, _ in
-                self.minMaxWindow(minimize: false)
+                self.minMaxWindow()
             }
             .submitLabel(.done)
             //.onKeyPress(handleKeyPress)
@@ -163,10 +175,13 @@ struct NoteView: View {
         self.nsWindow?.makeKey()
         self.nsWindow?.styleMask.remove(.titled)
     }
+    @State var counter = 0
     
     private func handleHover(_ hover: Bool) {
         guard note.isMinimized && maximizeOnHover else { return }
-        minMaxWindow(minimize: !hover)
+        print("handle hover set to \(!hover), \(counter)")
+        isCollapsed = !hover
+        counter += 1
     }
     
     private func handleDelete() {
@@ -178,14 +193,6 @@ struct NoteView: View {
         }
     }
     
-//    private func handleKeyPress(_ key: KeyPress) -> KeyPress.Result {
-//        if key.characters == "\r" && key.modifiers == .command {
-//            isEditing = false
-//            return .handled
-//        }
-//        return .ignored
-//    }
-    
     private func handleTextChange() {
         if !note.isMinimized {
             updateWindowSize()
@@ -193,7 +200,7 @@ struct NoteView: View {
     }
     
     private func updateWindowSize() {
-        minMaxWindow(minimize: note.isMinimized)
+        minMaxWindow()
     }
     
     private func processNote() {
@@ -206,8 +213,9 @@ struct NoteView: View {
         }
     }
     
-    private func minMaxWindow(minimize: Bool = false) {
-        let text = minimize ? note.text.truncate(5) : note.text
+    private func minMaxWindow() {
+        print("min max with \(isCollapsed)")
+        let text = isCollapsed ? note.text.truncate(5) : note.text
         let size = text.sizeUsingFont(usingFont: note.nsFont)
         
         let newHeight = size.height

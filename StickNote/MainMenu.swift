@@ -40,7 +40,7 @@ struct MainMenu: View {
             KeyboardShortcuts.Shortcut(name: .showHideNotes)?.toKeyboardShortcut()
         )
         Button("Settings...") { openSettings() }
-        Button("Exit") { NSApplication.shared.terminate(nil) }
+        Button("Quit") { NSApplication.shared.terminate(nil) }
             .keyboardShortcut("Q")
     }
 }
