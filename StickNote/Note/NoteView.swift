@@ -13,7 +13,7 @@ struct NoteView: View {
     @Default(.confirmOnDelete) var confirmOnDelete
     @Default(.maximizeOnEdit) var maximizeOnEdit
     @Default(.maximizeOnHover) var maximizeOnHover
-
+    
     @State private var note: Note
     @State private var isCollapsed: Bool = false
     @State private var nsWindow: NSWindow?
@@ -50,7 +50,7 @@ struct NoteView: View {
             deleteConfirmationButtons
         }
         .background(Color.fromString($note.color.wrappedValue))
-       
+        
         .background(WindowClickOutsideListener(isEditing: $isEditing))
         .background(windowAccessor)
         .frame(width: width, height: height)
@@ -62,7 +62,7 @@ struct NoteView: View {
         .onChange(of: isEditing, initial: true) {old, new in
             if new {
                 isCollapsed = false
-               
+                
             } else {
                 isCollapsed = note.isMinimized
             }
@@ -95,7 +95,7 @@ struct NoteView: View {
         .padding(.horizontal, -5 + NoteView.horizonalPadding)
         .padding(.top, NoteView.verticalPadding)
     }
-
+    
     
     @ViewBuilder
     private var displayView: some View {
@@ -105,7 +105,7 @@ struct NoteView: View {
             .padding(.horizontal, NoteView.horizonalPadding)
             .padding(.vertical, NoteView.verticalPadding)
             .frame(width: width, height: height, alignment: .topLeading)
-
+        
     }
     
     @ViewBuilder
