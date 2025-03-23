@@ -3,6 +3,12 @@ import SwiftData
 import SwiftUI
 
 struct NoteView: View {
+    
+    static let horizonalPadding: CGFloat = 2
+    static let verticalPadding: CGFloat = 2
+    static let trimmedLength = 4
+    
+    
     // MARK: - Properties
     @Default(.confirmOnDelete) var confirmOnDelete
     @Default(.maximizeOnEdit) var maximizeOnEdit
@@ -43,9 +49,8 @@ struct NoteView: View {
         ) {
             deleteConfirmationButtons
         }
-//        .background(Color.fromString($note.color.wrappedValue))
-        .background(.red)
-
+        .background(Color.fromString($note.color.wrappedValue))
+       
         .background(WindowClickOutsideListener(isEditing: $isEditing))
         .background(windowAccessor)
         .frame(width: width, height: height)
@@ -56,48 +61,49 @@ struct NoteView: View {
         .onChange(of: isCollapsed, initial: true) { updateWindowSize() }
         .onChange(of: isEditing, initial: true) {old, new in
             if new {
-                print("edit - set is collapsed to false")
                 isCollapsed = false
                
             } else {
-                print("edit finish - set is collapsed to \(note.isMinimized)")
                 isCollapsed = note.isMinimized
             }
+            updateWindowSize()
         }
     }
     
     // MARK: - Subviews
     @ViewBuilder
     private var editingView: some View {
-        TextEditor(text: $note.text, selection: $selection)
-            .focused($isTextEditorFocused)
-            .onAppear{
-                print("text editor appear - set is collapsed to false")
-                isCollapsed = false
-                configureEditingMode()
-            }
-            .lineSpacing(note.nsFont.leading)
-            .modifier(NoteModifier(note: note))
-            .scrollDisabled(true)
-            .onDisappear { processNote() }
-            .onSubmit { processNote() }
-            .onChange(of: note.text) { _, _ in
-                self.minMaxWindow()
-            }
-            .submitLabel(.done)
-            //.onKeyPress(handleKeyPress)
+        ZStack {
+            TextEditor(text: $note.text, selection: $selection)
+                .scrollContentBackground(.hidden)
+                .focused($isTextEditorFocused)
+                .onAppear{
+                    isCollapsed = false
+                    configureEditingMode()
+                }
+                .lineSpacing(note.nsFont.leading)
+                .modifier(NoteModifier(note: note))
+                .scrollDisabled(true)
+                .onDisappear { processNote() }
+                .onSubmit { processNote() }
+                .onChange(of: note.text) { _, _ in
+                    self.updateWindowSize()
+                }
+                .submitLabel(.done)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+        .padding(.horizontal, -5 + NoteView.horizonalPadding)
+        .padding(.top, NoteView.verticalPadding)
     }
-    
-    var horizonalPadding: CGFloat = 2
-    var verticalPadding: CGFloat = 2
+
     
     @ViewBuilder
     private var displayView: some View {
         NoteTextView(note: note, isCollapsed: $isCollapsed)
             .overlay(DraggableArea(isEditing: $isEditing))
             .contextMenu { contextMenuContent }
-            .padding(.horizontal, horizonalPadding)
-            .padding(.vertical, verticalPadding)
+            .padding(.horizontal, NoteView.horizonalPadding)
+            .padding(.vertical, NoteView.verticalPadding)
             .frame(width: width, height: height, alignment: .topLeading)
 
     }
@@ -106,6 +112,7 @@ struct NoteView: View {
     private var contextMenuContent: some View {
         Button {
             note.isMinimized.toggle()
+            isCollapsed = note.isMinimized
         } label: {
             Label(note.isMinimized ? "Maximize" : "Minimize", systemImage: note.isMinimized ? "arrow.up.left.and.arrow.down.right" : "arrow.down.right.and.arrow.up.left")
         }
@@ -181,13 +188,10 @@ struct NoteView: View {
         self.nsWindow?.makeKey()
         self.nsWindow?.styleMask.remove(.titled)
     }
-    @State var counter = 0
     
     private func handleHover(_ hover: Bool) {
-        guard note.isMinimized && maximizeOnHover else { return }
-        print("handle hover set to \(!hover), \(counter)")
+        guard note.isMinimized && maximizeOnHover && !isEditing else { return }
         isCollapsed = !hover
-        counter += 1
     }
     
     private func handleDelete() {
@@ -205,10 +209,6 @@ struct NoteView: View {
         }
     }
     
-    private func updateWindowSize() {
-        minMaxWindow()
-    }
-    
     private func processNote() {
         note.text = note.text.removeTrailingEmptyLines()
         if note.text.isEmpty {
@@ -219,14 +219,13 @@ struct NoteView: View {
         }
     }
     
-    private func minMaxWindow() {
-        print("min max with \(isCollapsed)")
-        let text = isCollapsed ? note.text.truncate(2)+"…" : note.text
+    private func updateWindowSize() {
+        let text = isCollapsed ? note.text.truncate(NoteView.trimmedLength) : note.text
         let size = text.sizeUsingFont(usingFont: note.nsFont)
         
-        let newHeight = size.height + verticalPadding * 2
+        let newHeight = size.height + NoteView.verticalPadding * 2 + (isEditing ? "H".sizeUsingFont(usingFont: note.nsFont).height + 1 :0)
         let newY = height == 0 ? note.y : (note.y! + height - newHeight)
-        let newWidth = size.width + horizonalPadding * 2
+        let newWidth = size.width + NoteView.horizonalPadding * 2 + (isEditing ? "W".sizeUsingFont(usingFont: note.nsFont).width + 1 :0)
         
         width = newWidth
         height = newHeight
