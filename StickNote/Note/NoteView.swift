@@ -223,9 +223,15 @@ struct NoteView: View {
         let text = isCollapsed ? note.text.truncate(NoteView.trimmedLength) : note.text
         let size = text.sizeUsingFont(usingFont: note.nsFont)
         
-        let newHeight = size.height + NoteView.verticalPadding * 2 + (isEditing ? "H".sizeUsingFont(usingFont: note.nsFont).height + 1 :0)
+        var newHeight = size.height + NoteView.verticalPadding * 2
         let newY = height == 0 ? note.y : (note.y! + height - newHeight)
-        let newWidth = size.width + NoteView.horizonalPadding * 2 + (isEditing ? "W".sizeUsingFont(usingFont: note.nsFont).width + 1 :0)
+        var newWidth = size.width + NoteView.horizonalPadding * 2
+        
+        if (isEditing){
+            let wSize = "W".sizeUsingFont(usingFont: note.nsFont)
+            newHeight += wSize.height
+            newWidth += wSize.width + 1
+        }
         
         width = newWidth
         height = newHeight
