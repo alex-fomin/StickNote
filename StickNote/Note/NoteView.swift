@@ -1,6 +1,8 @@
 import Defaults
 import SwiftData
 import SwiftUI
+import SwiftUI
+import SwiftUIIntrospect
 
 struct NoteView: View {
     
@@ -68,12 +70,25 @@ struct NoteView: View {
             }
             updateWindowSize()
         }
+        .onKeyPress { press in
+            print(press)
+            if (press.characters == "=" && press.modifiers.contains(.command)){
+                note.fontSize += 1
+                return .handled
+            }
+            if (press.characters == "-" && press.modifiers.contains(.command)){
+                note.fontSize -= 1
+                return .handled
+            }
+
+            return .ignored
+        }
     }
     
     // MARK: - Subviews
     @ViewBuilder
     private var editingView: some View {
-        ZStack {
+        VStack {
             TextEditor(text: $note.text, selection: $selection)
                 .scrollContentBackground(.hidden)
                 .focused($isTextEditorFocused)
@@ -91,6 +106,22 @@ struct NoteView: View {
                 }
                 .submitLabel(.done)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .onKeyPress { press in
+                    if ((press.key == .return && press.modifiers.contains(.command)) || (press.key == .escape)){
+                        isEditing = false
+                        return .handled
+                    }
+                    if (press.characters == "=" && press.modifiers.contains(.command)){
+                        note.fontSize += 1
+                        return .handled
+                    }
+                    if (press.characters == "-" && press.modifiers.contains(.command)){
+                        note.fontSize -= 1
+                        return .handled
+                    }
+  
+                    return .ignored
+                }
         }
         .padding(.horizontal, -5 + NoteView.horizonalPadding)
         .padding(.top, NoteView.verticalPadding)
@@ -228,9 +259,9 @@ struct NoteView: View {
         var newWidth = size.width + NoteView.horizonalPadding * 2
         
         if (isEditing){
-            let wSize = "W".sizeUsingFont(usingFont: note.nsFont)
-            newHeight += wSize.height
-            newWidth += wSize.width + 1
+//            let wSize = "W".sizeUsingFont(usingFont: note.nsFont)
+//            newHeight += wSize.height
+            newWidth += 2
         }
         
         width = newWidth
