@@ -2,7 +2,6 @@ import Defaults
 import SwiftData
 import SwiftUI
 import SwiftUI
-import SwiftUIIntrospect
 
 struct NoteView: View {
     
