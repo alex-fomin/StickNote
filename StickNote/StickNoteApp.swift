@@ -1,13 +1,15 @@
 import AppKit
 import SwiftData
 import SwiftUI
+import Defaults
 
 @main
 struct StickNoteApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     @StateObject private var appStateModel = AppState.shared.model
-
+    @Default(.showNotesCount) var showNotesCount
+    
     var body: some Scene {
         #if !targetEnvironment(simulator)
             MenuBarExtra {
@@ -15,6 +17,9 @@ struct StickNoteApp: App {
                     .environment(appStateModel)
             } label: {
                 Image(systemName: (appStateModel.isNotesHidden ? "note" : "note.text"))
+                if (showNotesCount){
+                    Text(appStateModel.notesCount > 0 ? "\(appStateModel.notesCount)" : "")
+                }
             }
         #endif
 

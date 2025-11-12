@@ -31,6 +31,16 @@ class NoteWindow: NSWindow {
         {
             AppState.shared.copyToClipboard(note)
         }
+        else if (event.keyCode == 24 && event.modifierFlags.intersection(.deviceIndependentFlagsMask) == .command) //Cmd +
+        {
+            note.fontSize += 1
+        }
+        else if (event.keyCode == 27 && event.modifierFlags.intersection(.deviceIndependentFlagsMask) == .command) //Cmd -
+        {
+            if (note.fontSize > 5){
+                note.fontSize -= 1
+            }
+        }
     }
 
     override func mouseDown(with event: NSEvent) {

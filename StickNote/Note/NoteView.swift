@@ -69,19 +69,6 @@ struct NoteView: View {
             }
             updateWindowSize()
         }
-        .onKeyPress { press in
-            print(press)
-            if (press.characters == "=" && press.modifiers.contains(.command)){
-                note.fontSize += 1
-                return .handled
-            }
-            if (press.characters == "-" && press.modifiers.contains(.command)){
-                note.fontSize -= 1
-                return .handled
-            }
-
-            return .ignored
-        }
     }
     
     // MARK: - Subviews
@@ -150,9 +137,8 @@ struct NoteView: View {
         Button {
             note.trim()
         } label: {
-            Label("Trim", systemImage:"trim")
+            Label("Trim", systemImage: "square.resize.down")
         }
-        
         
         Divider()
         
@@ -161,8 +147,8 @@ struct NoteView: View {
             AppState.shared.applyShowOnAllSpaces(note: note)
         } label: {
             Label(
-                (note.showOnAllSpaces ? "✓ " : "") + "Show on all spaces",
-                systemImage: "rectangle.on.rectangle"
+                "Show on all spaces",
+                systemImage: note.showOnAllSpaces ? "eye.fill" : "eye"
             )
         }
         
@@ -250,12 +236,26 @@ struct NoteView: View {
     }
     
     private func updateWindowSize() {
-        let text = isCollapsed ? note.text.truncate(NoteView.trimmedLength) : note.text
-        let size = text.sizeUsingFont(usingFont: note.nsFont)
+        var newHeight: CGFloat = 0
+        var newWidth: CGFloat = 0
+       
+        let fullSize = note.text.sizeUsingFont(usingFont: note.nsFont)
+        if (isCollapsed) {
+          
+            let collapsedSize = note.text.truncate(NoteView.trimmedLength).sizeUsingFont(usingFont: note.nsFont)
+            newHeight = min(fullSize.height, collapsedSize.height)
+            newWidth = min(fullSize.width, collapsedSize.width)
+        }
+        else {
+            newWidth = fullSize.width
+            newHeight = fullSize.height
+        }
         
-        var newHeight = size.height + NoteView.verticalPadding * 2
+        
+        newHeight += NoteView.verticalPadding * 2
+        newWidth += NoteView.horizonalPadding * 2
+        
         let newY = height == 0 ? note.y : (note.y! + height - newHeight)
-        var newWidth = size.width + NoteView.horizonalPadding * 2
         
         if (isEditing){
 //            let wSize = "W".sizeUsingFont(usingFont: note.nsFont)

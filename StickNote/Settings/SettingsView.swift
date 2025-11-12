@@ -19,6 +19,7 @@ struct SettingsView: View {
     @Default(.deleteToTrashBin) var deleteToTrashBin
     @Default(.maximizeOnHover) var maximizeOnHover
     @Default(.maximizeOnEdit) var maximizeOnEdit
+    @Default(.showNotesCount) var showNotesCount
 
     @Environment(\.modelContext) var modelContext
     @Query var layouts: [NoteLayout]
@@ -30,6 +31,8 @@ struct SettingsView: View {
             Tab("General", systemImage: "gear") {
                 Form {
                     LaunchAtLogin.Toggle()
+                    Toggle("Show notes count in menubar", isOn: $showNotesCount)
+                    
                     Section("Shortcuts") {
                         KeyboardShortcuts.Recorder("Add new note", name: .createNote)
                         KeyboardShortcuts.Recorder(

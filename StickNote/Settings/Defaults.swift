@@ -7,4 +7,5 @@ extension Defaults.Keys {
     static let maximizeOnHover = Key<Bool>("maximize-on-hover", default: true)
     static let maximizeOnEdit = Key<Bool>("maximize-on-edit", default: false)
     static let trimAfterPaste = Key<Bool>("trim-after-paste", default: false)
+    static let showNotesCount = Key<Bool>("show-notes-count", default: true)
 }

@@ -57,6 +57,7 @@ final class AppState {
         let note = Note(layout: getDefaultLayout())
         note.showOnAllSpaces = Defaults[.showOnAllSpaces]
         self.context.insert(note)
+       
 
         self.openNote(note, isEditing: true)
     }
@@ -70,6 +71,7 @@ final class AppState {
                 }
                 note.showOnAllSpaces = Defaults[.showOnAllSpaces]
                 self.context.insert(note)
+                
                 self.openNote(note, isEditing: false)
             }
         }
@@ -92,8 +94,6 @@ final class AppState {
             defer: true
         )
         window.note = note
-
-        
         
         notesToWindows[note.id] = window
 
@@ -118,6 +118,7 @@ final class AppState {
         window.styleMask.remove(.titled)
 
         try? context.save()
+        self.updateNotesCount()
     }
 
     private func getContentRectFromNote(_ note: Note) -> NSRect {
@@ -159,9 +160,13 @@ final class AppState {
             note.updatedAt = Date.now
         }
         try? self.context.save()
-
+        self.updateNotesCount()
     }
 
+    func updateNotesCount() {
+        model.notesCount = try! self.context.fetchCount(FetchDescriptor<Note>(predicate: #Predicate { $0.isInTrashBin == false }))
+    }
+    
     func copyToClipboard(_ note: Note) {
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(note.text, forType: .string)
@@ -204,4 +209,5 @@ final class AppState {
 
 @Observable class AppStateModel: ObservableObject {
     public var isNotesHidden: Bool = false
+    public var notesCount: Int = 0
 }
