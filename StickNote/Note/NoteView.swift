@@ -33,6 +33,7 @@ struct NoteView: View {
         self._isEditing = State(initialValue: isEditing)
         self.windowTracker = WindowPositionTracker(note: note)
         isCollapsed = note.isMinimized && !isEditing
+        isTextEditorFocused = isEditing
     }
     
     // MARK: - Body
@@ -81,6 +82,9 @@ struct NoteView: View {
                 .onAppear{
                     isCollapsed = false
                     configureEditingMode()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        isTextEditorFocused = true
+                    }
                 }
                 .lineSpacing(note.nsFont.leading)
                 .modifier(NoteModifier(note: note))
@@ -254,6 +258,8 @@ struct NoteView: View {
         
         newHeight += NoteView.verticalPadding * 2
         newWidth += NoteView.horizonalPadding * 2
+        
+        newWidth = max(20, newWidth)
         
         let newY = height == 0 ? note.y : (note.y! + height - newHeight)
         

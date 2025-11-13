@@ -7,7 +7,7 @@ class NoteWindow: NSWindow {
 
     override func keyDown(with event: NSEvent) {
         guard let note = note else { return }
-        if event.keyCode == 117  // fn+delete
+        if event.keyCode == 117 || (event.keyCode == 51 && isCmd(event)) // fn+delete || cmd+delete
         {
             if confirmOnDelete {
                 let alert: NSAlert = NSAlert()
@@ -26,20 +26,23 @@ class NoteWindow: NSWindow {
                 self.close()
                 AppState.shared.deleteNote(note)
             }
-        } else if event.keyCode == 8
-            && event.modifierFlags.intersection(.deviceIndependentFlagsMask) == .command  // Cmd+c
+        } else if event.keyCode == 8 && isCmd(event)  // Cmd+c
         {
             AppState.shared.copyToClipboard(note)
         }
-        else if (event.keyCode == 24 && event.modifierFlags.intersection(.deviceIndependentFlagsMask) == .command) //Cmd +
+        else if (event.keyCode == 24 && isCmd(event)) //Cmd +
         {
             note.fontSize += 1
         }
-        else if (event.keyCode == 27 && event.modifierFlags.intersection(.deviceIndependentFlagsMask) == .command) //Cmd -
+        else if (event.keyCode == 27 && isCmd(event)) //Cmd -
         {
             if (note.fontSize > 5){
                 note.fontSize -= 1
             }
+        }
+        
+        func isCmd(_ event: NSEvent)->Bool{
+            return event.modifierFlags.intersection(.deviceIndependentFlagsMask) == .command
         }
     }
 

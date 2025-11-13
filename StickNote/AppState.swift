@@ -58,8 +58,9 @@ final class AppState {
         note.showOnAllSpaces = Defaults[.showOnAllSpaces]
         self.context.insert(note)
        
-
+        
         self.openNote(note, isEditing: true)
+        NSApp.activate(ignoringOtherApps: true)
     }
 
     func openNewNoteFromClipboard() {
