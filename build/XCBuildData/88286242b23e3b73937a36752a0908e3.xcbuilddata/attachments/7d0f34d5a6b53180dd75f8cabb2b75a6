@@ -1,0 +1,16 @@
+{
+  "" : {
+    "const-values" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/LaunchAtLogin-Modern/build/LaunchAtLogin.build/Release/LaunchAtLogin.build/Objects-normal/x86_64/LaunchAtLogin-primary.swiftconstvalues",
+    "dependencies" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/LaunchAtLogin-Modern/build/LaunchAtLogin.build/Release/LaunchAtLogin.build/Objects-normal/x86_64/LaunchAtLogin-primary.d",
+    "diagnostics" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/LaunchAtLogin-Modern/build/LaunchAtLogin.build/Release/LaunchAtLogin.build/Objects-normal/x86_64/LaunchAtLogin-primary.dia",
+    "emit-module-dependencies" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/LaunchAtLogin-Modern/build/LaunchAtLogin.build/Release/LaunchAtLogin.build/Objects-normal/x86_64/LaunchAtLogin-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/LaunchAtLogin-Modern/build/LaunchAtLogin.build/Release/LaunchAtLogin.build/Objects-normal/x86_64/LaunchAtLogin-primary-emit-module.dia",
+    "pch" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/LaunchAtLogin-Modern/build/LaunchAtLogin.build/Release/LaunchAtLogin.build/Objects-normal/x86_64/LaunchAtLogin-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/LaunchAtLogin-Modern/build/LaunchAtLogin.build/Release/LaunchAtLogin.build/Objects-normal/x86_64/LaunchAtLogin-primary.swiftdeps"
+  },
+  "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/LaunchAtLogin-Modern/Sources/LaunchAtLogin/LaunchAtLogin.swift" : {
+    "index-unit-output-path" : "/LaunchAtLogin.build/Release/LaunchAtLogin.build/Objects-normal/x86_64/LaunchAtLogin.o",
+    "llvm-bc" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/LaunchAtLogin-Modern/build/LaunchAtLogin.build/Release/LaunchAtLogin.build/Objects-normal/x86_64/LaunchAtLogin.bc",
+    "object" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/LaunchAtLogin-Modern/build/LaunchAtLogin.build/Release/LaunchAtLogin.build/Objects-normal/x86_64/LaunchAtLogin.o"
+  }
+}

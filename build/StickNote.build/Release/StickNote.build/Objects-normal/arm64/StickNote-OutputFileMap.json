@@ -1,0 +1,151 @@
+{
+  "" : {
+    "const-values" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/StickNote-primary.swiftconstvalues",
+    "dependencies" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/StickNote-primary.d",
+    "diagnostics" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/StickNote-primary.dia",
+    "emit-module-dependencies" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/StickNote-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/StickNote-primary-emit-module.dia",
+    "pch" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/StickNote-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/StickNote-primary.swiftdeps"
+  },
+  "/Users/sane/Developer/StickNote/StickNote/AppDelegate.swift" : {
+    "index-unit-output-path" : "/StickNote.build/Release/StickNote.build/Objects-normal/arm64/AppDelegate.o",
+    "llvm-bc" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/AppDelegate.bc",
+    "object" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/AppDelegate.o"
+  },
+  "/Users/sane/Developer/StickNote/StickNote/AppState.swift" : {
+    "index-unit-output-path" : "/StickNote.build/Release/StickNote.build/Objects-normal/arm64/AppState.o",
+    "llvm-bc" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/AppState.bc",
+    "object" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/AppState.o"
+  },
+  "/Users/sane/Developer/StickNote/StickNote/Constants.swift" : {
+    "index-unit-output-path" : "/StickNote.build/Release/StickNote.build/Objects-normal/arm64/Constants.o",
+    "llvm-bc" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/Constants.bc",
+    "object" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/Constants.o"
+  },
+  "/Users/sane/Developer/StickNote/StickNote/Layout/LayoutMenu.swift" : {
+    "index-unit-output-path" : "/StickNote.build/Release/StickNote.build/Objects-normal/arm64/LayoutMenu.o",
+    "llvm-bc" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/LayoutMenu.bc",
+    "object" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/LayoutMenu.o"
+  },
+  "/Users/sane/Developer/StickNote/StickNote/Layout/LayoutPickerView.swift" : {
+    "index-unit-output-path" : "/StickNote.build/Release/StickNote.build/Objects-normal/arm64/LayoutPickerView.o",
+    "llvm-bc" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/LayoutPickerView.bc",
+    "object" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/LayoutPickerView.o"
+  },
+  "/Users/sane/Developer/StickNote/StickNote/Layout/LayoutView.swift" : {
+    "index-unit-output-path" : "/StickNote.build/Release/StickNote.build/Objects-normal/arm64/LayoutView.o",
+    "llvm-bc" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/LayoutView.bc",
+    "object" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/LayoutView.o"
+  },
+  "/Users/sane/Developer/StickNote/StickNote/MainMenu.swift" : {
+    "index-unit-output-path" : "/StickNote.build/Release/StickNote.build/Objects-normal/arm64/MainMenu.o",
+    "llvm-bc" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/MainMenu.bc",
+    "object" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/MainMenu.o"
+  },
+  "/Users/sane/Developer/StickNote/StickNote/Models/Note.swift" : {
+    "index-unit-output-path" : "/StickNote.build/Release/StickNote.build/Objects-normal/arm64/Note.o",
+    "llvm-bc" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/Note.bc",
+    "object" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/Note.o"
+  },
+  "/Users/sane/Developer/StickNote/StickNote/Models/NoteAppearance.swift" : {
+    "index-unit-output-path" : "/StickNote.build/Release/StickNote.build/Objects-normal/arm64/NoteAppearance.o",
+    "llvm-bc" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/NoteAppearance.bc",
+    "object" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/NoteAppearance.o"
+  },
+  "/Users/sane/Developer/StickNote/StickNote/Models/NoteLayout.swift" : {
+    "index-unit-output-path" : "/StickNote.build/Release/StickNote.build/Objects-normal/arm64/NoteLayout.o",
+    "llvm-bc" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/NoteLayout.bc",
+    "object" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/NoteLayout.o"
+  },
+  "/Users/sane/Developer/StickNote/StickNote/Note/DraggableArea.swift" : {
+    "index-unit-output-path" : "/StickNote.build/Release/StickNote.build/Objects-normal/arm64/DraggableArea.o",
+    "llvm-bc" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/DraggableArea.bc",
+    "object" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/DraggableArea.o"
+  },
+  "/Users/sane/Developer/StickNote/StickNote/Note/DraggableNSView.swift" : {
+    "index-unit-output-path" : "/StickNote.build/Release/StickNote.build/Objects-normal/arm64/DraggableNSView.o",
+    "llvm-bc" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/DraggableNSView.bc",
+    "object" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/DraggableNSView.o"
+  },
+  "/Users/sane/Developer/StickNote/StickNote/Note/NoteModifier.swift" : {
+    "index-unit-output-path" : "/StickNote.build/Release/StickNote.build/Objects-normal/arm64/NoteModifier.o",
+    "llvm-bc" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/NoteModifier.bc",
+    "object" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/NoteModifier.o"
+  },
+  "/Users/sane/Developer/StickNote/StickNote/Note/NoteTextView.swift" : {
+    "index-unit-output-path" : "/StickNote.build/Release/StickNote.build/Objects-normal/arm64/NoteTextView.o",
+    "llvm-bc" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/NoteTextView.bc",
+    "object" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/NoteTextView.o"
+  },
+  "/Users/sane/Developer/StickNote/StickNote/Note/NoteView.swift" : {
+    "index-unit-output-path" : "/StickNote.build/Release/StickNote.build/Objects-normal/arm64/NoteView.o",
+    "llvm-bc" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/NoteView.bc",
+    "object" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/NoteView.o"
+  },
+  "/Users/sane/Developer/StickNote/StickNote/Note/NoteWindow.swift" : {
+    "index-unit-output-path" : "/StickNote.build/Release/StickNote.build/Objects-normal/arm64/NoteWindow.o",
+    "llvm-bc" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/NoteWindow.bc",
+    "object" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/NoteWindow.o"
+  },
+  "/Users/sane/Developer/StickNote/StickNote/Note/WindowAccessor.swift" : {
+    "index-unit-output-path" : "/StickNote.build/Release/StickNote.build/Objects-normal/arm64/WindowAccessor.o",
+    "llvm-bc" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/WindowAccessor.bc",
+    "object" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/WindowAccessor.o"
+  },
+  "/Users/sane/Developer/StickNote/StickNote/Note/WindowClickOutsideListener.swift" : {
+    "index-unit-output-path" : "/StickNote.build/Release/StickNote.build/Objects-normal/arm64/WindowClickOutsideListener.o",
+    "llvm-bc" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/WindowClickOutsideListener.bc",
+    "object" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/WindowClickOutsideListener.o"
+  },
+  "/Users/sane/Developer/StickNote/StickNote/Note/WindowPositionTracker.swift" : {
+    "index-unit-output-path" : "/StickNote.build/Release/StickNote.build/Objects-normal/arm64/WindowPositionTracker.o",
+    "llvm-bc" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/WindowPositionTracker.bc",
+    "object" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/WindowPositionTracker.o"
+  },
+  "/Users/sane/Developer/StickNote/StickNote/NoteList/NoteListView.swift" : {
+    "index-unit-output-path" : "/StickNote.build/Release/StickNote.build/Objects-normal/arm64/NoteListView.o",
+    "llvm-bc" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/NoteListView.bc",
+    "object" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/NoteListView.o"
+  },
+  "/Users/sane/Developer/StickNote/StickNote/Settings/Defaults.swift" : {
+    "index-unit-output-path" : "/StickNote.build/Release/StickNote.build/Objects-normal/arm64/Defaults.o",
+    "llvm-bc" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/Defaults.bc",
+    "object" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/Defaults.o"
+  },
+  "/Users/sane/Developer/StickNote/StickNote/Settings/SettingsView.swift" : {
+    "index-unit-output-path" : "/StickNote.build/Release/StickNote.build/Objects-normal/arm64/SettingsView.o",
+    "llvm-bc" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/SettingsView.bc",
+    "object" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/SettingsView.o"
+  },
+  "/Users/sane/Developer/StickNote/StickNote/StickNoteApp.swift" : {
+    "index-unit-output-path" : "/StickNote.build/Release/StickNote.build/Objects-normal/arm64/StickNoteApp.o",
+    "llvm-bc" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/StickNoteApp.bc",
+    "object" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/StickNoteApp.o"
+  },
+  "/Users/sane/Developer/StickNote/StickNote/Utils/Bindings.swift" : {
+    "index-unit-output-path" : "/StickNote.build/Release/StickNote.build/Objects-normal/arm64/Bindings.o",
+    "llvm-bc" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/Bindings.bc",
+    "object" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/Bindings.o"
+  },
+  "/Users/sane/Developer/StickNote/StickNote/Utils/Color.swift" : {
+    "index-unit-output-path" : "/StickNote.build/Release/StickNote.build/Objects-normal/arm64/Color.o",
+    "llvm-bc" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/Color.bc",
+    "object" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/Color.o"
+  },
+  "/Users/sane/Developer/StickNote/StickNote/Utils/KeyboardShortcuts.swift" : {
+    "index-unit-output-path" : "/StickNote.build/Release/StickNote.build/Objects-normal/arm64/KeyboardShortcuts.o",
+    "llvm-bc" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/KeyboardShortcuts.bc",
+    "object" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/KeyboardShortcuts.o"
+  },
+  "/Users/sane/Developer/StickNote/StickNote/Utils/String.swift" : {
+    "index-unit-output-path" : "/StickNote.build/Release/StickNote.build/Objects-normal/arm64/String.o",
+    "llvm-bc" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/String.bc",
+    "object" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/String.o"
+  },
+  "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/DerivedSources/GeneratedAssetSymbols.swift" : {
+    "index-unit-output-path" : "/StickNote.build/Release/StickNote.build/Objects-normal/arm64/GeneratedAssetSymbols.o",
+    "llvm-bc" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/GeneratedAssetSymbols.bc",
+    "object" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/arm64/GeneratedAssetSymbols.o"
+  }
+}

@@ -1,0 +1,38 @@
+Target dependency graph (16 targets)
+Target 'StickNote' in project 'StickNote'
+➜ Explicit dependency on target 'Defaults' in project 'Defaults'
+➜ Explicit dependency on target 'KeyboardShortcuts' in project 'KeyboardShortcuts'
+➜ Explicit dependency on target 'FontPicker' in project 'FontPicker'
+➜ Explicit dependency on target 'LaunchAtLogin' in project 'LaunchAtLogin'
+➜ Explicit dependency on target 'MenuBarExtraAccess' in project 'MenuBarExtraAccess'
+➜ Explicit dependency on target 'DefaultsMacros' in project 'Defaults'
+Target 'DefaultsMacros' in project 'Defaults'
+➜ Explicit dependency on target 'DefaultsMacros' in project 'Defaults'
+➜ Explicit dependency on target 'Defaults' in project 'Defaults'
+➜ Explicit dependency on target 'DefaultsMacrosDeclarations' in project 'Defaults'
+Target 'DefaultsMacros' in project 'Defaults'
+➜ Explicit dependency on target 'Defaults' in project 'Defaults'
+➜ Explicit dependency on target 'DefaultsMacrosDeclarations' in project 'Defaults'
+Target 'DefaultsMacrosDeclarations' in project 'Defaults'
+➜ Explicit dependency on target 'Defaults' in project 'Defaults'
+Target 'MenuBarExtraAccess' in project 'MenuBarExtraAccess'
+➜ Explicit dependency on target 'MenuBarExtraAccess' in project 'MenuBarExtraAccess'
+Target 'MenuBarExtraAccess' in project 'MenuBarExtraAccess' (no dependencies)
+Target 'LaunchAtLogin' in project 'LaunchAtLogin'
+➜ Explicit dependency on target 'LaunchAtLogin' in project 'LaunchAtLogin'
+Target 'LaunchAtLogin' in project 'LaunchAtLogin' (no dependencies)
+Target 'FontPicker' in project 'FontPicker'
+➜ Explicit dependency on target 'FontPicker' in project 'FontPicker'
+Target 'FontPicker' in project 'FontPicker' (no dependencies)
+Target 'KeyboardShortcuts' in project 'KeyboardShortcuts'
+➜ Explicit dependency on target 'KeyboardShortcuts' in project 'KeyboardShortcuts'
+➜ Explicit dependency on target 'KeyboardShortcuts_KeyboardShortcuts' in project 'KeyboardShortcuts'
+Target 'KeyboardShortcuts' in project 'KeyboardShortcuts'
+➜ Explicit dependency on target 'KeyboardShortcuts_KeyboardShortcuts' in project 'KeyboardShortcuts'
+Target 'KeyboardShortcuts_KeyboardShortcuts' in project 'KeyboardShortcuts' (no dependencies)
+Target 'Defaults' in project 'Defaults'
+➜ Explicit dependency on target 'Defaults' in project 'Defaults'
+➜ Explicit dependency on target 'Defaults_Defaults' in project 'Defaults'
+Target 'Defaults' in project 'Defaults'
+➜ Explicit dependency on target 'Defaults_Defaults' in project 'Defaults'
+Target 'Defaults_Defaults' in project 'Defaults' (no dependencies)

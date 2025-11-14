@@ -1,0 +1,16 @@
+{
+  "" : {
+    "const-values" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/Defaults/build/Defaults.build/Release/DefaultsMacros.build/Objects-normal/x86_64/DefaultsMacros-primary.swiftconstvalues",
+    "dependencies" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/Defaults/build/Defaults.build/Release/DefaultsMacros.build/Objects-normal/x86_64/DefaultsMacros-primary.d",
+    "diagnostics" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/Defaults/build/Defaults.build/Release/DefaultsMacros.build/Objects-normal/x86_64/DefaultsMacros-primary.dia",
+    "emit-module-dependencies" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/Defaults/build/Defaults.build/Release/DefaultsMacros.build/Objects-normal/x86_64/DefaultsMacros-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/Defaults/build/Defaults.build/Release/DefaultsMacros.build/Objects-normal/x86_64/DefaultsMacros-primary-emit-module.dia",
+    "pch" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/Defaults/build/Defaults.build/Release/DefaultsMacros.build/Objects-normal/x86_64/DefaultsMacros-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/Defaults/build/Defaults.build/Release/DefaultsMacros.build/Objects-normal/x86_64/DefaultsMacros-primary.swiftdeps"
+  },
+  "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/Defaults/Sources/DefaultsMacros/ObservableDefault.swift" : {
+    "index-unit-output-path" : "/Defaults.build/Release/DefaultsMacros.build/Objects-normal/x86_64/ObservableDefault.o",
+    "llvm-bc" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/Defaults/build/Defaults.build/Release/DefaultsMacros.build/Objects-normal/x86_64/ObservableDefault.bc",
+    "object" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/Defaults/build/Defaults.build/Release/DefaultsMacros.build/Objects-normal/x86_64/ObservableDefault.o"
+  }
+}

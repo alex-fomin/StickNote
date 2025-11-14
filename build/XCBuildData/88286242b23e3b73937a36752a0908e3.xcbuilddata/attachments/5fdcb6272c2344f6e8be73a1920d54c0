@@ -1,0 +1,61 @@
+{
+  "" : {
+    "const-values" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/MenuBarExtraAccess/build/MenuBarExtraAccess.build/Release/MenuBarExtraAccess.build/Objects-normal/arm64/MenuBarExtraAccess-primary.swiftconstvalues",
+    "dependencies" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/MenuBarExtraAccess/build/MenuBarExtraAccess.build/Release/MenuBarExtraAccess.build/Objects-normal/arm64/MenuBarExtraAccess-primary.d",
+    "diagnostics" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/MenuBarExtraAccess/build/MenuBarExtraAccess.build/Release/MenuBarExtraAccess.build/Objects-normal/arm64/MenuBarExtraAccess-primary.dia",
+    "emit-module-dependencies" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/MenuBarExtraAccess/build/MenuBarExtraAccess.build/Release/MenuBarExtraAccess.build/Objects-normal/arm64/MenuBarExtraAccess-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/MenuBarExtraAccess/build/MenuBarExtraAccess.build/Release/MenuBarExtraAccess.build/Objects-normal/arm64/MenuBarExtraAccess-primary-emit-module.dia",
+    "pch" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/MenuBarExtraAccess/build/MenuBarExtraAccess.build/Release/MenuBarExtraAccess.build/Objects-normal/arm64/MenuBarExtraAccess-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/MenuBarExtraAccess/build/MenuBarExtraAccess.build/Release/MenuBarExtraAccess.build/Objects-normal/arm64/MenuBarExtraAccess-primary.swiftdeps"
+  },
+  "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/MenuBarExtraAccess/Sources/MenuBarExtraAccess/MenuBarExtra Window Introspection.swift" : {
+    "index-unit-output-path" : "/MenuBarExtraAccess.build/Release/MenuBarExtraAccess.build/Objects-normal/arm64/MenuBarExtra Window Introspection.o",
+    "llvm-bc" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/MenuBarExtraAccess/build/MenuBarExtraAccess.build/Release/MenuBarExtraAccess.build/Objects-normal/arm64/MenuBarExtra Window Introspection.bc",
+    "object" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/MenuBarExtraAccess/build/MenuBarExtraAccess.build/Release/MenuBarExtraAccess.build/Objects-normal/arm64/MenuBarExtra Window Introspection.o"
+  },
+  "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/MenuBarExtraAccess/Sources/MenuBarExtraAccess/MenuBarExtraAccess.swift" : {
+    "index-unit-output-path" : "/MenuBarExtraAccess.build/Release/MenuBarExtraAccess.build/Objects-normal/arm64/MenuBarExtraAccess.o",
+    "llvm-bc" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/MenuBarExtraAccess/build/MenuBarExtraAccess.build/Release/MenuBarExtraAccess.build/Objects-normal/arm64/MenuBarExtraAccess.bc",
+    "object" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/MenuBarExtraAccess/build/MenuBarExtraAccess.build/Release/MenuBarExtraAccess.build/Objects-normal/arm64/MenuBarExtraAccess.o"
+  },
+  "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/MenuBarExtraAccess/Sources/MenuBarExtraAccess/MenuBarExtraUtils/MenuBarExtraUtils.swift" : {
+    "index-unit-output-path" : "/MenuBarExtraAccess.build/Release/MenuBarExtraAccess.build/Objects-normal/arm64/MenuBarExtraUtils.o",
+    "llvm-bc" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/MenuBarExtraAccess/build/MenuBarExtraAccess.build/Release/MenuBarExtraAccess.build/Objects-normal/arm64/MenuBarExtraUtils.bc",
+    "object" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/MenuBarExtraAccess/build/MenuBarExtraAccess.build/Release/MenuBarExtraAccess.build/Objects-normal/arm64/MenuBarExtraUtils.o"
+  },
+  "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/MenuBarExtraAccess/Sources/MenuBarExtraAccess/MenuBarExtraUtils/StatusItemIdentity.swift" : {
+    "index-unit-output-path" : "/MenuBarExtraAccess.build/Release/MenuBarExtraAccess.build/Objects-normal/arm64/StatusItemIdentity.o",
+    "llvm-bc" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/MenuBarExtraAccess/build/MenuBarExtraAccess.build/Release/MenuBarExtraAccess.build/Objects-normal/arm64/StatusItemIdentity.bc",
+    "object" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/MenuBarExtraAccess/build/MenuBarExtraAccess.build/Release/MenuBarExtraAccess.build/Objects-normal/arm64/StatusItemIdentity.o"
+  },
+  "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/MenuBarExtraAccess/Sources/MenuBarExtraAccess/NSControl Extensions.swift" : {
+    "index-unit-output-path" : "/MenuBarExtraAccess.build/Release/MenuBarExtraAccess.build/Objects-normal/arm64/NSControl Extensions.o",
+    "llvm-bc" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/MenuBarExtraAccess/build/MenuBarExtraAccess.build/Release/MenuBarExtraAccess.build/Objects-normal/arm64/NSControl Extensions.bc",
+    "object" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/MenuBarExtraAccess/build/MenuBarExtraAccess.build/Release/MenuBarExtraAccess.build/Objects-normal/arm64/NSControl Extensions.o"
+  },
+  "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/MenuBarExtraAccess/Sources/MenuBarExtraAccess/NSEvent Extensions.swift" : {
+    "index-unit-output-path" : "/MenuBarExtraAccess.build/Release/MenuBarExtraAccess.build/Objects-normal/arm64/NSEvent Extensions.o",
+    "llvm-bc" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/MenuBarExtraAccess/build/MenuBarExtraAccess.build/Release/MenuBarExtraAccess.build/Objects-normal/arm64/NSEvent Extensions.bc",
+    "object" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/MenuBarExtraAccess/build/MenuBarExtraAccess.build/Release/MenuBarExtraAccess.build/Objects-normal/arm64/NSEvent Extensions.o"
+  },
+  "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/MenuBarExtraAccess/Sources/MenuBarExtraAccess/NSStatusItem Extensions.swift" : {
+    "index-unit-output-path" : "/MenuBarExtraAccess.build/Release/MenuBarExtraAccess.build/Objects-normal/arm64/NSStatusItem Extensions.o",
+    "llvm-bc" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/MenuBarExtraAccess/build/MenuBarExtraAccess.build/Release/MenuBarExtraAccess.build/Objects-normal/arm64/NSStatusItem Extensions.bc",
+    "object" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/MenuBarExtraAccess/build/MenuBarExtraAccess.build/Release/MenuBarExtraAccess.build/Objects-normal/arm64/NSStatusItem Extensions.o"
+  },
+  "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/MenuBarExtraAccess/Sources/MenuBarExtraAccess/NSWindow Extensions.swift" : {
+    "index-unit-output-path" : "/MenuBarExtraAccess.build/Release/MenuBarExtraAccess.build/Objects-normal/arm64/NSWindow Extensions.o",
+    "llvm-bc" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/MenuBarExtraAccess/build/MenuBarExtraAccess.build/Release/MenuBarExtraAccess.build/Objects-normal/arm64/NSWindow Extensions.bc",
+    "object" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/MenuBarExtraAccess/build/MenuBarExtraAccess.build/Release/MenuBarExtraAccess.build/Objects-normal/arm64/NSWindow Extensions.o"
+  },
+  "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/MenuBarExtraAccess/Sources/MenuBarExtraAccess/Unused/Unused Code.swift" : {
+    "index-unit-output-path" : "/MenuBarExtraAccess.build/Release/MenuBarExtraAccess.build/Objects-normal/arm64/Unused Code.o",
+    "llvm-bc" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/MenuBarExtraAccess/build/MenuBarExtraAccess.build/Release/MenuBarExtraAccess.build/Objects-normal/arm64/Unused Code.bc",
+    "object" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/MenuBarExtraAccess/build/MenuBarExtraAccess.build/Release/MenuBarExtraAccess.build/Objects-normal/arm64/Unused Code.o"
+  },
+  "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/MenuBarExtraAccess/Sources/MenuBarExtraAccess/Utilities.swift" : {
+    "index-unit-output-path" : "/MenuBarExtraAccess.build/Release/MenuBarExtraAccess.build/Objects-normal/arm64/Utilities.o",
+    "llvm-bc" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/MenuBarExtraAccess/build/MenuBarExtraAccess.build/Release/MenuBarExtraAccess.build/Objects-normal/arm64/Utilities.bc",
+    "object" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/MenuBarExtraAccess/build/MenuBarExtraAccess.build/Release/MenuBarExtraAccess.build/Objects-normal/arm64/Utilities.o"
+  }
+}

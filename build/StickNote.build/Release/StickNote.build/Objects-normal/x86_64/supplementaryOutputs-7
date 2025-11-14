@@ -1,0 +1,12 @@
+{
+  "/Users/sane/Developer/StickNote/StickNote/Layout/LayoutMenu.swift" : {
+    "abi-baseline-json" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/x86_64/StickNote.abi.json",
+    "const-values" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/x86_64/StickNote-primary.swiftconstvalues",
+    "dependencies" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/x86_64/StickNote-primary.d",
+    "diagnostics" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/x86_64/StickNote-primary.dia",
+    "objc-header" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/x86_64/StickNote-Swift.h",
+    "swiftdoc" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/x86_64/StickNote.swiftdoc",
+    "swiftmodule" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/x86_64/StickNote.swiftmodule",
+    "swiftsourceinfo" : "/Users/sane/Developer/StickNote/build/StickNote.build/Release/StickNote.build/Objects-normal/x86_64/StickNote.swiftsourceinfo"
+  }
+}

@@ -1,0 +1,4 @@
+module MenuBarExtraAccess {
+header "MenuBarExtraAccess-Swift.h"
+export *
+}

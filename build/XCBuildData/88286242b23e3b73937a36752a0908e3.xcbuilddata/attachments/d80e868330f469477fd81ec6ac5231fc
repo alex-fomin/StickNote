@@ -1,0 +1,16 @@
+{
+  "" : {
+    "const-values" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/FontPicker/build/FontPicker.build/Release/FontPicker.build/Objects-normal/x86_64/FontPicker-primary.swiftconstvalues",
+    "dependencies" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/FontPicker/build/FontPicker.build/Release/FontPicker.build/Objects-normal/x86_64/FontPicker-primary.d",
+    "diagnostics" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/FontPicker/build/FontPicker.build/Release/FontPicker.build/Objects-normal/x86_64/FontPicker-primary.dia",
+    "emit-module-dependencies" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/FontPicker/build/FontPicker.build/Release/FontPicker.build/Objects-normal/x86_64/FontPicker-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/FontPicker/build/FontPicker.build/Release/FontPicker.build/Objects-normal/x86_64/FontPicker-primary-emit-module.dia",
+    "pch" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/FontPicker/build/FontPicker.build/Release/FontPicker.build/Objects-normal/x86_64/FontPicker-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/FontPicker/build/FontPicker.build/Release/FontPicker.build/Objects-normal/x86_64/FontPicker-primary.swiftdeps"
+  },
+  "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/FontPicker/Sources/FontPicker/FontPicker.swift" : {
+    "index-unit-output-path" : "/FontPicker.build/Release/FontPicker.build/Objects-normal/x86_64/FontPicker.o",
+    "llvm-bc" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/FontPicker/build/FontPicker.build/Release/FontPicker.build/Objects-normal/x86_64/FontPicker.bc",
+    "object" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/FontPicker/build/FontPicker.build/Release/FontPicker.build/Objects-normal/x86_64/FontPicker.o"
+  }
+}

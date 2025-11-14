@@ -1,0 +1,66 @@
+{
+  "" : {
+    "const-values" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/KeyboardShortcuts/build/KeyboardShortcuts.build/Release/KeyboardShortcuts.build/Objects-normal/x86_64/KeyboardShortcuts-primary.swiftconstvalues",
+    "dependencies" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/KeyboardShortcuts/build/KeyboardShortcuts.build/Release/KeyboardShortcuts.build/Objects-normal/x86_64/KeyboardShortcuts-primary.d",
+    "diagnostics" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/KeyboardShortcuts/build/KeyboardShortcuts.build/Release/KeyboardShortcuts.build/Objects-normal/x86_64/KeyboardShortcuts-primary.dia",
+    "emit-module-dependencies" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/KeyboardShortcuts/build/KeyboardShortcuts.build/Release/KeyboardShortcuts.build/Objects-normal/x86_64/KeyboardShortcuts-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/KeyboardShortcuts/build/KeyboardShortcuts.build/Release/KeyboardShortcuts.build/Objects-normal/x86_64/KeyboardShortcuts-primary-emit-module.dia",
+    "pch" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/KeyboardShortcuts/build/KeyboardShortcuts.build/Release/KeyboardShortcuts.build/Objects-normal/x86_64/KeyboardShortcuts-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/KeyboardShortcuts/build/KeyboardShortcuts.build/Release/KeyboardShortcuts.build/Objects-normal/x86_64/KeyboardShortcuts-primary.swiftdeps"
+  },
+  "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/KeyboardShortcuts/Sources/KeyboardShortcuts/CarbonKeyboardShortcuts.swift" : {
+    "index-unit-output-path" : "/KeyboardShortcuts.build/Release/KeyboardShortcuts.build/Objects-normal/x86_64/CarbonKeyboardShortcuts.o",
+    "llvm-bc" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/KeyboardShortcuts/build/KeyboardShortcuts.build/Release/KeyboardShortcuts.build/Objects-normal/x86_64/CarbonKeyboardShortcuts.bc",
+    "object" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/KeyboardShortcuts/build/KeyboardShortcuts.build/Release/KeyboardShortcuts.build/Objects-normal/x86_64/CarbonKeyboardShortcuts.o"
+  },
+  "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/KeyboardShortcuts/Sources/KeyboardShortcuts/Key.swift" : {
+    "index-unit-output-path" : "/KeyboardShortcuts.build/Release/KeyboardShortcuts.build/Objects-normal/x86_64/Key.o",
+    "llvm-bc" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/KeyboardShortcuts/build/KeyboardShortcuts.build/Release/KeyboardShortcuts.build/Objects-normal/x86_64/Key.bc",
+    "object" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/KeyboardShortcuts/build/KeyboardShortcuts.build/Release/KeyboardShortcuts.build/Objects-normal/x86_64/Key.o"
+  },
+  "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/KeyboardShortcuts/Sources/KeyboardShortcuts/KeyboardShortcuts.swift" : {
+    "index-unit-output-path" : "/KeyboardShortcuts.build/Release/KeyboardShortcuts.build/Objects-normal/x86_64/KeyboardShortcuts.o",
+    "llvm-bc" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/KeyboardShortcuts/build/KeyboardShortcuts.build/Release/KeyboardShortcuts.build/Objects-normal/x86_64/KeyboardShortcuts.bc",
+    "object" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/KeyboardShortcuts/build/KeyboardShortcuts.build/Release/KeyboardShortcuts.build/Objects-normal/x86_64/KeyboardShortcuts.o"
+  },
+  "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/KeyboardShortcuts/Sources/KeyboardShortcuts/NSMenuItem++.swift" : {
+    "index-unit-output-path" : "/KeyboardShortcuts.build/Release/KeyboardShortcuts.build/Objects-normal/x86_64/NSMenuItem++.o",
+    "llvm-bc" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/KeyboardShortcuts/build/KeyboardShortcuts.build/Release/KeyboardShortcuts.build/Objects-normal/x86_64/NSMenuItem++.bc",
+    "object" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/KeyboardShortcuts/build/KeyboardShortcuts.build/Release/KeyboardShortcuts.build/Objects-normal/x86_64/NSMenuItem++.o"
+  },
+  "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/KeyboardShortcuts/Sources/KeyboardShortcuts/Name.swift" : {
+    "index-unit-output-path" : "/KeyboardShortcuts.build/Release/KeyboardShortcuts.build/Objects-normal/x86_64/Name.o",
+    "llvm-bc" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/KeyboardShortcuts/build/KeyboardShortcuts.build/Release/KeyboardShortcuts.build/Objects-normal/x86_64/Name.bc",
+    "object" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/KeyboardShortcuts/build/KeyboardShortcuts.build/Release/KeyboardShortcuts.build/Objects-normal/x86_64/Name.o"
+  },
+  "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/KeyboardShortcuts/Sources/KeyboardShortcuts/Recorder.swift" : {
+    "index-unit-output-path" : "/KeyboardShortcuts.build/Release/KeyboardShortcuts.build/Objects-normal/x86_64/Recorder.o",
+    "llvm-bc" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/KeyboardShortcuts/build/KeyboardShortcuts.build/Release/KeyboardShortcuts.build/Objects-normal/x86_64/Recorder.bc",
+    "object" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/KeyboardShortcuts/build/KeyboardShortcuts.build/Release/KeyboardShortcuts.build/Objects-normal/x86_64/Recorder.o"
+  },
+  "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/KeyboardShortcuts/Sources/KeyboardShortcuts/RecorderCocoa.swift" : {
+    "index-unit-output-path" : "/KeyboardShortcuts.build/Release/KeyboardShortcuts.build/Objects-normal/x86_64/RecorderCocoa.o",
+    "llvm-bc" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/KeyboardShortcuts/build/KeyboardShortcuts.build/Release/KeyboardShortcuts.build/Objects-normal/x86_64/RecorderCocoa.bc",
+    "object" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/KeyboardShortcuts/build/KeyboardShortcuts.build/Release/KeyboardShortcuts.build/Objects-normal/x86_64/RecorderCocoa.o"
+  },
+  "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/KeyboardShortcuts/Sources/KeyboardShortcuts/Shortcut.swift" : {
+    "index-unit-output-path" : "/KeyboardShortcuts.build/Release/KeyboardShortcuts.build/Objects-normal/x86_64/Shortcut.o",
+    "llvm-bc" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/KeyboardShortcuts/build/KeyboardShortcuts.build/Release/KeyboardShortcuts.build/Objects-normal/x86_64/Shortcut.bc",
+    "object" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/KeyboardShortcuts/build/KeyboardShortcuts.build/Release/KeyboardShortcuts.build/Objects-normal/x86_64/Shortcut.o"
+  },
+  "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/KeyboardShortcuts/Sources/KeyboardShortcuts/Utilities.swift" : {
+    "index-unit-output-path" : "/KeyboardShortcuts.build/Release/KeyboardShortcuts.build/Objects-normal/x86_64/Utilities.o",
+    "llvm-bc" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/KeyboardShortcuts/build/KeyboardShortcuts.build/Release/KeyboardShortcuts.build/Objects-normal/x86_64/Utilities.bc",
+    "object" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/KeyboardShortcuts/build/KeyboardShortcuts.build/Release/KeyboardShortcuts.build/Objects-normal/x86_64/Utilities.o"
+  },
+  "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/KeyboardShortcuts/Sources/KeyboardShortcuts/ViewModifiers.swift" : {
+    "index-unit-output-path" : "/KeyboardShortcuts.build/Release/KeyboardShortcuts.build/Objects-normal/x86_64/ViewModifiers.o",
+    "llvm-bc" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/KeyboardShortcuts/build/KeyboardShortcuts.build/Release/KeyboardShortcuts.build/Objects-normal/x86_64/ViewModifiers.bc",
+    "object" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/KeyboardShortcuts/build/KeyboardShortcuts.build/Release/KeyboardShortcuts.build/Objects-normal/x86_64/ViewModifiers.o"
+  },
+  "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/KeyboardShortcuts/build/KeyboardShortcuts.build/Release/KeyboardShortcuts.build/DerivedSources/resource_bundle_accessor.swift" : {
+    "index-unit-output-path" : "/KeyboardShortcuts.build/Release/KeyboardShortcuts.build/Objects-normal/x86_64/resource_bundle_accessor.o",
+    "llvm-bc" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/KeyboardShortcuts/build/KeyboardShortcuts.build/Release/KeyboardShortcuts.build/Objects-normal/x86_64/resource_bundle_accessor.bc",
+    "object" : "/Users/sane/Library/Developer/Xcode/DerivedData/StickNote-cjwoiznqahmjcvdoqjphpydtfflg/SourcePackages/checkouts/KeyboardShortcuts/build/KeyboardShortcuts.build/Release/KeyboardShortcuts.build/Objects-normal/x86_64/resource_bundle_accessor.o"
+  }
+}

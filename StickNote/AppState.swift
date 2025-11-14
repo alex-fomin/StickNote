@@ -135,9 +135,9 @@ final class AppState {
     }
 
     func openAllNotes() {
-        let notes = try? self.context.fetch<Note>(
+        let notes : [Note]? = try? self.context.fetch(
             FetchDescriptor<Note>(predicate: #Predicate { $0.isInTrashBin == false }))
-
+        
         if let notes {
             for note in notes {
                 if note.text.isEmpty {

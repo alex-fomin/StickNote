@@ -1,0 +1,4 @@
+module DefaultsMacros {
+header "DefaultsMacros-Swift.h"
+export *
+}
