@@ -59,7 +59,7 @@ class NoteWindow: NSWindow {
     }
 
     override func resignKey() {
-//        self.hasShadow = false
+        self.hasShadow = false
         super.resignKey()
     }
 }

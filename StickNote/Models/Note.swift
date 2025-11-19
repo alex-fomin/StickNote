@@ -4,6 +4,9 @@ import SwiftUI
 
 @Model
 final class Note: NoteAppearance, Identifiable {
+    @Transient
+    var window: NoteWindow?
+    
     var x: CGFloat?
     var y: CGFloat?
     var isMinimized: Bool = false

@@ -166,7 +166,7 @@ struct NoteView: View {
         
         Divider()
         
-        Menu("Layout") {
+        Menu("Layout", systemImage: "textformat") {
             LayoutMenu(note: $note)
         }
         

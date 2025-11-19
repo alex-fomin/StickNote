@@ -11,9 +11,7 @@ final class AppState {
     var sharedModelContainer: ModelContainer
     var context: ModelContext
 
-    var windowCount: Int = 0
-
-    var notesToWindows: [PersistentIdentifier: NSWindow] = [:]
+    var windows:[NoteWindow] = []
 
     private init() {
         self.sharedModelContainer = {
@@ -79,8 +77,6 @@ final class AppState {
     }
 
     func openNote(_ note: Note, isEditing: Bool) {
-        windowCount += 1
-
         let contentRect = getContentRectFromNote(note)
 
         note.x = contentRect.minX
@@ -95,8 +91,6 @@ final class AppState {
             defer: true
         )
         window.note = note
-        
-        notesToWindows[note.id] = window
 
         let contentView = NoteView(note: note, isEditing: isEditing)
             .preferredColorScheme(.light)
@@ -120,13 +114,14 @@ final class AppState {
 
         try? context.save()
         self.updateNotesCount()
+        self.windows.append(window);
     }
 
     private func getContentRectFromNote(_ note: Note) -> NSRect {
         let screenFrame = NSScreen.main?.frame ?? NSRect.zero
 
-        let x = note.x ?? (screenFrame.midX - 500 + CGFloat(self.windowCount) * 20)
-        let y = note.y ?? (screenFrame.midY + 450 - CGFloat(self.windowCount) * 20)
+        let x = note.x ?? (screenFrame.midX - 500 + CGFloat(self.windows.count) * 20)
+        let y = note.y ?? (screenFrame.midY + 450 - CGFloat(self.windows.count) * 20)
 
         return NSRect(
             x: x,
@@ -150,9 +145,11 @@ final class AppState {
     }
 
     func deleteNote(_ note: Note, forceDelete: Bool = false) {
-
-        let window = notesToWindows.removeValue(forKey: note.id)
-        window?.close()
+        let window = note.window
+        if let window = window{
+            window.close()
+            self.windows.removeAll { $0 === window }
+        }
 
         if forceDelete || !deleteToTrashBin {
             self.context.delete(note)
@@ -174,7 +171,8 @@ final class AppState {
     }
 
     func toggleNotesVisibility() {
-        for (_, window) in notesToWindows {
+       
+        for window in self.windows {
             if model.isNotesHidden {
                 window.orderFront(nil)
             } else {
@@ -185,7 +183,7 @@ final class AppState {
     }
 
     func applyShowOnAllSpaces(note: Note) {
-        guard let nsWindow = notesToWindows[note.id] else { return }
+        guard let nsWindow = note.window else { return }
         if note.showOnAllSpaces {
             nsWindow.collectionBehavior.insert(.canJoinAllSpaces)
         } else {
