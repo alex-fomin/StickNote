@@ -1,17 +1,23 @@
 import SwiftData
 import SwiftUI
 
-enum HideNoteUntilDefaults {
-    /// Tomorrow at 9:00 in the current calendar (used as the initial picker value).
-    static func suggestedDate() -> Date {
+private enum HideNoteUntilDefaults {
+    /// Next 9:00 AM local: today if still ahead, otherwise tomorrow.
+    static func nextNineAM() -> Date {
         let cal = Calendar.current
-        let tomorrow = cal.date(byAdding: .day, value: 1, to: Date.now) ?? Date.now
+        let now = Date.now
+        var parts = cal.dateComponents([.year, .month, .day], from: now)
+        parts.hour = 9
+        parts.minute = 0
+        parts.second = 0
+        let todayNineAM = cal.date(from: parts) ?? now
+        if todayNineAM > now { return todayNineAM }
+        let tomorrow = cal.date(byAdding: .day, value: 1, to: now) ?? now
         return cal.date(bySettingHour: 9, minute: 0, second: 0, of: tomorrow) ?? tomorrow
     }
 
     static func initialPickerDate() -> Date {
-        let s = suggestedDate()
-        return s > Date.now ? s : (Calendar.current.date(byAdding: .minute, value: 1, to: Date.now) ?? s)
+        nextNineAM()
     }
 }
 
@@ -28,18 +34,44 @@ struct HideNoteUntilSheet: View {
         _chosenDate = State(initialValue: HideNoteUntilDefaults.initialPickerDate())
     }
 
+    private var isValid: Bool {
+        chosenDate > Date.now
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("The note stays hidden until the date and time you choose.")
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
-            DatePicker(
-                "Hide until",
-                selection: $chosenDate,
-                displayedComponents: [.date, .hourAndMinute]
-            )
-            HStack {
-                Spacer()
+            Text("Hide until later")
+                .font(.headline)
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Date")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                DatePicker(
+                    "",
+                    selection: $chosenDate,
+                    displayedComponents: [.date]
+                )
+                .labelsHidden()
+                .datePickerStyle(.graphical)
+                .accessibilityLabel("Date")
+            }
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Time")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                DatePicker(
+                    "",
+                    selection: $chosenDate,
+                    displayedComponents: [.hourAndMinute]
+                )
+                .labelsHidden()
+                .accessibilityLabel("Time")
+            }
+
+            HStack(spacing: 12) {
+                Spacer(minLength: 0)
                 Button("Cancel") {
                     dismiss()
                 }
@@ -50,10 +82,11 @@ struct HideNoteUntilSheet: View {
                     dismiss()
                 }
                 .keyboardShortcut(.defaultAction)
-                .disabled(chosenDate <= Date.now)
+                .disabled(!isValid)
             }
         }
-        .padding()
-        .frame(minWidth: 320)
+        .padding(20)
+        .frame(maxWidth: 320, alignment: .leading)
+        .fixedSize(horizontal: true, vertical: false)
     }
 }
