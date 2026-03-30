@@ -30,6 +30,7 @@ final class Note: NoteAppearance, Identifiable {
     var showOnAllSpaces: Bool = true
 
     var isInTrashBin: Bool = false
+    var isHidden: Bool = false
     var createdAt: Date = Date()
     var updatedAt: Date = Date()
 

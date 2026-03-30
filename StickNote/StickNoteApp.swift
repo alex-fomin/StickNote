@@ -61,6 +61,7 @@ struct StickNoteApp: App {
         
         Window("Note list", id: "note-list") {
             NoteListView()
+                .environment(appStateModel)
         }
         .modelContext(AppState.shared.context)
         

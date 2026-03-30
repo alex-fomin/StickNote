@@ -5,14 +5,19 @@ import SwiftUI
 enum SelectedFolder {
     case Notes
     case TrashBin
+    case Hidden
 }
 
 struct NoteListView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query(filter: #Predicate<Note> { $0.isInTrashBin == false }) private var notes: [Note]
+    @Environment(AppStateModel.self) private var appStateModel
+
+    @Query(filter: #Predicate<Note> { $0.isInTrashBin == false && $0.isHidden == false }) private var notes: [Note]
     @Query(filter: #Predicate<Note> { $0.isInTrashBin == true }) private var deleted: [Note]
+    @Query(filter: #Predicate<Note> { $0.isInTrashBin == false && $0.isHidden == true }) private var hiddenNotes: [Note]
     @State private var showEmptyTrashConfirmation = false
 
+    @State private var lastHandledRevealHiddenToken: Int = 0
     @State private var selectedFolder: SelectedFolder?
     @State private var selectedNote: Note?
     @State private var searchText: String = ""
@@ -54,10 +59,26 @@ struct NoteListView: View {
     fileprivate func RestoreButton(note: Note) -> Button<Label<Text, Image>> {
         return Button("Restore", systemImage: "arrow.up.trash") {
             note.isInTrashBin = false
+            note.isHidden = false
             note.updatedAt = Date.now
             AppState.shared.openNote(note, isEditing: false)
             self.selectedFolder = .Notes
             self.selectedNote = note
+        }
+    }
+
+    fileprivate func UnhideButton(note: Note) -> Button<Label<Text, Image>> {
+        Button("Unhide", systemImage: "eye") {
+            AppState.shared.unhideNote(note)
+            self.selectedFolder = .Notes
+            self.selectedNote = note
+        }
+    }
+
+    fileprivate func HideButton(note: Note) -> some View {
+        Button("Hide", systemImage: "eye.slash") {
+            AppState.shared.hideNote(note)
+            self.selectedNote = nil
         }
     }
 
@@ -91,13 +112,26 @@ struct NoteListView: View {
                     Label("Notes", systemImage: "note.text")
                         .badge(filteredNotes(notes: getNoteList(.Notes)).count)
                 }
+                NavigationLink(value: SelectedFolder.Hidden) {
+                    Label("Hidden", systemImage: "eye.slash")
+                        .badge(filteredNotes(notes: getNoteList(.Hidden)).count)
+                }
                 NavigationLink(value: SelectedFolder.TrashBin) {
                     Label("Trash", systemImage: "trash")
                         .badge(filteredNotes(notes: getNoteList(.TrashBin)).count)
                 }
             }
             .onAppear {
-                selectedFolder = .Notes
+                if !syncRevealHiddenFolderSelection() {
+                    if selectedFolder == nil {
+                        selectedFolder = .Notes
+                    }
+                }
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .stickNoteRevealHiddenNotesInList)) {
+                _ in
+                lastHandledRevealHiddenToken = appStateModel.noteListRevealHiddenToken
+                selectedFolder = .Hidden
             }
             .onChange(of: selectedFolder) {
                 selectedNote = nil
@@ -123,7 +157,7 @@ struct NoteListView: View {
                     TableColumn("Text", value: \.text)
                     DateTableColumn("Created", value: \.createdAt)
                     DateTableColumn(
-                        selectedFolder == .Notes ? "Updated" : "Deleted", value: \.updatedAt)
+                        selectedFolder == .TrashBin ? "Deleted" : "Updated", value: \.updatedAt)
                     TableColumn("Maximized") { n in
                         Toggle(
                             "",
@@ -133,7 +167,8 @@ struct NoteListView: View {
                     }
                     .width(50)
                     .alignment(.center)
-                    .defaultVisibility(selectedFolder == .Notes ? .visible : .hidden)
+                    .defaultVisibility(
+                        selectedFolder == .Notes || selectedFolder == .Hidden ? .visible : .hidden)
 
                     TableColumn("All spaces") { n in
                         Toggle(
@@ -144,7 +179,8 @@ struct NoteListView: View {
                     }
                     .width(50)
                     .alignment(.center)
-                    .defaultVisibility(selectedFolder == .Notes ? .visible : .hidden)
+                    .defaultVisibility(
+                        selectedFolder == .Notes || selectedFolder == .Hidden ? .visible : .hidden)
 
                     TableColumn("Layout") { (n: Note) in
                         LayoutPickerView(
@@ -159,7 +195,8 @@ struct NoteListView: View {
                             ), layouts: layouts)
                     }
                     .width(100)
-                    .defaultVisibility(selectedFolder == .Notes ? .visible : .hidden)
+                    .defaultVisibility(
+                        selectedFolder == .Notes || selectedFolder == .Hidden ? .visible : .hidden)
 
                 } rows: {
                     ForEach(filteredNotes(notes: getNoteList(selectedFolder))) { note in
@@ -167,7 +204,11 @@ struct NoteListView: View {
                             .contextMenu {
                                 if note.isInTrashBin {
                                     RestoreButton(note: note)
+                                } else if note.isHidden {
+                                    UnhideButton(note: note)
+                                    DeleteButton(note: note)
                                 } else {
+                                    HideButton(note: note)
                                     DeleteButton(note: note)
                                 }
                             }
@@ -220,10 +261,22 @@ struct NoteListView: View {
                 }
 
                 if let note = selectedNote {
-                    ToolbarItem {
-                        if selectedFolder == .TrashBin {
+                    if selectedFolder == .TrashBin {
+                        ToolbarItem {
                             RestoreButton(note: note)
-                        } else {
+                        }
+                    } else if selectedFolder == .Hidden {
+                        ToolbarItem {
+                            UnhideButton(note: note)
+                        }
+                        ToolbarItem {
+                            DeleteButton(note: note)
+                        }
+                    } else {
+                        ToolbarItem {
+                            HideButton(note: note)
+                        }
+                        ToolbarItem {
                             DeleteButton(note: note)
                         }
                     }
@@ -246,12 +299,23 @@ struct NoteListView: View {
         switch selectedFolder {
         case .Notes:
             resultNotes = notes
+        case .Hidden:
+            resultNotes = hiddenNotes
         case .TrashBin:
             resultNotes = deleted
         }
 
         resultNotes.sort(using: sortOrder)
         return resultNotes
+    }
+
+    @discardableResult
+    private func syncRevealHiddenFolderSelection() -> Bool {
+        let token = appStateModel.noteListRevealHiddenToken
+        guard token > lastHandledRevealHiddenToken else { return false }
+        lastHandledRevealHiddenToken = token
+        selectedFolder = .Hidden
+        return true
     }
 }
 
@@ -265,7 +329,12 @@ struct NoteListView: View {
     deletedNote.isInTrashBin = true
     container.mainContext.insert(deletedNote)
 
+    let hiddenNote = Note(layout: NoteLayout.defaultLayout, text: "Hidden note")
+    hiddenNote.isHidden = true
+    container.mainContext.insert(hiddenNote)
+
     return NoteListView()
+        .environment(AppStateModel())
         .frame(width: 2000, height: 2000)
         .modelContainer(container)
 }

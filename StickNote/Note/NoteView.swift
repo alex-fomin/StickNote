@@ -45,6 +45,9 @@ struct NoteView: View {
                 displayView
             }
         }
+        .contextMenu {
+            contextMenuContent
+        }
         .confirmationDialog(
             #"Are you sure you want to delete "\#(note.text.truncate(15))"?"#,
             isPresented: $showConfirmation
@@ -122,7 +125,6 @@ struct NoteView: View {
     private var displayView: some View {
         NoteTextView(note: note, isCollapsed: $isCollapsed)
             .overlay(DraggableArea(isEditing: $isEditing))
-            .contextMenu { contextMenuContent }
             .padding(.horizontal, NoteView.horizonalPadding)
             .padding(.vertical, NoteView.verticalPadding)
             .frame(width: width, height: height, alignment: .topLeading)
@@ -171,7 +173,13 @@ struct NoteView: View {
         }
         
         Divider()
-        
+
+        Button {
+            AppState.shared.hideNote(note)
+        } label: {
+            Label("Hide", systemImage: "eye.slash")
+        }
+
         Button(role: .destructive) {
             handleDelete()
         } label: {

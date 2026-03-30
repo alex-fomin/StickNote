@@ -77,6 +77,15 @@ final class AppState {
     }
 
     func openNote(_ note: Note, isEditing: Bool) {
+        if let existing = note.window {
+            existing.orderFront(nil)
+            if isEditing {
+                NSApplication.shared.activate(ignoringOtherApps: true)
+                existing.makeKey()
+            }
+            return
+        }
+
         let contentRect = getContentRectFromNote(note)
 
         note.x = contentRect.minX
@@ -91,6 +100,7 @@ final class AppState {
             defer: true
         )
         window.note = note
+        note.window = window
 
         let contentView = NoteView(note: note, isEditing: isEditing)
             .preferredColorScheme(.light)
@@ -130,8 +140,9 @@ final class AppState {
     }
 
     func openAllNotes() {
-        let notes : [Note]? = try? self.context.fetch(
-            FetchDescriptor<Note>(predicate: #Predicate { $0.isInTrashBin == false }))
+        let notes: [Note]? = try? self.context.fetch(
+            FetchDescriptor<Note>(
+                predicate: #Predicate { $0.isInTrashBin == false && $0.isHidden == false }))
         
         if let notes {
             for note in notes {
@@ -145,8 +156,8 @@ final class AppState {
     }
 
     func deleteNote(_ note: Note, forceDelete: Bool = false) {
-        let window = note.window
-        if let window = window{
+        if let window = note.window {
+            note.window = nil
             window.close()
             self.windows.removeAll { $0 === window }
         }
@@ -162,7 +173,40 @@ final class AppState {
     }
 
     func updateNotesCount() {
-        model.notesCount = try! self.context.fetchCount(FetchDescriptor<Note>(predicate: #Predicate { $0.isInTrashBin == false }))
+        model.notesCount = try! self.context.fetchCount(
+            FetchDescriptor<Note>(
+                predicate: #Predicate { $0.isInTrashBin == false && $0.isHidden == false }))
+    }
+
+    func hideNote(_ note: Note) {
+        let noteId = note.persistentModelID
+        if let window = note.window ?? windows.first(where: { $0.note?.persistentModelID == noteId }) {
+            note.window = nil
+            window.close()
+            self.windows.removeAll { $0 === window }
+        }
+        note.isHidden = true
+        note.updatedAt = Date.now
+        try? context.save()
+        updateNotesCount()
+    }
+
+    func unhideNote(_ note: Note) {
+        note.isHidden = false
+        note.updatedAt = Date.now
+        try? context.save()
+        updateNotesCount()
+        openNote(note, isEditing: false)
+    }
+
+    func requestRevealHiddenNotesInList() {
+        model.noteListRevealHiddenToken += 1
+        // Menu bar and the note list live in different scenes; Observation may not refresh
+        // the list window. A main-queue notification reliably switches the sidebar selection.
+        DispatchQueue.main.async {
+            NotificationCenter.default.post(
+                name: .stickNoteRevealHiddenNotesInList, object: nil)
+        }
     }
     
     func copyToClipboard(_ note: Note) {
@@ -209,4 +253,5 @@ final class AppState {
 @Observable class AppStateModel: ObservableObject {
     public var isNotesHidden: Bool = false
     public var notesCount: Int = 0
+    public var noteListRevealHiddenToken: Int = 0
 }

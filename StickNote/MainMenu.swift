@@ -1,3 +1,4 @@
+import AppKit
 import KeyboardShortcuts
 import SwiftUI
 
@@ -30,6 +31,11 @@ struct MainMenu: View {
         )
         Divider()
         Button("Note list...") {
+            openWindow(id: "note-list")
+        }
+        Button("Show all hidden notes") {
+            AppState.shared.requestRevealHiddenNotesInList()
+            NSApp.activate(ignoringOtherApps: true)
             openWindow(id: "note-list")
         }
         Divider()
