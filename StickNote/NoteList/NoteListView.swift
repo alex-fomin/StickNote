@@ -27,6 +27,7 @@ struct NoteListView: View {
     @State private var selectedNoteId: Note.ID?
 
     @State private var showConfirmation = false
+    @State private var hideUntilSheetNote: Note?
     @Default(.confirmOnDelete) var confirmOnDelete
 
     @Query var layouts: [NoteLayout]
@@ -60,6 +61,7 @@ struct NoteListView: View {
         return Button("Restore", systemImage: "arrow.up.trash") {
             note.isInTrashBin = false
             note.isHidden = false
+            note.hiddenUntil = nil
             note.updatedAt = Date.now
             AppState.shared.openNote(note, isEditing: false)
             self.selectedFolder = .Notes
@@ -79,6 +81,12 @@ struct NoteListView: View {
         Button("Hide", systemImage: "eye.slash") {
             AppState.shared.hideNote(note)
             self.selectedNote = nil
+        }
+    }
+
+    fileprivate func HideUntilButton(note: Note) -> some View {
+        Button("Hide note until…", systemImage: "calendar.badge.clock") {
+            hideUntilSheetNote = note
         }
     }
 
@@ -198,6 +206,23 @@ struct NoteListView: View {
                     .defaultVisibility(
                         selectedFolder == .Notes || selectedFolder == .Hidden ? .visible : .hidden)
 
+                    TableColumn("Hide until") { n in
+                        if let u = n.hiddenUntil {
+                            VStack(alignment: .leading) {
+                                Text(u.formatted(date: .abbreviated, time: .omitted))
+                                    .controlSize(.small)
+                                Text(u.formatted(date: .omitted, time: .shortened))
+                                    .controlSize(.small)
+                            }
+                        } else {
+                            Text("—")
+                                .foregroundStyle(.secondary)
+                                .controlSize(.small)
+                        }
+                    }
+                    .width(min: 80, ideal: 100, max: 120)
+                    .defaultVisibility(selectedFolder == .Hidden ? .visible : .hidden)
+
                 } rows: {
                     ForEach(filteredNotes(notes: getNoteList(selectedFolder))) { note in
                         TableRow(note)
@@ -209,6 +234,7 @@ struct NoteListView: View {
                                     DeleteButton(note: note)
                                 } else {
                                     HideButton(note: note)
+                                    HideUntilButton(note: note)
                                     DeleteButton(note: note)
                                 }
                             }
@@ -277,10 +303,19 @@ struct NoteListView: View {
                             HideButton(note: note)
                         }
                         ToolbarItem {
+                            HideUntilButton(note: note)
+                        }
+                        ToolbarItem {
                             DeleteButton(note: note)
                         }
                     }
                 }
+            }
+        }
+        .sheet(item: $hideUntilSheetNote) { note in
+            HideNoteUntilSheet(note: note) {
+                selectedNote = nil
+                selectedNoteId = nil
             }
         }
     }
@@ -332,6 +367,11 @@ struct NoteListView: View {
     let hiddenNote = Note(layout: NoteLayout.defaultLayout, text: "Hidden note")
     hiddenNote.isHidden = true
     container.mainContext.insert(hiddenNote)
+
+    let scheduledHidden = Note(layout: NoteLayout.defaultLayout, text: "Scheduled hidden")
+    scheduledHidden.isHidden = true
+    scheduledHidden.hiddenUntil = Date.now.addingTimeInterval(86_400)
+    container.mainContext.insert(scheduledHidden)
 
     return NoteListView()
         .environment(AppStateModel())

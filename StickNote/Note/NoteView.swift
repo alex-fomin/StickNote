@@ -1,7 +1,6 @@
 import Defaults
 import SwiftData
 import SwiftUI
-import SwiftUI
 
 struct NoteView: View {
     
@@ -22,6 +21,7 @@ struct NoteView: View {
     @FocusState private var isTextEditorFocused: Bool
     @State private var selection: TextSelection?
     @State private var showConfirmation = false
+    @State private var showHideUntilSheet = false
     @State private var width: CGFloat = 0
     @State private var height: CGFloat = 0
     
@@ -53,6 +53,9 @@ struct NoteView: View {
             isPresented: $showConfirmation
         ) {
             deleteConfirmationButtons
+        }
+        .sheet(isPresented: $showHideUntilSheet) {
+            HideNoteUntilSheet(note: note)
         }
         .background(Color.fromString($note.color.wrappedValue))
         
@@ -178,6 +181,12 @@ struct NoteView: View {
             AppState.shared.hideNote(note)
         } label: {
             Label("Hide", systemImage: "eye.slash")
+        }
+
+        Button {
+            showHideUntilSheet = true
+        } label: {
+            Label("Hide note until…", systemImage: "calendar.badge.clock")
         }
 
         Button(role: .destructive) {

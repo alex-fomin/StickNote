@@ -1,4 +1,5 @@
 import Defaults
+import Foundation
 import SwiftData
 import SwiftUI
 
@@ -12,6 +13,8 @@ final class AppState {
     var context: ModelContext
 
     var windows:[NoteWindow] = []
+
+    private var scheduledUnhideTimer: Timer?
 
     private init() {
         self.sharedModelContainer = {
@@ -42,6 +45,13 @@ final class AppState {
 
             try? self.context.save()
         }
+
+        let timer = Timer(timeInterval: 1, repeats: true) { _ in
+            AppState.shared.processDueScheduledUnhides()
+        }
+        timer.tolerance = 0.2
+        RunLoop.main.add(timer, forMode: .common)
+        scheduledUnhideTimer = timer
     }
 
     func getDefaultLayout() -> NoteLayout {
@@ -139,6 +149,27 @@ final class AppState {
             width: 10, height: 10)
     }
 
+    func processDueScheduledUnhides() {
+        let now = Date.now
+        let descriptor = FetchDescriptor<Note>(predicate: #Predicate<Note> { $0.isHidden == true })
+        guard let hidden = try? context.fetch(descriptor) else { return }
+        var changed = false
+        for note in hidden {
+            guard note.isInTrashBin == false, let until = note.hiddenUntil, until <= now else { continue }
+            note.isHidden = false
+            note.hiddenUntil = nil
+            note.updatedAt = now
+            changed = true
+            if !note.text.isEmpty {
+                openNote(note, isEditing: false)
+            }
+        }
+        if changed {
+            try? context.save()
+            updateNotesCount()
+        }
+    }
+
     func openAllNotes() {
         let notes: [Note]? = try? self.context.fetch(
             FetchDescriptor<Note>(
@@ -166,6 +197,7 @@ final class AppState {
             self.context.delete(note)
         } else {
             note.isInTrashBin = true
+            note.hiddenUntil = nil
             note.updatedAt = Date.now
         }
         try? self.context.save()
@@ -178,7 +210,10 @@ final class AppState {
                 predicate: #Predicate { $0.isInTrashBin == false && $0.isHidden == false }))
     }
 
-    func hideNote(_ note: Note) {
+    func hideNote(_ note: Note, hiddenUntil until: Date? = nil) {
+        if let until, until <= Date.now {
+            return
+        }
         let noteId = note.persistentModelID
         if let window = note.window ?? windows.first(where: { $0.note?.persistentModelID == noteId }) {
             note.window = nil
@@ -186,6 +221,7 @@ final class AppState {
             self.windows.removeAll { $0 === window }
         }
         note.isHidden = true
+        note.hiddenUntil = until
         note.updatedAt = Date.now
         try? context.save()
         updateNotesCount()
@@ -193,6 +229,7 @@ final class AppState {
 
     func unhideNote(_ note: Note) {
         note.isHidden = false
+        note.hiddenUntil = nil
         note.updatedAt = Date.now
         try? context.save()
         updateNotesCount()

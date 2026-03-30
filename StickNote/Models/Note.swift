@@ -31,6 +31,8 @@ final class Note: NoteAppearance, Identifiable {
 
     var isInTrashBin: Bool = false
     var isHidden: Bool = false
+    /// When non-nil and in the future, the note is treated as hidden until this instant (then shown again).
+    var hiddenUntil: Date?
     var createdAt: Date = Date()
     var updatedAt: Date = Date()
 

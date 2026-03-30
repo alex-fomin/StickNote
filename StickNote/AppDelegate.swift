@@ -15,6 +15,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             AppState.shared.toggleNotesVisibility()
         }
 
+        AppState.shared.processDueScheduledUnhides()
         AppState.shared.openAllNotes()
     }
 }
