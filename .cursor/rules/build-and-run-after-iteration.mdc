@@ -1,0 +1,31 @@
+---
+description: After each coding iteration, stop StickNote if running, build, then launch the app
+alwaysApply: true
+---
+
+# Build and run after each iteration
+
+When you finish a coherent round of changes (an “iteration”), **build and run StickNote** from the repository root before considering the task done.
+
+## Order of operations
+
+1. **Stop a running instance first** so the build can replace the binary and you avoid stale behavior.
+   - Prefer: `killall StickNote 2>/dev/null || true`
+   - If `killall` fails because the bundle name differs, find the process (e.g. Activity Monitor / `ps`) and quit it, then continue.
+
+2. **Build** (Debug, macOS), using a predictable output path:
+   ```bash
+   xcodebuild -project StickNote.xcodeproj -scheme StickNote -configuration Debug -destination 'platform=macOS' -derivedDataPath .build build
+   ```
+
+3. **Run** the built app:
+   ```bash
+   open .build/Build/Products/Debug/StickNote.app
+   ```
+
+If `xcodebuild` fails, fix compile errors and repeat from step 2 (still stop the app first if you relaunched it manually in between).
+
+## When this applies
+
+- After substantive edits that should be verified in the running app.
+- Skip only when the user explicitly asks not to build/run, or when the change cannot affect the macOS target (e.g. docs-only with no code impact).
