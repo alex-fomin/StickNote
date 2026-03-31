@@ -168,6 +168,12 @@ struct NoteView: View {
         } label: {
             Label("Copy to clipboard", systemImage: "doc.on.doc")
         }
+
+        Button {
+            AppState.shared.exportNoteToFile(note)
+        } label: {
+            Label("Export to file…", systemImage: "square.and.arrow.down")
+        }
         
         Divider()
         

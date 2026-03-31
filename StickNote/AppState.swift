@@ -1,7 +1,9 @@
+import AppKit
 import Defaults
 import Foundation
 import SwiftData
 import SwiftUI
+import UniformTypeIdentifiers
 
 final class AppState {
 
@@ -249,6 +251,43 @@ final class AppState {
     func copyToClipboard(_ note: Note) {
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(note.text, forType: .string)
+    }
+
+    func exportNoteToFile(_ note: Note) {
+        let text = note.text
+        let defaultName = Self.suggestedExportFilename(for: text)
+        DispatchQueue.main.async {
+            let panel = NSSavePanel()
+            panel.allowedContentTypes = [.plainText]
+            panel.canCreateDirectories = true
+            panel.title = "Export Note"
+            panel.nameFieldStringValue = defaultName
+            panel.begin { response in
+                guard response == .OK, let url = panel.url else { return }
+                do {
+                    try text.write(to: url, atomically: true, encoding: .utf8)
+                } catch {
+                    let alert = NSAlert()
+                    alert.messageText = "Couldn’t save the file."
+                    alert.informativeText = error.localizedDescription
+                    alert.alertStyle = .warning
+                    alert.runModal()
+                }
+            }
+        }
+    }
+
+    private static func suggestedExportFilename(for text: String) -> String {
+        let firstLine =
+            text.split(separator: "\n", omittingEmptySubsequences: true).first.map(String.init) ?? "Note"
+        let trimmed = firstLine.trimmingCharacters(in: .whitespacesAndNewlines)
+        var base = trimmed.isEmpty ? "Note" : String(trimmed.prefix(80))
+        for ch in ["/", ":", "\0"] {
+            base = base.replacingOccurrences(of: ch, with: "-")
+        }
+        base = base.trimmingCharacters(in: .whitespacesAndNewlines)
+        if base.isEmpty { base = "Note" }
+        return base.hasSuffix(".txt") ? base : "\(base).txt"
     }
 
     func toggleNotesVisibility() {

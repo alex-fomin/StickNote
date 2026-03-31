@@ -90,6 +90,12 @@ struct NoteListView: View {
         }
     }
 
+    fileprivate func ExportToFileButton(note: Note) -> some View {
+        Button("Export to file…", systemImage: "square.and.arrow.down") {
+            AppState.shared.exportNoteToFile(note)
+        }
+    }
+
     fileprivate func DeleteButton(note: Note) -> some View {
         return Button("Delete", systemImage: "trash") {
             if confirmOnDelete {
@@ -229,12 +235,16 @@ struct NoteListView: View {
                             .contextMenu {
                                 if note.isInTrashBin {
                                     RestoreButton(note: note)
+                                    ExportToFileButton(note: note)
+                                    DeleteButton(note: note)
                                 } else if note.isHidden {
                                     UnhideButton(note: note)
+                                    ExportToFileButton(note: note)
                                     DeleteButton(note: note)
                                 } else {
                                     HideButton(note: note)
                                     HideUntilButton(note: note)
+                                    ExportToFileButton(note: note)
                                     DeleteButton(note: note)
                                 }
                             }
