@@ -3,8 +3,6 @@ import Defaults
 
 class NoteWindow: NSWindow {
     var note: Note?
-    /// Toolbar panel shown on hover; kept in sync when ordering the note out or closing.
-    var hoverToolbarPanel: NSPanel?
     @Default(.confirmOnDelete) var confirmOnDelete
 
     override func keyDown(with event: NSEvent) {
@@ -63,16 +61,5 @@ class NoteWindow: NSWindow {
     override func resignKey() {
         self.hasShadow = false
         super.resignKey()
-    }
-
-    override func orderOut(_ sender: Any?) {
-        hoverToolbarPanel?.orderOut(nil)
-        super.orderOut(sender)
-    }
-
-    override func close() {
-        hoverToolbarPanel?.close()
-        hoverToolbarPanel = nil
-        super.close()
     }
 }

@@ -24,7 +24,6 @@ struct NoteView: View {
     @State private var showHideUntilSheet = false
     @State private var width: CGFloat = 0
     @State private var height: CGFloat = 0
-    @State private var hoverToolbarController: NoteHoverToolbarPanelController?
     
     private let windowTracker: WindowPositionTracker
     
@@ -62,10 +61,7 @@ struct NoteView: View {
         .background(WindowClickOutsideListener(isEditing: $isEditing))
         .background(windowAccessor)
         .frame(width: width, height: height)
-        .onHover { hovering in
-            handleHover(hovering)
-            hoverToolbarController?.setPointerOverNote(hovering)
-        }
+        .onHover { handleHover($0) }
         .onChange(of: note.fontSize, initial: false) { updateWindowSize() }
         .onChange(of: note.fontName, initial: false) { updateWindowSize() }
         .onChange(of: note.text, initial: false) { handleTextChange() }
@@ -73,17 +69,12 @@ struct NoteView: View {
         .onChange(of: isCollapsed, initial: true) { updateWindowSize() }
         .onChange(of: isEditing, initial: true) {old, new in
             if new {
+                note.isMinimized = false
                 isCollapsed = false
-                
             } else {
                 isCollapsed = note.isMinimized
             }
             updateWindowSize()
-        }
-        .onDisappear {
-            hoverToolbarController?.invalidate()
-            hoverToolbarController = nil
-            (nsWindow as? NoteWindow)?.hoverToolbarPanel = nil
         }
     }
     
@@ -226,31 +217,10 @@ struct NoteView: View {
     private var windowAccessor: some View {
         WindowAccessor { window in
             self.nsWindow = window
-            guard let window else {
-                hoverToolbarController?.invalidate()
-                hoverToolbarController = nil
-                return
-            }
-            window.styleMask.remove(.titled)
-            window.backgroundColor = NSColor.fromString($note.color.wrappedValue)
-            window.delegate = self.windowTracker
-            window.level = .floating
-            guard hoverToolbarController == nil else { return }
-            let controller = NoteHoverToolbarPanelController(
-                parentWindow: window,
-                note: $note,
-                isCollapsed: $isCollapsed,
-                showHideUntilSheet: $showHideUntilSheet,
-                showConfirmation: $showConfirmation,
-                modelContext: AppState.shared.sharedModelContainer.mainContext,
-                onDelete: {
-                    self.nsWindow?.close()
-                    AppState.shared.deleteNote(note)
-                },
-                updateWindowSize: { self.updateWindowSize() }
-            )
-            hoverToolbarController = controller
-            (window as? NoteWindow)?.hoverToolbarPanel = controller.panel
+            window?.styleMask.remove(.titled)
+            window?.backgroundColor = NSColor.fromString($note.color.wrappedValue)
+            window?.delegate = self.windowTracker
+            window?.level = .floating
         }
     }
     
