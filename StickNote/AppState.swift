@@ -326,6 +326,9 @@ final class AppState {
             nsWindow.collectionBehavior.remove(.canJoinAllSpaces)
         }
         nsWindow.update()
+        if let hoverPanel = (nsWindow as? NoteWindow)?.hoverToolbarPanel {
+            hoverPanel.collectionBehavior = nsWindow.collectionBehavior
+        }
     }
 
     func emptyTrashBin() {

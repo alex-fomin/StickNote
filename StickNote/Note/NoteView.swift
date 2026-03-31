@@ -24,6 +24,7 @@ struct NoteView: View {
     @State private var showHideUntilSheet = false
     @State private var width: CGFloat = 0
     @State private var height: CGFloat = 0
+    @State private var hoverToolbarController: NoteHoverToolbarPanelController?
     
     private let windowTracker: WindowPositionTracker
     
@@ -38,7 +39,7 @@ struct NoteView: View {
     
     // MARK: - Body
     var body: some View {
-        VStack() {
+        VStack {
             if isEditing {
                 editingView
             } else {
@@ -61,7 +62,10 @@ struct NoteView: View {
         .background(WindowClickOutsideListener(isEditing: $isEditing))
         .background(windowAccessor)
         .frame(width: width, height: height)
-        .onHover { handleHover($0) }
+        .onHover { hovering in
+            handleHover(hovering)
+            hoverToolbarController?.setPointerOverNote(hovering)
+        }
         .onChange(of: note.fontSize, initial: false) { updateWindowSize() }
         .onChange(of: note.fontName, initial: false) { updateWindowSize() }
         .onChange(of: note.text, initial: false) { handleTextChange() }
@@ -75,6 +79,11 @@ struct NoteView: View {
                 isCollapsed = note.isMinimized
             }
             updateWindowSize()
+        }
+        .onDisappear {
+            hoverToolbarController?.invalidate()
+            hoverToolbarController = nil
+            (nsWindow as? NoteWindow)?.hoverToolbarPanel = nil
         }
     }
     
@@ -131,7 +140,6 @@ struct NoteView: View {
             .padding(.horizontal, NoteView.horizonalPadding)
             .padding(.vertical, NoteView.verticalPadding)
             .frame(width: width, height: height, alignment: .topLeading)
-        
     }
     
     @ViewBuilder
@@ -142,14 +150,6 @@ struct NoteView: View {
         } label: {
             Label(note.isMinimized ? "Maximize" : "Minimize", systemImage: note.isMinimized ? "arrow.up.left.and.arrow.down.right" : "arrow.down.right.and.arrow.up.left")
         }
-        
-        Button {
-            note.trim()
-        } label: {
-            Label("Trim", systemImage: "square.resize.down")
-        }
-        
-        Divider()
         
         Button {
             note.showOnAllSpaces.toggle()
@@ -226,10 +226,31 @@ struct NoteView: View {
     private var windowAccessor: some View {
         WindowAccessor { window in
             self.nsWindow = window
-            window?.styleMask.remove(.titled)
-            window?.backgroundColor = NSColor.fromString($note.color.wrappedValue)
-            window?.delegate = self.windowTracker
-            window?.level = .floating
+            guard let window else {
+                hoverToolbarController?.invalidate()
+                hoverToolbarController = nil
+                return
+            }
+            window.styleMask.remove(.titled)
+            window.backgroundColor = NSColor.fromString($note.color.wrappedValue)
+            window.delegate = self.windowTracker
+            window.level = .floating
+            guard hoverToolbarController == nil else { return }
+            let controller = NoteHoverToolbarPanelController(
+                parentWindow: window,
+                note: $note,
+                isCollapsed: $isCollapsed,
+                showHideUntilSheet: $showHideUntilSheet,
+                showConfirmation: $showConfirmation,
+                modelContext: AppState.shared.sharedModelContainer.mainContext,
+                onDelete: {
+                    self.nsWindow?.close()
+                    AppState.shared.deleteNote(note)
+                },
+                updateWindowSize: { self.updateWindowSize() }
+            )
+            hoverToolbarController = controller
+            (window as? NoteWindow)?.hoverToolbarPanel = controller.panel
         }
     }
     
@@ -299,13 +320,13 @@ struct NoteView: View {
         
         newWidth = max(20, newWidth)
         
-        let newY = height == 0 ? note.y : (note.y! + height - newHeight)
-        
         if (isEditing){
 //            let wSize = "W".sizeUsingFont(usingFont: note.nsFont)
 //            newHeight += wSize.height
             newWidth += 2
         }
+        
+        let newY = height == 0 ? note.y : (note.y! + height - newHeight)
         
         width = newWidth
         height = newHeight
