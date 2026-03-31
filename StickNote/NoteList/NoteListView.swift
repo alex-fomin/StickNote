@@ -22,7 +22,7 @@ struct NoteListView: View {
     @State private var selectedNote: Note?
     @State private var searchText: String = ""
 
-    @State private var sortOrder = [KeyPathComparator(\Note.text)]
+    @State private var sortOrder = [KeyPathComparator(\Note.updatedAt, order: .reverse)]
 
     @State private var selectedNoteId: Note.ID?
 
