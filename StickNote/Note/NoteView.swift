@@ -58,7 +58,6 @@ struct NoteView: View {
             HideNoteUntilSheet(note: note)
         }
         .background(Color.fromString($note.color.wrappedValue))
-        
         .background(WindowClickOutsideListener(isEditing: $isEditing))
         .background(windowAccessor)
         .frame(width: width, height: height)
@@ -66,6 +65,7 @@ struct NoteView: View {
         .onChange(of: note.fontSize, initial: false) { updateWindowSize() }
         .onChange(of: note.fontName, initial: false) { updateWindowSize() }
         .onChange(of: note.text, initial: false) { handleTextChange() }
+        .onChange(of: note.isMarkdown, initial: false) { updateWindowSize() }
         .onChange(of: isCollapsed, initial: true) { updateWindowSize() }
         .onChange(of: isEditing, initial: true) {old, new in
             if new {
@@ -169,6 +169,18 @@ struct NoteView: View {
             Label("Copy to clipboard", systemImage: "doc.on.doc")
         }
 
+        Toggle(
+            isOn: Binding(
+                get: { note.isMarkdown },
+                set: { newValue in
+                    note.isMarkdown = newValue
+                    updateWindowSize()
+                }
+            )
+        ) {
+            Text("Markdown")
+        }
+
         Button {
             AppState.shared.exportNoteToFile(note)
         } label: {
@@ -257,11 +269,14 @@ struct NoteView: View {
         if note.text.isEmpty {
             AppState.shared.deleteNote(self.note, forceDelete: true)
             nsWindow?.close()
-        } else if maximizeOnEdit {
-            note.isMinimized = false
+        } else {
+            note.applyLikelyMarkdownFlagFromContent()
+            if maximizeOnEdit {
+                note.isMinimized = false
+            }
         }
     }
-    
+
     private func updateWindowSize() {
         var newHeight: CGFloat = 0
         var newWidth: CGFloat = 0

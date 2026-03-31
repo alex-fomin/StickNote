@@ -90,6 +90,15 @@ struct NoteListView: View {
         }
     }
 
+    fileprivate func MarkdownToggle(note: Note) -> some View {
+        Toggle(isOn: Binding(
+            get: { note.isMarkdown },
+            set: { note.isMarkdown = $0 }
+        )) {
+            Text("Markdown")
+        }
+    }
+
     fileprivate func ExportToFileButton(note: Note) -> some View {
         Button("Export to file…", systemImage: "square.and.arrow.down") {
             AppState.shared.exportNoteToFile(note)
@@ -235,15 +244,18 @@ struct NoteListView: View {
                             .contextMenu {
                                 if note.isInTrashBin {
                                     RestoreButton(note: note)
+                                    MarkdownToggle(note: note)
                                     ExportToFileButton(note: note)
                                     DeleteButton(note: note)
                                 } else if note.isHidden {
                                     UnhideButton(note: note)
+                                    MarkdownToggle(note: note)
                                     ExportToFileButton(note: note)
                                     DeleteButton(note: note)
                                 } else {
                                     HideButton(note: note)
                                     HideUntilButton(note: note)
+                                    MarkdownToggle(note: note)
                                     ExportToFileButton(note: note)
                                     DeleteButton(note: note)
                                 }

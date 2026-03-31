@@ -31,6 +31,8 @@ final class Note: NoteAppearance, Identifiable {
 
     var isInTrashBin: Bool = false
     var isHidden: Bool = false
+    /// When true, the note is shown as rendered Markdown while not editing; export uses `.md`.
+    var isMarkdown: Bool = false
     /// When non-nil and in the future, the note is treated as hidden until this instant (then shown again).
     var hiddenUntil: Date?
     var createdAt: Date = Date()
@@ -38,7 +40,8 @@ final class Note: NoteAppearance, Identifiable {
 
     init(
         x: CGFloat? = nil, y: CGFloat? = nil, isMinimized: Bool = false,
-        text: String, color: String, fontName: String, fontSize: CGFloat, fontColor: String
+        text: String, color: String, fontName: String, fontSize: CGFloat, fontColor: String,
+        isMarkdown: Bool = false
     ) {
         self.x = x
         self.y = y
@@ -47,6 +50,7 @@ final class Note: NoteAppearance, Identifiable {
         self.fontName = fontName
         self.fontSize = fontSize
         self.fontColor = fontColor
+        self.isMarkdown = isMarkdown
     }
 
     convenience init(layout: NoteLayout, text: String = "") {
@@ -67,5 +71,24 @@ final class Note: NoteAppearance, Identifiable {
             .components(separatedBy: .newlines)
             .map { $0.trimmingCharacters(in: .whitespaces) }
             .joined(separator: "\n")
+    }
+
+    /// If the trimmed body looks like Markdown (headers, lists, etc.), turn Markdown mode on.
+    func applyLikelyMarkdownFlagFromContent() {
+        if Self.textLooksLikeMarkdown(text) {
+            isMarkdown = true
+        }
+    }
+
+    /// Heuristic for auto-enabling Markdown after editing (first non-empty line / start of note).
+    static func textLooksLikeMarkdown(_ raw: String) -> Bool {
+        let t = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !t.isEmpty else { return false }
+        if t.hasPrefix("#") { return true }
+        if t.range(of: #"^\s*1\.\s"#, options: .regularExpression) != nil { return true }
+        // Trimmed note can still start with "- " (same as a line beginning with " - " before trim).
+        if t.hasPrefix("- ") { return true }
+        if t.hasPrefix("*") { return true }
+        return false
     }
 }

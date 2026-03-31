@@ -255,10 +255,15 @@ final class AppState {
 
     func exportNoteToFile(_ note: Note) {
         let text = note.text
-        let defaultName = Self.suggestedExportFilename(for: text)
+        let isMarkdown = note.isMarkdown
+        let defaultName = Self.suggestedExportFilename(for: text, isMarkdown: isMarkdown)
         DispatchQueue.main.async {
             let panel = NSSavePanel()
-            panel.allowedContentTypes = [.plainText]
+            if isMarkdown, let mdType = UTType(filenameExtension: "md") {
+                panel.allowedContentTypes = [mdType, .plainText]
+            } else {
+                panel.allowedContentTypes = [.plainText]
+            }
             panel.canCreateDirectories = true
             panel.title = "Export Note"
             panel.nameFieldStringValue = defaultName
@@ -277,7 +282,7 @@ final class AppState {
         }
     }
 
-    private static func suggestedExportFilename(for text: String) -> String {
+    private static func suggestedExportFilename(for text: String, isMarkdown: Bool) -> String {
         let firstLine =
             text.split(separator: "\n", omittingEmptySubsequences: true).first.map(String.init) ?? "Note"
         let trimmed = firstLine.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -287,7 +292,18 @@ final class AppState {
         }
         base = base.trimmingCharacters(in: .whitespacesAndNewlines)
         if base.isEmpty { base = "Note" }
-        return base.hasSuffix(".txt") ? base : "\(base).txt"
+        let ext = isMarkdown ? "md" : "txt"
+        let lower = base.lowercased()
+        if lower.hasSuffix(".\(ext)") {
+            return base
+        }
+        if lower.hasSuffix(".txt") {
+            base = String(base.dropLast(4)).trimmingCharacters(in: .whitespacesAndNewlines)
+        } else if lower.hasSuffix(".md") {
+            base = String(base.dropLast(3)).trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+        if base.isEmpty { base = "Note" }
+        return "\(base).\(ext)"
     }
 
     func toggleNotesVisibility() {
