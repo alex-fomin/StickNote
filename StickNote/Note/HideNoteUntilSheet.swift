@@ -39,9 +39,10 @@ struct HideNoteUntilSheet: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .center, spacing: 12) {
             Text("Hide until later")
                 .font(.headline)
+                .multilineTextAlignment(.center)
 
             VStack(alignment: .leading, spacing: 6) {
                 Text("Date")
@@ -61,17 +62,22 @@ struct HideNoteUntilSheet: View {
                 Text("Time")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
-                DatePicker(
-                    "",
-                    selection: $chosenDate,
-                    displayedComponents: [.hourAndMinute]
-                )
-                .labelsHidden()
-                .accessibilityLabel("Time")
+                HStack(alignment: .firstTextBaseline, spacing: 10) {
+                    Text(chosenDate.formatted(date: .abbreviated, time: .omitted))
+                        .font(.body)
+                        .foregroundStyle(.primary)
+                        .accessibilityLabel("Selected date")
+                    DatePicker(
+                        "",
+                        selection: $chosenDate,
+                        displayedComponents: [.hourAndMinute]
+                    )
+                    .labelsHidden()
+                    .accessibilityLabel("Time")
+                }
             }
 
             HStack(spacing: 12) {
-                Spacer(minLength: 0)
                 Button("Cancel") {
                     dismiss()
                 }
@@ -84,9 +90,9 @@ struct HideNoteUntilSheet: View {
                 .keyboardShortcut(.defaultAction)
                 .disabled(!isValid)
             }
+            .padding(.top, 4)
         }
-        .padding(20)
-        .frame(maxWidth: 320, alignment: .leading)
-        .fixedSize(horizontal: true, vertical: false)
+        .fixedSize(horizontal: true, vertical: true)
+        .padding(16)
     }
 }
