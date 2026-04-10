@@ -1,6 +1,7 @@
 import Defaults
 import SwiftData
 import SwiftUI
+import Textual
 
 enum SelectedFolder {
     case Notes
@@ -276,7 +277,9 @@ struct NoteListView: View {
             }
         } detail: {
             if let note = selectedNote {
-                if note.isInTrashBin {
+                if note.isMarkdown {
+                    NoteListMarkdownPreview(note: note)
+                } else if note.isInTrashBin {
                     TextEditor(text: .constant(note.text))
                         .modifier(NoteModifier(note: note))
                 } else {
@@ -376,6 +379,25 @@ struct NoteListView: View {
         lastHandledRevealHiddenToken = token
         selectedFolder = .Hidden
         return true
+    }
+}
+
+/// Read-only rendered Markdown for the note list detail pane (same styling as the note window).
+private struct NoteListMarkdownPreview: View {
+    let note: Note
+
+    var body: some View {
+        ScrollView(.vertical, showsIndicators: true) {
+            StructuredText(note.text, parser: StickNoteMarkdownParser())
+                .textual.textSelection(.enabled)
+                .textual.structuredTextStyle(StickNoteStructuredTextStyle())
+                .font(Font(note.nsFont))
+                .foregroundStyle(Color.fromString(note.fontColor))
+                .multilineTextAlignment(.leading)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .fixedSize(horizontal: false, vertical: true)
+                .background(Color.fromString(note.color))
+        }
     }
 }
 
