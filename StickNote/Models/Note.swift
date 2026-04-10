@@ -73,22 +73,17 @@ final class Note: NoteAppearance, Identifiable {
             .joined(separator: "\n")
     }
 
-    /// If the trimmed body looks like Markdown (headers, lists, etc.), turn Markdown mode on.
+    /// If the trimmed body starts with `#` (Markdown heading), turn Markdown mode on.
     func applyLikelyMarkdownFlagFromContent() {
         if Self.textLooksLikeMarkdown(text) {
             isMarkdown = true
         }
     }
 
-    /// Heuristic for auto-enabling Markdown after editing (first non-empty line / start of note).
+    /// Auto-enables Markdown after editing when the note starts with `#` (after trimming whitespace).
     static func textLooksLikeMarkdown(_ raw: String) -> Bool {
         let t = raw.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !t.isEmpty else { return false }
-        if t.hasPrefix("#") { return true }
-        if t.range(of: #"^\s*1\.\s"#, options: .regularExpression) != nil { return true }
-        // Trimmed note can still start with "- " (same as a line beginning with " - " before trim).
-        if t.hasPrefix("- ") { return true }
-        if t.hasPrefix("*") { return true }
-        return false
+        return t.hasPrefix("#")
     }
 }
