@@ -141,7 +141,19 @@ private struct MarkdownMeasureRoot: View {
                 guard size.width > 0, size.height > 0 else { return }
                 onGeometryUpdate(size)
             }
-            .id(text)
+            .id(MarkdownMeasureIdentity(text: text, font: nsFont))
+    }
+}
+
+private struct MarkdownMeasureIdentity: Hashable {
+    let text: String
+    let pointSize: CGFloat
+    let fontName: String
+
+    init(text: String, font: NSFont) {
+        self.text = text
+        self.pointSize = font.pointSize
+        self.fontName = font.fontName ?? ""
     }
 }
 

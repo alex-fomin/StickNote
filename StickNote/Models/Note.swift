@@ -33,6 +33,12 @@ final class Note: NoteAppearance, Identifiable {
     var isHidden: Bool = false
     /// When true, the note is shown as rendered Markdown while not editing; export uses `.md`.
     var isMarkdown: Bool = false
+    /// Raster image embedded in the model (PNG). When set, the note is display-only (not editable text).
+    var isImageNote: Bool = false
+    var imageData: Data?
+    /// Last window size for image notes (full window width/height in points), persisted when the user resizes.
+    var imageFrameWidth: Double?
+    var imageFrameHeight: Double?
     /// When true, content that looks like Markdown must not auto-enable ``isMarkdown`` (user turned Markdown off).
     var markdownAutoDisabledByUser: Bool = false
     /// Last measured window width/height for markdown display (points), including ``NoteView`` padding. Used to avoid resizing on activation; cleared when text or font changes.

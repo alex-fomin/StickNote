@@ -20,6 +20,7 @@ struct NoteTextView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .fixedSize(horizontal: false, vertical: true)
                         .background(Color.fromString(note.color))
+                        .id("\(note.fontSize)-\(note.fontName)")
                 } else {
                     Text(isCollapsed ? note.text.truncate(NoteView.trimmedLength) : note.text)
                         .multilineTextAlignment(.leading)

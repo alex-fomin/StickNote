@@ -59,38 +59,44 @@ enum NoteClipboardImage {
         return types.contains { pasteboard.data(forType: $0) != nil }
     }
 
-    /// Writes PNG data to the app’s clipboard-images folder and returns the file URL, or `nil` if there is no image.
-    static func exportPastedImageToPNGFile(from pasteboard: NSPasteboard = .general) -> URL? {
+    /// PNG bytes for embedding in a note (no disk file).
+    static func exportPastedImageToPNGData(from pasteboard: NSPasteboard = .general) -> Data? {
         if let data = pasteboard.data(forType: NSPasteboard.PasteboardType(UTType.png.identifier)) {
-            return writeFreshPNGFile(data)
+            return data
         }
         if let data = pasteboard.data(forType: NSPasteboard.PasteboardType(UTType.tiff.identifier)),
            let png = pngData(fromBitmapOrImageData: data)
         {
-            return writeFreshPNGFile(png)
+            return png
         }
         if let data = pasteboard.data(forType: NSPasteboard.PasteboardType(UTType.jpeg.identifier)),
            let png = pngData(fromBitmapOrImageData: data)
         {
-            return writeFreshPNGFile(png)
+            return png
         }
         if let data = pasteboard.data(forType: NSPasteboard.PasteboardType(UTType.gif.identifier)),
            let png = pngData(fromBitmapOrImageData: data)
         {
-            return writeFreshPNGFile(png)
+            return png
         }
         if let data = pasteboard.data(forType: NSPasteboard.PasteboardType(UTType.webP.identifier)),
            let png = pngData(fromBitmapOrImageData: data)
         {
-            return writeFreshPNGFile(png)
+            return png
         }
         if let images = pasteboard.readObjects(forClasses: [NSImage.self]) as? [NSImage],
            let first = images.first,
            let png = pngData(from: first)
         {
-            return writeFreshPNGFile(png)
+            return png
         }
         return nil
+    }
+
+    /// Writes PNG data to the app’s clipboard-images folder and returns the file URL, or `nil` if there is no image.
+    static func exportPastedImageToPNGFile(from pasteboard: NSPasteboard = .general) -> URL? {
+        guard let png = exportPastedImageToPNGData(from: pasteboard) else { return nil }
+        return writeFreshPNGFile(png)
     }
 
     // MARK: - Private

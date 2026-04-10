@@ -37,13 +37,40 @@ struct NoteView: View {
     @State private var didSyncLaunchOriginFromWindow = false
 
     private let windowTracker: WindowPositionTracker
-    
+
+    private var resolvedFrameWidth: CGFloat {
+        if note.isImageNote, let w = note.imageFrameWidth, w > 0 { return CGFloat(w) }
+        return width
+    }
+
+    private var resolvedFrameHeight: CGFloat {
+        if note.isImageNote, let h = note.imageFrameHeight, h > 0 { return CGFloat(h) }
+        return height
+    }
+
     // MARK: - Initialization
     init(note: Note, isEditing: Bool = false) {
         let collapsed = note.isMinimized && !isEditing
-        if note.isMarkdown, !collapsed,
-           let sw = note.markdownFrameWidth, let sh = note.markdownFrameHeight,
-           sw > 0, sh > 0
+        if note.isImageNote, let data = note.imageData, !data.isEmpty {
+            if let sw = note.imageFrameWidth, let sh = note.imageFrameHeight, sw > 0, sh > 0 {
+                _width = State(initialValue: CGFloat(sw))
+                _height = State(initialValue: CGFloat(sh))
+            } else if let img = NSImage(data: data) {
+                let maxDim: CGFloat = 600
+                let intrinsic = img.size
+                let longest = max(intrinsic.width, intrinsic.height, 1)
+                let s = min(1, maxDim / longest)
+                let contentW = intrinsic.width * s + Self.horizonalPadding * 2
+                let contentH = intrinsic.height * s + Self.verticalPadding * 2
+                _width = State(initialValue: max(20, contentW))
+                _height = State(initialValue: max(20, contentH))
+            } else {
+                _width = State(initialValue: 200)
+                _height = State(initialValue: 200)
+            }
+        } else if note.isMarkdown, !collapsed,
+                  let sw = note.markdownFrameWidth, let sh = note.markdownFrameHeight,
+                  sw > 0, sh > 0
         {
             _width = State(initialValue: CGFloat(sw))
             _height = State(initialValue: CGFloat(sh))
@@ -52,16 +79,18 @@ struct NoteView: View {
             _height = State(initialValue: 0)
         }
         self._note = State(initialValue: note)
-        self._isEditing = State(initialValue: isEditing)
+        self._isEditing = State(initialValue: isEditing && !note.isImageNote)
         self.windowTracker = WindowPositionTracker(note: note)
         isCollapsed = collapsed
-        isTextEditorFocused = isEditing
+        isTextEditorFocused = isEditing && !note.isImageNote
     }
     
     // MARK: - Body
     var body: some View {
         VStack {
-            if isEditing {
+            if note.isImageNote {
+                imageDisplayView
+            } else if isEditing {
                 editingView
             } else {
                 displayView
@@ -71,7 +100,7 @@ struct NoteView: View {
             contextMenuContent
         }
         .confirmationDialog(
-            #"Are you sure you want to delete "\#(note.text.truncate(15))"?"#,
+            deleteConfirmationTitle,
             isPresented: $showConfirmation
         ) {
             deleteConfirmationButtons
@@ -82,8 +111,11 @@ struct NoteView: View {
         .background(Color.fromString($note.color.wrappedValue))
         .background(WindowClickOutsideListener(isEditing: $isEditing))
         .background(windowAccessor)
-        .frame(width: width, height: height)
-        .onAppear { updateWindowSize() }
+        .frame(width: resolvedFrameWidth, height: resolvedFrameHeight)
+        .onAppear {
+            if note.isImageNote { isEditing = false }
+            updateWindowSize()
+        }
         .onChange(of: nsWindow) { _, window in
             guard window != nil else { return }
             DispatchQueue.main.async { syncLaunchOriginFromWindowOnce() }
@@ -104,6 +136,10 @@ struct NoteView: View {
         }
         .onChange(of: isCollapsed, initial: true) { updateWindowSize() }
         .onChange(of: isEditing, initial: true) { old, new in
+            if note.isImageNote {
+                isEditing = false
+                return
+            }
             if new {
                 note.isMinimized = false
                 isCollapsed = false
@@ -112,6 +148,13 @@ struct NoteView: View {
             }
             updateWindowSize()
         }
+    }
+
+    private var deleteConfirmationTitle: String {
+        if note.isImageNote {
+            return "Delete this image note?"
+        }
+        return #"Are you sure you want to delete "\#(note.text.truncate(15))"?"#
     }
     
     // MARK: - Subviews
@@ -162,6 +205,15 @@ struct NoteView: View {
     
     
     @ViewBuilder
+    private var imageDisplayView: some View {
+        NoteImageDisplay(imageData: note.imageData)
+            .overlay(DraggableArea(isEditing: $isEditing, allowsEditOnDoubleClick: false))
+            .padding(.horizontal, NoteView.horizonalPadding)
+            .padding(.vertical, NoteView.verticalPadding)
+            .frame(width: resolvedFrameWidth, height: resolvedFrameHeight, alignment: .topLeading)
+    }
+
+    @ViewBuilder
     private var displayView: some View {
         NoteTextView(note: note, isCollapsed: $isCollapsed)
             .overlay(DraggableArea(isEditing: $isEditing))
@@ -199,17 +251,19 @@ struct NoteView: View {
             Label("Copy to clipboard", systemImage: "doc.on.doc")
         }
 
-        Toggle(
-            isOn: Binding(
-                get: { note.isMarkdown },
-                set: { newValue in
-                    note.isMarkdown = newValue
-                    note.markdownAutoDisabledByUser = !newValue
-                    updateWindowSize()
-                }
-            )
-        ) {
-            Label("Markdown", systemImage: "doc.richtext")
+        if !note.isImageNote {
+            Toggle(
+                isOn: Binding(
+                    get: { note.isMarkdown },
+                    set: { newValue in
+                        note.isMarkdown = newValue
+                        note.markdownAutoDisabledByUser = !newValue
+                        updateWindowSize()
+                    }
+                )
+            ) {
+                Label("Markdown", systemImage: "doc.richtext")
+            }
         }
 
         Button {
@@ -306,7 +360,7 @@ struct NoteView: View {
     }
     
     private func handleHover(_ hover: Bool) {
-        guard note.isMinimized && maximizeOnHover && !isEditing else { return }
+        guard !note.isImageNote, note.isMinimized && maximizeOnHover && !isEditing else { return }
         isCollapsed = !hover
     }
     
@@ -320,6 +374,7 @@ struct NoteView: View {
     }
     
     private func handleTextChange() {
+        guard !note.isImageNote else { return }
         if note.isMarkdown {
             note.clearMarkdownDisplayFrame()
         }
@@ -353,6 +408,9 @@ struct NoteView: View {
     }
 
     private func updateWindowSize() {
+        if note.isImageNote {
+            return
+        }
         if note.isMarkdown, !isCollapsed, !isEditing,
            let sw = note.markdownFrameWidth, let sh = note.markdownFrameHeight,
            sw > 0, sh > 0

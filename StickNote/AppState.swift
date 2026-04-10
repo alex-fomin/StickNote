@@ -74,11 +74,11 @@ final class AppState {
     }
 
     func openNewNoteFromClipboard() {
-        if let imageFileURL = NoteClipboardImage.exportPastedImageToPNGFile() {
-            let md = "![Pasted image](\(imageFileURL.absoluteString))"
-            let note = Note(layout: getDefaultLayout(), text: md)
-            note.isMarkdown = true
-            note.markdownAutoDisabledByUser = false
+        if let pngData = NoteClipboardImage.exportPastedImageToPNGData() {
+            let note = Note(layout: getDefaultLayout(), text: "Image")
+            note.isImageNote = true
+            note.imageData = pngData
+            note.isMarkdown = false
             note.showOnAllSpaces = Defaults[.showOnAllSpaces]
             context.insert(note)
             openNote(note, isEditing: false)
@@ -100,32 +100,35 @@ final class AppState {
     }
 
     func openNote(_ note: Note, isEditing: Bool) {
+        let effectiveEditing = isEditing && !note.isImageNote
         if let existing = note.window {
             existing.orderFront(nil)
-            if isEditing {
+            if effectiveEditing {
                 NSApplication.shared.activate(ignoringOtherApps: true)
                 existing.makeKey()
             }
             return
         }
 
-        let contentRect = getContentRectFromNote(note, isEditing: isEditing)
+        let contentRect = getContentRectFromNote(note, isEditing: effectiveEditing)
 
         note.x = contentRect.minX
         note.y = contentRect.minY
 
+        var styleMask: NSWindow.StyleMask = [.titled]
+        if note.isImageNote {
+            styleMask.insert(.resizable)
+        }
         let window = NoteWindow(
             contentRect: contentRect,
-            styleMask: [
-                .titled
-            ],
+            styleMask: styleMask,
             backing: .buffered,
             defer: true
         )
         window.note = note
         note.window = window
 
-        let contentView = NoteView(note: note, isEditing: isEditing)
+        let contentView = NoteView(note: note, isEditing: effectiveEditing)
             .preferredColorScheme(.light)
             .environment(\.modelContext, self.sharedModelContainer.mainContext)
             .environment(AppState.shared.model)
@@ -133,18 +136,21 @@ final class AppState {
         window.contentView = NSHostingView(rootView: contentView)
 
         window.level = .floating
-        window.hasShadow = isEditing
+        window.hasShadow = effectiveEditing
         window.isReleasedWhenClosed = false
 
         applyShowOnAllSpaces(note: note)
 
         window.orderFront(nil)
-        if isEditing {
+        if effectiveEditing {
             NSApplication.shared.activate(ignoringOtherApps: true)
             window.makeKey()
         }
 
         window.styleMask.remove(.titled)
+        if note.isImageNote {
+            window.styleMask.insert(.resizable)
+        }
 
         try? context.save()
         self.updateNotesCount()
@@ -165,6 +171,24 @@ final class AppState {
 
         var cw: CGFloat = 10
         var ch: CGFloat = 10
+
+        if note.isImageNote, note.imageData != nil {
+            if let mw = note.imageFrameWidth, let mh = note.imageFrameHeight, mw > 0, mh > 0 {
+                cw = CGFloat(mw)
+                ch = CGFloat(mh)
+            } else if let img = NSImage(data: note.imageData!) {
+                let maxDim: CGFloat = 600
+                let intrinsic = img.size
+                let longest = max(intrinsic.width, intrinsic.height, 1)
+                let scale = min(1, maxDim / longest)
+                cw = max(20, intrinsic.width * scale + padW)
+                ch = max(20, intrinsic.height * scale + padV)
+            } else {
+                cw = 200
+                ch = 200
+            }
+            return NSRect(x: x, y: y, width: cw, height: ch)
+        }
 
         if note.isMarkdown, !collapsedDisplay,
            let mw = note.markdownFrameWidth, let mh = note.markdownFrameHeight,
@@ -199,7 +223,7 @@ final class AppState {
             note.hiddenUntil = nil
             note.updatedAt = now
             changed = true
-            if !note.text.isEmpty {
+            if !note.text.isEmpty || (note.isImageNote && note.imageData != nil) {
                 openNote(note, isEditing: false)
             }
         }
@@ -216,7 +240,7 @@ final class AppState {
         
         if let notes {
             for note in notes {
-                if note.text.isEmpty {
+                if note.text.isEmpty && !(note.isImageNote && note.imageData != nil) {
                     self.deleteNote(note, forceDelete: true)
                 } else {
                     self.openNote(note, isEditing: false)
@@ -295,6 +319,13 @@ final class AppState {
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
 
+        if note.isImageNote, let data = note.imageData {
+            pasteboard.setData(data, forType: NSPasteboard.PasteboardType(UTType.png.identifier))
+            if let img = NSImage(data: data), let tiff = img.tiffRepresentation {
+                pasteboard.setData(tiff, forType: .tiff)
+            }
+            return
+        }
         if note.isMarkdown {
             MarkdownClipboard.populatePasteboard(pasteboard, note: note)
         } else {
@@ -303,6 +334,28 @@ final class AppState {
     }
 
     func exportNoteToFile(_ note: Note) {
+        if note.isImageNote, let data = note.imageData {
+            DispatchQueue.main.async {
+                let panel = NSSavePanel()
+                panel.allowedContentTypes = [.png]
+                panel.canCreateDirectories = true
+                panel.title = "Export Image"
+                panel.nameFieldStringValue = "Image.png"
+                panel.begin { response in
+                    guard response == .OK, let url = panel.url else { return }
+                    do {
+                        try data.write(to: url, options: .atomic)
+                    } catch {
+                        let alert = NSAlert()
+                        alert.messageText = "Couldn’t save the file."
+                        alert.informativeText = error.localizedDescription
+                        alert.alertStyle = .warning
+                        alert.runModal()
+                    }
+                }
+            }
+            return
+        }
         let text = note.text
         let isMarkdown = note.isMarkdown
         let defaultName = Self.suggestedExportFilename(for: text, isMarkdown: isMarkdown)

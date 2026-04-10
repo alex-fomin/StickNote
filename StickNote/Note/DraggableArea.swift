@@ -10,6 +10,7 @@ import SwiftUI
 /// A helper view that enables dragging the entire window
 struct DraggableArea: NSViewRepresentable {
     @Binding var isEditing: Bool
+    var allowsEditOnDoubleClick: Bool = true
 
     func makeNSView(context: Context) -> NSView {
         let view = DraggableNSView()
@@ -19,5 +20,7 @@ struct DraggableArea: NSViewRepresentable {
         return view
     }
 
-    func updateNSView(_ nsView: NSView, context: Context) {}
+    func updateNSView(_ nsView: NSView, context: Context) {
+        (nsView as? DraggableNSView)?.area = self
+    }
 }

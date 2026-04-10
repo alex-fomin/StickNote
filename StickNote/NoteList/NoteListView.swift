@@ -101,6 +101,7 @@ struct NoteListView: View {
         )) {
             Label("Markdown", systemImage: "doc.richtext")
         }
+        .disabled(note.isImageNote)
     }
 
     fileprivate func ExportToFileButton(note: Note) -> some View {
@@ -181,7 +182,14 @@ struct NoteListView: View {
         } content: {
             if let selectedFolder {
                 Table(of: Note.self, selection: $selectedNoteId, sortOrder: $sortOrder) {
-                    TableColumn("Text", value: \.text)
+                    TableColumn("Text") { (n: Note) in
+                        if n.isImageNote {
+                            Label("Image", systemImage: "photo")
+                                .foregroundStyle(.secondary)
+                        } else {
+                            Text(n.text)
+                        }
+                    }
                     DateTableColumn("Created", value: \.createdAt)
                     DateTableColumn(
                         selectedFolder == .TrashBin ? "Deleted" : "Updated", value: \.updatedAt)
@@ -277,7 +285,9 @@ struct NoteListView: View {
             }
         } detail: {
             if let note = selectedNote {
-                if note.isMarkdown {
+                if note.isImageNote {
+                    NoteListImagePreview(note: note)
+                } else if note.isMarkdown {
                     NoteListMarkdownPreview(note: note)
                 } else if note.isInTrashBin {
                     TextEditor(text: .constant(note.text))
@@ -349,10 +359,11 @@ struct NoteListView: View {
     }
 
     func filteredNotes(notes: [Note]) -> [Note] {
-        if searchText == "" {
+        if searchText.isEmpty {
             return notes
-        } else {
-            return notes.filter { $0.text.contains(searchText) }
+        }
+        return notes.filter { n in
+            n.text.localizedStandardContains(searchText)
         }
     }
 
@@ -382,6 +393,20 @@ struct NoteListView: View {
     }
 }
 
+/// Image note preview in the list detail pane.
+private struct NoteListImagePreview: View {
+    let note: Note
+
+    var body: some View {
+        ScrollView(.vertical, showsIndicators: true) {
+            NoteImageDisplay(imageData: note.imageData)
+                .frame(maxWidth: .infinity)
+                .padding(8)
+                .background(Color.fromString(note.color))
+        }
+    }
+}
+
 /// Read-only rendered Markdown for the note list detail pane (same styling as the note window).
 private struct NoteListMarkdownPreview: View {
     let note: Note
@@ -397,6 +422,7 @@ private struct NoteListMarkdownPreview: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .fixedSize(horizontal: false, vertical: true)
                 .background(Color.fromString(note.color))
+                .id("\(note.fontSize)-\(note.fontName)")
         }
     }
 }
