@@ -397,14 +397,42 @@ struct NoteListView: View {
 private struct NoteListImagePreview: View {
     let note: Note
 
+    /// Avoids ``NoteImageDisplay``’s ``GeometryReader`` collapsing to a tiny height inside ``ScrollView``.
+    private static let minPreviewHeight: CGFloat = 320
+    private static let maxPreviewHeight: CGFloat = 1600
+
     var body: some View {
-        ScrollView(.vertical, showsIndicators: true) {
-            NoteImageDisplay(imageData: note.imageData)
-                .scaleEffect(CGFloat(note.fontSize) / NoteImageDisplay.referenceFontSize)
-            .frame(maxWidth: .infinity)
-            .padding(8)
-            .background(Color.fromString(note.color))
+        GeometryReader { geo in
+            let pad: CGFloat = 8
+            let maxW = max(geo.size.width - pad * 2, 200)
+            ScrollView(.vertical, showsIndicators: true) {
+                Group {
+                    if let data = note.imageData, let ns = NSImage(data: data) {
+                        let iw = max(ns.size.width, 1)
+                        let ih = ns.size.height
+                        let naturalH = maxW * (ih / iw)
+                        let h = min(
+                            max(naturalH, Self.minPreviewHeight),
+                            Self.maxPreviewHeight
+                        )
+                        Image(nsImage: ns)
+                            .resizable()
+                            .interpolation(.high)
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: maxW, height: h)
+                    } else {
+                        Image(systemName: "photo")
+                            .font(.largeTitle)
+                            .foregroundStyle(.secondary)
+                            .frame(width: maxW, height: 240)
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .padding(pad)
+                .background(Color.fromString(note.color))
+            }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 
