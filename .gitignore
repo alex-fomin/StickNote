@@ -31,6 +31,9 @@ playground.xcworkspace
 
 .build/
 
+# Local DMG output (scripts/publish-dmg.sh)
+dist/
+
 # Cursor agent debug session logs (NDJSON, local-only)
 .cursor/debug*.log
 
