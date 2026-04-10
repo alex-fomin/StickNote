@@ -31,6 +31,9 @@ playground.xcworkspace
 
 .build/
 
+# Cursor agent debug session logs (NDJSON, local-only)
+.cursor/debug*.log
+
 # Local Release builds (xcodebuild -derivedDataPath build/DerivedData)
 build/
 
