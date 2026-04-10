@@ -61,6 +61,7 @@ struct NoteView: View {
         .background(WindowClickOutsideListener(isEditing: $isEditing))
         .background(windowAccessor)
         .frame(width: width, height: height)
+        .onAppear { updateWindowSize() }
         .onHover { handleHover($0) }
         .onChange(of: note.fontSize, initial: false) { updateWindowSize() }
         .onChange(of: note.fontName, initial: false) { updateWindowSize() }
@@ -272,7 +273,12 @@ struct NoteView: View {
         var newHeight: CGFloat = 0
         var newWidth: CGFloat = 0
        
-        let fullSize = note.text.sizeUsingFont(usingFont: note.nsFont)
+        let fullSize: CGSize
+        if note.isMarkdown && !isCollapsed && !isEditing {
+            fullSize = MarkdownDisplaySize.fittingSize(for: note)
+        } else {
+            fullSize = note.text.sizeUsingFont(usingFont: note.nsFont)
+        }
         if (isCollapsed) {
           
             let collapsedSize = note.text.truncate(NoteView.trimmedLength).sizeUsingFont(usingFont: note.nsFont)
