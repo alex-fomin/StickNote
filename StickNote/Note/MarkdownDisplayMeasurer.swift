@@ -14,7 +14,7 @@ final class MarkdownDisplayMeasurer {
     private init() {}
 
     /// Measures the note’s rendered markdown size. Calls `completion` on the main queue once (or with a fallback if layout fails).
-    /// - Parameter contentMaxWidth: When the note already has a width, pass the inner content width so wrapping matches the real window; otherwise a large default is used (same idea as unbounded string sizing).
+    /// - Parameter contentMaxWidth: Upper bound for line wrapping during layout; pass `nil` to use a large default so width/height follow rendered markdown (plain-text width is a poor cap for headings, code, etc.).
     func measure(note: Note, contentMaxWidth: CGFloat?, completion: @escaping @MainActor (CGSize) -> Void) {
         var finished = false
         let finishOnce: @MainActor (CGSize) -> Void = { size in
@@ -27,15 +27,17 @@ final class MarkdownDisplayMeasurer {
 
         let maxW = contentMaxWidth.map { max(1, $0) } ?? 10_000
 
+        // Updated by MarkdownMeasureRoot as SwiftUI lays out; default StructuredText can take several
+        // passes (e.g. headings), so we must not complete measurement on the first value.
+        var reportedSize: CGSize = .zero
+
         let root = MarkdownMeasureRoot(
             text: note.text,
             nsFont: note.nsFont,
             fontColor: Color.fromString(note.fontColor),
             noteColor: Color.fromString(note.color),
             contentMaxWidth: maxW,
-            onMeasured: { size in
-                finishOnce(size)
-            }
+            onGeometryUpdate: { reportedSize = $0 }
         )
 
         if hosting == nil {
@@ -73,30 +75,25 @@ final class MarkdownDisplayMeasurer {
 
         hosting.layoutSubtreeIfNeeded()
 
-        DispatchQueue.main.async { [weak self] in
-            guard let self else { return }
-            hosting.invalidateIntrinsicContentSize()
-            hosting.layoutSubtreeIfNeeded()
-            let intrinsic = hosting.intrinsicContentSize
-            if intrinsic.width > 0, intrinsic.height > 0,
-                intrinsic.width != NSView.noIntrinsicMetric, intrinsic.height != NSView.noIntrinsicMetric
-            {
-                finishOnce(intrinsic)
-            }
-        }
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { [weak self] in
+        // One run loop is not always enough for StructuredText; wait briefly so the last geometry
+        // preference reflects the final layout (avoids locking in a zero or stale size).
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) { [weak self] in
             guard let self else { return }
             guard !finished else { return }
+            hosting.invalidateIntrinsicContentSize()
             hosting.layoutSubtreeIfNeeded()
+
             let intrinsic = hosting.intrinsicContentSize
-            if intrinsic.width > 0, intrinsic.height > 0,
-                intrinsic.width != NSView.noIntrinsicMetric, intrinsic.height != NSView.noIntrinsicMetric
-            {
+            let intrinsicOK = intrinsic.width > 0 && intrinsic.height > 0
+                && intrinsic.width != NSView.noIntrinsicMetric && intrinsic.height != NSView.noIntrinsicMetric
+
+            if reportedSize.width > 0, reportedSize.height > 0 {
+                finishOnce(reportedSize)
+            } else if intrinsicOK {
                 finishOnce(intrinsic)
-                return
+            } else {
+                finishOnce(note.text.sizeUsingFont(usingFont: note.nsFont))
             }
-            finishOnce(note.text.sizeUsingFont(usingFont: note.nsFont))
         }
     }
 
@@ -119,19 +116,19 @@ private struct MarkdownMeasureRoot: View {
     let noteColor: Color
     /// Caps line width so the measure view does not expand to the full off-screen window (which would distort width).
     let contentMaxWidth: CGFloat
-    let onMeasured: (CGSize) -> Void
-
-    @State private var didReport = false
+    let onGeometryUpdate: (CGSize) -> Void
 
     var body: some View {
         StructuredText(text, parser: StickNoteMarkdownParser())
             .textual.textSelection(.enabled)
-            .textual.structuredTextStyle(StickNoteStructuredTextStyle())
+            .textual.structuredTextStyle(.default)
             .font(Font(nsFont))
             .foregroundStyle(fontColor)
             .multilineTextAlignment(.leading)
             .frame(maxWidth: contentMaxWidth, alignment: .leading)
-            .fixedSize(horizontal: false, vertical: true)
+            // Horizontal must hug intrinsic width so geometry width isn’t always `contentMaxWidth`
+            // (unlike display mode, which uses maxWidth: .infinity to fill the window).
+            .fixedSize(horizontal: true, vertical: true)
             .background(noteColor)
             .background {
                 GeometryReader { geo in
@@ -139,10 +136,10 @@ private struct MarkdownMeasureRoot: View {
                 }
             }
             .onPreferenceChange(MarkdownMeasuredSizeKey.self) { size in
-                guard !didReport, size.width > 0, size.height > 0 else { return }
-                didReport = true
-                onMeasured(size)
+                guard size.width > 0, size.height > 0 else { return }
+                onGeometryUpdate(size)
             }
+            .id(text)
     }
 }
 

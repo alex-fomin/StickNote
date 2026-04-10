@@ -314,8 +314,8 @@ struct NoteView: View {
     private func refineMarkdownFrameAfterEditing() {
         let token = UUID()
         markdownLayoutToken = token
-        let provisional = note.text.sizeUsingFont(usingFont: note.nsFont)
-        MarkdownDisplayMeasurer.shared.measure(note: note, contentMaxWidth: provisional.width) { measured in
+        // Do not cap by plain-text width: markdown blocks can be wider or narrower than `sizeUsingFont`.
+        MarkdownDisplayMeasurer.shared.measure(note: note, contentMaxWidth: nil) { measured in
             guard self.markdownLayoutToken == token else { return }
             self.applyWindowFrame(fullContentSize: measured, persistMarkdownFrame: true)
         }
