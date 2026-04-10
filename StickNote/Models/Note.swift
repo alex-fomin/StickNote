@@ -33,6 +33,8 @@ final class Note: NoteAppearance, Identifiable {
     var isHidden: Bool = false
     /// When true, the note is shown as rendered Markdown while not editing; export uses `.md`.
     var isMarkdown: Bool = false
+    /// When true, content that looks like Markdown must not auto-enable ``isMarkdown`` (user turned Markdown off).
+    var markdownAutoDisabledByUser: Bool = false
     /// Last measured window width/height for markdown display (points), including ``NoteView`` padding. Used to avoid resizing on activation; cleared when text or font changes.
     var markdownFrameWidth: Double?
     var markdownFrameHeight: Double?
@@ -81,8 +83,9 @@ final class Note: NoteAppearance, Identifiable {
         markdownFrameHeight = nil
     }
 
-    /// If the trimmed body starts with `#` (Markdown heading), turn Markdown mode on.
+    /// If the trimmed body starts with `#` (Markdown heading), turn Markdown mode on unless the user opted out.
     func applyLikelyMarkdownFlagFromContent() {
+        guard !markdownAutoDisabledByUser else { return }
         if Self.textLooksLikeMarkdown(text) {
             isMarkdown = true
         }

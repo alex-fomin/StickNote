@@ -93,7 +93,10 @@ struct NoteListView: View {
     fileprivate func MarkdownToggle(note: Note) -> some View {
         Toggle(isOn: Binding(
             get: { note.isMarkdown },
-            set: { note.isMarkdown = $0 }
+            set: { newValue in
+                note.isMarkdown = newValue
+                note.markdownAutoDisabledByUser = !newValue
+            }
         )) {
             Text("Markdown")
         }

@@ -26,6 +26,8 @@ struct NoteView: View {
     @State private var height: CGFloat
     /// Cancels stale async markdown measurements when the note changes again before layout finishes.
     @State private var markdownLayoutToken = UUID()
+    /// Snapshot when the text editor last appeared; used to run Markdown auto-detect only after real edits.
+    @State private var textAtEditSessionStart: String = ""
 
     private let windowTracker: WindowPositionTracker
     
@@ -113,6 +115,7 @@ struct NoteView: View {
                 .focused($isTextEditorFocused)
                 .onAppear{
                     isCollapsed = false
+                    textAtEditSessionStart = note.text
                     configureEditingMode()
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                         isTextEditorFocused = true
@@ -191,6 +194,7 @@ struct NoteView: View {
                 get: { note.isMarkdown },
                 set: { newValue in
                     note.isMarkdown = newValue
+                    note.markdownAutoDisabledByUser = !newValue
                     updateWindowSize()
                 }
             )
@@ -285,12 +289,16 @@ struct NoteView: View {
     }
     
     private func processNote() {
+        let priorForComparison = textAtEditSessionStart.removeTrailingEmptyLines()
         note.text = note.text.removeTrailingEmptyLines()
         if note.text.isEmpty {
             AppState.shared.deleteNote(self.note, forceDelete: true)
             nsWindow?.close()
         } else {
-            note.applyLikelyMarkdownFlagFromContent()
+            let textChangedThisSession = note.text != priorForComparison
+            if textChangedThisSession {
+                note.applyLikelyMarkdownFlagFromContent()
+            }
             if maximizeOnEdit {
                 note.isMinimized = false
             }

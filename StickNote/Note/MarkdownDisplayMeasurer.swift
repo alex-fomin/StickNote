@@ -75,8 +75,9 @@ final class MarkdownDisplayMeasurer {
 
         hosting.layoutSubtreeIfNeeded()
 
-        // One run loop is not always enough for StructuredText; wait briefly so the last geometry
-        // preference reflects the final layout (avoids locking in a zero or stale size).
+        // One run loop is not always enough for StructuredText; wait briefly so layout settles.
+        // Prefer `intrinsicContentSize` after `layoutSubtreeIfNeeded()` over GeometryReader preferences:
+        // preferences can reflect an early pass (e.g. narrow width) while intrinsic matches the final layout.
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) { [weak self] in
             guard let self else { return }
             guard !finished else { return }
@@ -86,13 +87,14 @@ final class MarkdownDisplayMeasurer {
             let intrinsic = hosting.intrinsicContentSize
             let intrinsicOK = intrinsic.width > 0 && intrinsic.height > 0
                 && intrinsic.width != NSView.noIntrinsicMetric && intrinsic.height != NSView.noIntrinsicMetric
+            let plainFallback = note.text.sizeUsingFont(usingFont: note.nsFont)
 
-            if reportedSize.width > 0, reportedSize.height > 0 {
-                finishOnce(reportedSize)
-            } else if intrinsicOK {
+            if intrinsicOK {
                 finishOnce(intrinsic)
+            } else if reportedSize.width > 0, reportedSize.height > 0 {
+                finishOnce(reportedSize)
             } else {
-                finishOnce(note.text.sizeUsingFont(usingFont: note.nsFont))
+                finishOnce(plainFallback)
             }
         }
     }
