@@ -98,7 +98,7 @@ final class AppState {
             return
         }
 
-        let contentRect = getContentRectFromNote(note)
+        let contentRect = getContentRectFromNote(note, isEditing: isEditing)
 
         note.x = contentRect.minX
         note.y = contentRect.minY
@@ -117,6 +117,7 @@ final class AppState {
         let contentView = NoteView(note: note, isEditing: isEditing)
             .preferredColorScheme(.light)
             .environment(\.modelContext, self.sharedModelContainer.mainContext)
+            .environment(AppState.shared.model)
 
         window.contentView = NSHostingView(rootView: contentView)
 
@@ -139,16 +140,41 @@ final class AppState {
         self.windows.append(window);
     }
 
-    private func getContentRectFromNote(_ note: Note) -> NSRect {
+    /// Initial window frame. Uses saved markdown size or measured text instead of a 10×10 stub
+    /// so the first layout matches persisted position (avoids a large height jump on launch).
+    private func getContentRectFromNote(_ note: Note, isEditing: Bool) -> NSRect {
         let screenFrame = NSScreen.main?.frame ?? NSRect.zero
 
         let x = note.x ?? (screenFrame.midX - 500 + CGFloat(self.windows.count) * 20)
         let y = note.y ?? (screenFrame.midY + 450 - CGFloat(self.windows.count) * 20)
 
-        return NSRect(
-            x: x,
-            y: y,
-            width: 10, height: 10)
+        let collapsedDisplay = note.isMinimized && !isEditing
+        let padW = NoteView.horizonalPadding * 2
+        let padV = NoteView.verticalPadding * 2
+
+        var cw: CGFloat = 10
+        var ch: CGFloat = 10
+
+        if note.isMarkdown, !collapsedDisplay,
+           let mw = note.markdownFrameWidth, let mh = note.markdownFrameHeight,
+           mw > 0, mh > 0
+        {
+            cw = CGFloat(mw)
+            ch = CGFloat(mh)
+        } else if !note.text.isEmpty {
+            let textForSize =
+                collapsedDisplay
+                ? note.text.truncate(NoteView.trimmedLength)
+                : note.text
+            let fs = textForSize.sizeUsingFont(usingFont: note.nsFont)
+            var w = fs.width + padW
+            var h = fs.height + padV
+            if isEditing { w += 2 }
+            cw = max(20, w)
+            ch = max(20, h)
+        }
+
+        return NSRect(x: x, y: y, width: cw, height: ch)
     }
 
     func processDueScheduledUnhides() {

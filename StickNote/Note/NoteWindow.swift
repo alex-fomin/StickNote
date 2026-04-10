@@ -48,9 +48,11 @@ class NoteWindow: NSWindow {
 
     override func mouseDown(with event: NSEvent) {
         super.mouseDown(with: event)
+        let saved = self.frame
         self.styleMask.insert(.titled)
         self.makeKey()
         self.styleMask.remove(.titled)
+        self.setFrame(saved, display: true)
     }
 
     override func becomeKey() {

@@ -1,3 +1,4 @@
+import AppKit
 import Defaults
 import SwiftData
 import SwiftUI
@@ -13,6 +14,10 @@ struct NoteView: View {
     @Default(.confirmOnDelete) var confirmOnDelete
     @Default(.maximizeOnEdit) var maximizeOnEdit
     @Default(.maximizeOnHover) var maximizeOnHover
+
+    @Environment(AppStateModel.self) private var appStateModel
+    @Environment(\.openSettings) private var openSettings
+    @Environment(\.openWindow) private var openWindow
     
     @State private var note: Note
     @State private var isCollapsed: Bool = false
@@ -28,6 +33,8 @@ struct NoteView: View {
     @State private var markdownLayoutToken = UUID()
     /// Snapshot when the text editor last appeared; used to run Markdown auto-detect only after real edits.
     @State private var textAtEditSessionStart: String = ""
+    /// One-shot: align persisted `note.x` / `note.y` with `NSWindow.frame.origin` after open.
+    @State private var didSyncLaunchOriginFromWindow = false
 
     private let windowTracker: WindowPositionTracker
     
@@ -77,6 +84,10 @@ struct NoteView: View {
         .background(windowAccessor)
         .frame(width: width, height: height)
         .onAppear { updateWindowSize() }
+        .onChange(of: nsWindow) { _, window in
+            guard window != nil else { return }
+            DispatchQueue.main.async { syncLaunchOriginFromWindowOnce() }
+        }
         .onHover { handleHover($0) }
         .onChange(of: note.fontSize, initial: false) {
             note.clearMarkdownDisplayFrame()
@@ -225,6 +236,36 @@ struct NoteView: View {
             Label("Hide note until…", systemImage: "calendar.badge.clock")
         }
 
+        Divider()
+
+        Menu("StickNote", systemImage: "note.text") {
+            Button("Note list...") {
+                NSApp.activate(ignoringOtherApps: true)
+                openWindow(id: "note-list")
+            }
+            Button("Show all hidden notes") {
+                AppState.shared.requestRevealHiddenNotesInList()
+                NSApp.activate(ignoringOtherApps: true)
+                openWindow(id: "note-list")
+            }
+            Button {
+                AppState.shared.toggleNotesVisibility()
+            } label: {
+                Label(
+                    appStateModel.isNotesHidden ? "Show notes" : "Hide notes",
+                    systemImage: appStateModel.isNotesHidden ? "eye" : "eye.slash"
+                )
+            }
+            Divider()
+            Button("Settings...") {
+                NSApp.activate(ignoringOtherApps: true)
+                openSettings()
+            }
+            Button("Quit") {
+                NSApplication.shared.terminate(nil)
+            }
+        }
+
         Button(role: .destructive) {
             handleDelete()
         } label: {
@@ -302,6 +343,13 @@ struct NoteView: View {
         }
     }
 
+    private func syncLaunchOriginFromWindowOnce() {
+        guard !didSyncLaunchOriginFromWindow, let w = nsWindow else { return }
+        didSyncLaunchOriginFromWindow = true
+        note.x = w.frame.origin.x
+        note.y = w.frame.origin.y
+    }
+
     private func updateWindowSize() {
         if note.isMarkdown, !isCollapsed, !isEditing,
            let sw = note.markdownFrameWidth, let sh = note.markdownFrameHeight,
@@ -333,11 +381,18 @@ struct NoteView: View {
         }
     }
 
+    /// Height to use when anchoring the window top edge: must match ``note.y``'s source (``NSWindow.frame``), not stale SwiftUI state.
+    private func anchorWindowHeightForResize() -> CGFloat {
+        if let w = nsWindow { return w.frame.height }
+        return height
+    }
+
     /// Restores a previously saved markdown window size (full frame, including padding).
     private func applyPersistedMarkdownFrame(frameWidth: CGFloat, frameHeight: CGFloat) {
         let newWidth = max(20, frameWidth)
         let newHeight = frameHeight
-        let newY = height == 0 ? note.y : (note.y! + height - newHeight)
+        let oldH = anchorWindowHeightForResize()
+        let newY = height == 0 ? note.y : (note.y! + oldH - newHeight)
         width = newWidth
         height = newHeight
         note.y = newY
@@ -364,7 +419,8 @@ struct NoteView: View {
             newWidth += 2
         }
 
-        let newY = height == 0 ? note.y : (note.y! + height - newHeight)
+        let oldH = anchorWindowHeightForResize()
+        let newY = height == 0 ? note.y : (note.y! + oldH - newHeight)
 
         width = newWidth
         height = newHeight

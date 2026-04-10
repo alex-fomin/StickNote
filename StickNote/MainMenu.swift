@@ -31,6 +31,7 @@ struct MainMenu: View {
         )
         Divider()
         Button("Note list...") {
+            NSApp.activate(ignoringOtherApps: true)
             openWindow(id: "note-list")
         }
         Button("Show all hidden notes") {
@@ -45,7 +46,10 @@ struct MainMenu: View {
         .keyboardShortcut(
             KeyboardShortcuts.Shortcut(name: .showHideNotes)?.toKeyboardShortcut()
         )
-        Button("Settings...") { openSettings() }
+        Button("Settings...") {
+            NSApp.activate(ignoringOtherApps: true)
+            openSettings()
+        }
         Button("Quit") { NSApplication.shared.terminate(nil) }
             .keyboardShortcut("Q")
     }

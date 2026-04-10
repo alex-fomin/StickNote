@@ -63,12 +63,14 @@ struct StickNoteApp: App {
             NoteListView()
                 .environment(appStateModel)
         }
+        .windowLevel(.floating)
         .modelContext(AppState.shared.context)
         
         Settings {
             SettingsView()
                 .fixedSize()
         }
+        .windowLevel(.floating)
         .windowResizability(.contentSize)
         .modelContext(AppState.shared.context)
     }
