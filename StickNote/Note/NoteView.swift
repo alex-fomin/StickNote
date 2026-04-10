@@ -17,6 +17,7 @@ struct NoteView: View {
     @Default(.maximizeOnHover) var maximizeOnHover
 
     @Environment(AppStateModel.self) private var appStateModel
+    @Environment(\.modelContext) private var modelContext
     @Environment(\.openSettings) private var openSettings
     @Environment(\.openWindow) private var openWindow
     
@@ -36,6 +37,8 @@ struct NoteView: View {
     @State private var textAtEditSessionStart: String = ""
     /// One-shot: align persisted `note.x` / `note.y` with `NSWindow.frame.origin` after open.
     @State private var didSyncLaunchOriginFromWindow = false
+    /// Skips ``resizeImageNoteWindowForFontChange`` / markdown resize while applying Cmd+0 default zoom.
+    @State private var isApplyingZoomReset = false
 
     private let windowTracker: WindowPositionTracker
 
@@ -106,6 +109,13 @@ struct NoteView: View {
                 displayView
             }
         }
+        .onKeyPress { press in
+            if press.characters == "0" && press.modifiers.contains(.command) {
+                resetZoomToDefault()
+                return .handled
+            }
+            return .ignored
+        }
         .contextMenu {
             contextMenuContent
         }
@@ -131,7 +141,12 @@ struct NoteView: View {
             DispatchQueue.main.async { syncLaunchOriginFromWindowOnce() }
         }
         .onHover { handleHover($0) }
+        .onReceive(NotificationCenter.default.publisher(for: .stickNoteResetZoom)) { notification in
+            guard let n = notification.object as? Note, n.id == note.id else { return }
+            resetZoomToDefault()
+        }
         .onChange(of: note.fontSize, initial: false) { oldFont, newFont in
+            if isApplyingZoomReset { return }
             if note.isImageNote {
                 resizeImageNoteWindowForFontChange(from: oldFont, to: newFont)
                 return
@@ -203,6 +218,10 @@ struct NoteView: View {
                 .onKeyPress { press in
                     if ((press.key == .return && press.modifiers.contains(.command)) || (press.key == .escape)){
                         isEditing = false
+                        return .handled
+                    }
+                    if press.characters == "0" && press.modifiers.contains(.command) {
+                        resetZoomToDefault()
                         return .handled
                     }
                     if (press.characters == "=" && press.modifiers.contains(.command)){
@@ -450,6 +469,54 @@ struct NoteView: View {
         didSyncLaunchOriginFromWindow = true
         note.x = w.frame.origin.x
         note.y = w.frame.origin.y
+    }
+
+    /// Cmd+0: text notes use the matching persisted ``NoteLayout`` font size; image notes use default layout size and snap window to intrinsic image size.
+    private func resetZoomToDefault() {
+        let resetFontSize: CGFloat =
+            note.isImageNote
+            ? NoteLayout.defaultLayout.fontSize
+            : layoutFontSizeFromMatchingNoteLayout()
+        isApplyingZoomReset = true
+        DispatchQueue.main.async {
+            DispatchQueue.main.async {
+                isApplyingZoomReset = false
+            }
+        }
+
+        if note.isImageNote {
+            note.isMinimized = false
+            isCollapsed = false
+            note.imageFrameWidth = nil
+            note.imageFrameHeight = nil
+            applyImageNoteWindowFrame()
+            if !isCollapsed {
+                note.imageFrameWidth = Double(width)
+                note.imageFrameHeight = Double(height)
+            }
+            note.fontSize = resetFontSize
+            note.updatedAt = Date.now
+            try? AppState.shared.context.save()
+        } else {
+            note.fontSize = resetFontSize
+            note.clearMarkdownDisplayFrame()
+            updateWindowSize()
+            note.updatedAt = Date.now
+            try? AppState.shared.context.save()
+        }
+    }
+
+    /// Font size from the ``NoteLayout`` that matches this note’s color, font name, and font color (ignores zoomed ``Note/fontSize``).
+    private func layoutFontSizeFromMatchingNoteLayout() -> CGFloat {
+        let descriptor = FetchDescriptor<NoteLayout>()
+        guard let layouts = try? modelContext.fetch(descriptor) else {
+            return NoteLayout.defaultLayout.fontSize
+        }
+        return layouts.first { layout in
+            layout.color == note.color
+                && layout.fontColor == note.fontColor
+                && layout.fontName == note.fontName
+        }?.fontSize ?? NoteLayout.defaultLayout.fontSize
     }
 
     /// Cmd+/Cmd- scales window dimensions by `newFont/oldFont` and keeps the top edge fixed; ``Note/imageData`` is unchanged.

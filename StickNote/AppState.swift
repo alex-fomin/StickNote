@@ -448,7 +448,17 @@ final class AppState {
         }
     }
 
+    /// Posts ``Notification/Name/stickNoteResetZoom`` so ``NoteView`` can reset font and image scale (Cmd+0).
+    func postResetZoom(for note: Note) {
+        NotificationCenter.default.post(name: .stickNoteResetZoom, object: note)
+    }
+
     var model: AppStateModel = AppStateModel()
+}
+
+extension Notification.Name {
+    /// Posted for Cmd+0; ``object`` is the ``Note`` to reset zoom for.
+    static let stickNoteResetZoom = Notification.Name("StickNote.resetZoom")
 }
 
 @Observable class AppStateModel: ObservableObject {

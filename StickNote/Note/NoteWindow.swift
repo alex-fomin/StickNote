@@ -40,7 +40,12 @@ class NoteWindow: NSWindow {
                 note.fontSize -= 1
             }
         }
-        
+        else if isCmd(event),
+            event.charactersIgnoringModifiers == "0" || event.keyCode == 82
+        {  // Cmd+0 (main keyboard or keypad)
+            AppState.shared.postResetZoom(for: note)
+        }
+
         func isCmd(_ event: NSEvent)->Bool{
             return event.modifierFlags.intersection(.deviceIndependentFlagsMask) == .command
         }
