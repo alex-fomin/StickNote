@@ -179,16 +179,18 @@ struct NoteView: View {
             Label(note.isMinimized ? "Maximize" : "Minimize", systemImage: note.isMinimized ? "arrow.up.left.and.arrow.down.right" : "arrow.down.right.and.arrow.up.left")
         }
         
-        Button {
-            note.showOnAllSpaces.toggle()
-            AppState.shared.applyShowOnAllSpaces(note: note)
-        } label: {
-            Label(
-                "Show on all spaces",
-                systemImage: note.showOnAllSpaces ? "eye.fill" : "eye"
+        Toggle(
+            isOn: Binding(
+                get: { note.showOnAllSpaces },
+                set: { newValue in
+                    note.showOnAllSpaces = newValue
+                    AppState.shared.applyShowOnAllSpaces(note: note)
+                }
             )
+        ) {
+            Label("Show on all spaces", systemImage: "eye")
         }
-        
+
         Divider()
         
         Button {
@@ -207,7 +209,7 @@ struct NoteView: View {
                 }
             )
         ) {
-            Text("Markdown")
+            Label("Markdown", systemImage: "doc.richtext")
         }
 
         Button {

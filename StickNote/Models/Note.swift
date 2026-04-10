@@ -83,7 +83,7 @@ final class Note: NoteAppearance, Identifiable {
         markdownFrameHeight = nil
     }
 
-    /// If the trimmed body starts with `#` (Markdown heading), turn Markdown mode on unless the user opted out.
+    /// If the note looks like Markdown (ATX heading at start: # / ## / ### plus space, or fenced code blocks), turn Markdown mode on unless the user opted out.
     func applyLikelyMarkdownFlagFromContent() {
         guard !markdownAutoDisabledByUser else { return }
         if Self.textLooksLikeMarkdown(text) {
@@ -91,10 +91,11 @@ final class Note: NoteAppearance, Identifiable {
         }
     }
 
-    /// Auto-enables Markdown after editing when the note starts with `#` (after trimming whitespace).
+    /// Auto-enables Markdown after editing when the trimmed note starts with a level-1–3 ATX heading (hash marks plus space) or the text contains fenced code (triple backticks).
     static func textLooksLikeMarkdown(_ raw: String) -> Bool {
+        if raw.contains("```") { return true }
         let t = raw.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !t.isEmpty else { return false }
-        return t.hasPrefix("#")
+        return t.hasPrefix("### ") || t.hasPrefix("## ") || t.hasPrefix("# ")
     }
 }

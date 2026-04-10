@@ -98,7 +98,7 @@ struct NoteListView: View {
                 note.markdownAutoDisabledByUser = !newValue
             }
         )) {
-            Text("Markdown")
+            Label("Markdown", systemImage: "doc.richtext")
         }
     }
 
