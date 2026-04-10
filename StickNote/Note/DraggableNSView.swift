@@ -13,12 +13,20 @@ class DraggableNSView: NSView {
 
     override func mouseDown(with event: NSEvent) {
         super.mouseDown(with: event)
-        if event.clickCount == 2, self.area?.allowsEditOnDoubleClick ?? true {
-            DispatchQueue.main.async {
-                self.area?.isEditing = true
+        if event.clickCount == 2 {
+            if let onDoubleClick = area?.onDoubleClick {
+                DispatchQueue.main.async {
+                    onDoubleClick()
+                }
+                return
             }
-        } else {
-            self.window?.performDrag(with: event)  // Allow window dragging
+            if self.area?.allowsEditOnDoubleClick ?? true {
+                DispatchQueue.main.async {
+                    self.area?.isEditing = true
+                }
+                return
+            }
         }
+        self.window?.performDrag(with: event)  // Allow window dragging
     }
 }

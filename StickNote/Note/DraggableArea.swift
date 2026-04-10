@@ -11,6 +11,8 @@ import SwiftUI
 struct DraggableArea: NSViewRepresentable {
     @Binding var isEditing: Bool
     var allowsEditOnDoubleClick: Bool = true
+    /// When set, invoked on double-click before edit/drag logic (e.g. restore a minimized image note).
+    var onDoubleClick: (() -> Void)? = nil
 
     func makeNSView(context: Context) -> NSView {
         let view = DraggableNSView()

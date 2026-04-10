@@ -173,6 +173,13 @@ final class AppState {
         var ch: CGFloat = 10
 
         if note.isImageNote, note.imageData != nil {
+            if collapsedDisplay {
+                let textForSize = note.text.truncate(NoteView.trimmedLength)
+                let fs = textForSize.sizeUsingFont(usingFont: note.nsFont)
+                cw = max(20, fs.width + NoteView.imageCollapsedStripExtraWidth + padW)
+                ch = max(20, fs.height + padV)
+                return NSRect(x: x, y: y, width: cw, height: ch)
+            }
             if let mw = note.imageFrameWidth, let mh = note.imageFrameHeight, mw > 0, mh > 0 {
                 cw = CGFloat(mw)
                 ch = CGFloat(mh)

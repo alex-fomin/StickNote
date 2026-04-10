@@ -17,7 +17,7 @@ class WindowPositionTracker: NSObject, NSWindowDelegate {
         guard let window = notification.object as? NSWindow else { return }
         note.x = window.frame.origin.x
         note.y = window.frame.origin.y
-        if note.isImageNote {
+        if note.isImageNote, !note.isMinimized {
             note.imageFrameWidth = Double(window.frame.width)
             note.imageFrameHeight = Double(window.frame.height)
             note.updatedAt = Date.now

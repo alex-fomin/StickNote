@@ -8,8 +8,9 @@ struct NoteView: View {
     static let horizonalPadding: CGFloat = 2
     static let verticalPadding: CGFloat = 2
     static let trimmedLength = 4
-    
-    
+    /// Icon + spacing beyond truncated text width for minimized image strip (see ``imageCollapsedStrip``).
+    static let imageCollapsedStripExtraWidth: CGFloat = 6 + 18
+
     // MARK: - Properties
     @Default(.confirmOnDelete) var confirmOnDelete
     @Default(.maximizeOnEdit) var maximizeOnEdit
@@ -39,12 +40,18 @@ struct NoteView: View {
     private let windowTracker: WindowPositionTracker
 
     private var resolvedFrameWidth: CGFloat {
-        if note.isImageNote, let w = note.imageFrameWidth, w > 0 { return CGFloat(w) }
+        if note.isImageNote {
+            if isCollapsed { return max(20, width) }
+            if let w = note.imageFrameWidth, w > 0 { return CGFloat(w) }
+        }
         return width
     }
 
     private var resolvedFrameHeight: CGFloat {
-        if note.isImageNote, let h = note.imageFrameHeight, h > 0 { return CGFloat(h) }
+        if note.isImageNote {
+            if isCollapsed { return max(20, height) }
+            if let h = note.imageFrameHeight, h > 0 { return CGFloat(h) }
+        }
         return height
     }
 
@@ -52,7 +59,10 @@ struct NoteView: View {
     init(note: Note, isEditing: Bool = false) {
         let collapsed = note.isMinimized && !isEditing
         if note.isImageNote, let data = note.imageData, !data.isEmpty {
-            if let sw = note.imageFrameWidth, let sh = note.imageFrameHeight, sw > 0, sh > 0 {
+            if collapsed {
+                _width = State(initialValue: 0)
+                _height = State(initialValue: 0)
+            } else if let sw = note.imageFrameWidth, let sh = note.imageFrameHeight, sw > 0, sh > 0 {
                 _width = State(initialValue: CGFloat(sw))
                 _height = State(initialValue: CGFloat(sh))
             } else if let img = NSImage(data: data) {
@@ -139,6 +149,10 @@ struct NoteView: View {
             updateWindowSize()
         }
         .onChange(of: isCollapsed, initial: true) { updateWindowSize() }
+        .onChange(of: note.isMinimized, initial: false) { _, new in
+            guard !isEditing else { return }
+            isCollapsed = new
+        }
         .onChange(of: isEditing, initial: true) { old, new in
             if note.isImageNote {
                 isEditing = false
@@ -210,11 +224,38 @@ struct NoteView: View {
     
     @ViewBuilder
     private var imageDisplayView: some View {
-        NoteImageDisplay(imageData: note.imageData)
-            .overlay(DraggableArea(isEditing: $isEditing, allowsEditOnDoubleClick: false))
-            .padding(.horizontal, NoteView.horizonalPadding)
-            .padding(.vertical, NoteView.verticalPadding)
-            .frame(width: resolvedFrameWidth, height: resolvedFrameHeight, alignment: .topLeading)
+        Group {
+            if isCollapsed {
+                imageCollapsedStrip
+            } else {
+                NoteImageDisplay(imageData: note.imageData)
+            }
+        }
+        .overlay(
+            DraggableArea(
+                isEditing: $isEditing,
+                allowsEditOnDoubleClick: false,
+                onDoubleClick: {
+                    guard isCollapsed else { return }
+                    note.isMinimized = false
+                    isCollapsed = false
+                }
+            )
+        )
+        .padding(.horizontal, NoteView.horizonalPadding)
+        .padding(.vertical, NoteView.verticalPadding)
+        .frame(width: resolvedFrameWidth, height: resolvedFrameHeight, alignment: .topLeading)
+    }
+
+    private var imageCollapsedStrip: some View {
+        HStack(alignment: .center, spacing: 6) {
+            Image(systemName: "photo")
+                .foregroundStyle(.secondary)
+            Text(note.text.truncate(NoteView.trimmedLength))
+                .lineLimit(1)
+        }
+        .modifier(NoteModifier(note: note))
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
     }
 
     @ViewBuilder
@@ -364,7 +405,7 @@ struct NoteView: View {
     }
     
     private func handleHover(_ hover: Bool) {
-        guard !note.isImageNote, note.isMinimized && maximizeOnHover && !isEditing else { return }
+        guard note.isMinimized && maximizeOnHover && !isEditing else { return }
         isCollapsed = !hover
     }
     
@@ -426,8 +467,10 @@ struct NoteView: View {
 
         width = newW
         height = newH
-        note.imageFrameWidth = Double(newW)
-        note.imageFrameHeight = Double(newH)
+        if !isCollapsed {
+            note.imageFrameWidth = Double(newW)
+            note.imageFrameHeight = Double(newH)
+        }
         note.y = newY
         note.updatedAt = Date.now
 
@@ -443,8 +486,63 @@ struct NoteView: View {
         try? AppState.shared.context.save()
     }
 
+    private func expandedImageContentFrameSize() -> CGSize {
+        if let iw = note.imageFrameWidth, let ih = note.imageFrameHeight, iw > 0, ih > 0 {
+            return CGSize(width: CGFloat(iw), height: CGFloat(ih))
+        }
+        guard let data = note.imageData, let img = NSImage(data: data) else {
+            return CGSize(width: 200, height: 200)
+        }
+        let maxDim: CGFloat = 600
+        let intrinsic = img.size
+        let longest = max(intrinsic.width, intrinsic.height, 1)
+        let s = min(1, maxDim / longest)
+        let contentW = intrinsic.width * s + Self.horizonalPadding * 2
+        let contentH = intrinsic.height * s + Self.verticalPadding * 2
+        return CGSize(width: max(20, contentW), height: max(20, contentH))
+    }
+
+    private func applyImageNoteFrame(width newW: CGFloat, height newH: CGFloat) {
+        let oldH = anchorWindowHeightForResize()
+        let newY = height == 0 ? note.y : (note.y! + oldH - newH)
+
+        width = newW
+        height = newH
+        note.y = newY
+        note.updatedAt = Date.now
+
+        if let win = nsWindow {
+            var f = win.frame
+            let top = f.maxY
+            f.size.width = newW
+            f.size.height = newH
+            f.origin.y = top - newH
+            win.setFrame(f, display: true)
+        }
+
+        try? AppState.shared.context.save()
+    }
+
+    /// Sizes the image note window: a strip when minimized; full image when maximized. Persists dimensions via ``WindowPositionTracker`` only while maximized.
+    private func applyImageNoteWindowFrame() {
+        if isCollapsed {
+            let textForSize = note.text.truncate(NoteView.trimmedLength)
+            let fs = textForSize.sizeUsingFont(usingFont: note.nsFont)
+            let newW = max(
+                20,
+                fs.width + Self.imageCollapsedStripExtraWidth + NoteView.horizonalPadding * 2)
+            let newH = max(20, fs.height + NoteView.verticalPadding * 2)
+            applyImageNoteFrame(width: newW, height: newH)
+            return
+        }
+
+        let full = expandedImageContentFrameSize()
+        applyImageNoteFrame(width: full.width, height: full.height)
+    }
+
     private func updateWindowSize() {
         if note.isImageNote {
+            applyImageNoteWindowFrame()
             return
         }
         if note.isMarkdown, !isCollapsed, !isEditing,
