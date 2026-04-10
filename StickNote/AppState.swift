@@ -74,6 +74,17 @@ final class AppState {
     }
 
     func openNewNoteFromClipboard() {
+        if let imageFileURL = NoteClipboardImage.exportPastedImageToPNGFile() {
+            let md = "![Pasted image](\(imageFileURL.absoluteString))"
+            let note = Note(layout: getDefaultLayout(), text: md)
+            note.isMarkdown = true
+            note.markdownAutoDisabledByUser = false
+            note.showOnAllSpaces = Defaults[.showOnAllSpaces]
+            context.insert(note)
+            openNote(note, isEditing: false)
+            NSApp.activate(ignoringOtherApps: true)
+            return
+        }
         if let text = NSPasteboard.general.string(forType: .string) {
             if !text.isEmpty {
                 let note = Note(layout: getDefaultLayout(), text: text)
@@ -222,6 +233,11 @@ final class AppState {
         }
 
         if forceDelete || !deleteToTrashBin {
+            let allNotes = (try? context.fetch(FetchDescriptor<Note>())) ?? []
+            NoteClipboardImage.deleteStoredImagesIfOnlyReferencedByDeletedNote(
+                deletedNote: note,
+                allNotes: allNotes
+            )
             self.context.delete(note)
         } else {
             note.isInTrashBin = true

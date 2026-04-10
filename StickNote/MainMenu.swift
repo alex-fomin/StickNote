@@ -19,13 +19,7 @@ struct MainMenu: View {
         Button("Paste note") {
             AppState.shared.openNewNoteFromClipboard()
         }
-        .disabled(
-            !NSPasteboard.general.canReadItem(withDataConformingToTypes: [
-                NSPasteboard.PasteboardType.string.rawValue,
-                NSPasteboard.PasteboardType.rtf.rawValue,
-                NSPasteboard.PasteboardType.rtfd.rawValue,
-            ])
-        )
+        .disabled(!NoteClipboardImage.pasteboardCanCreateNote())
         .keyboardShortcut(
             KeyboardShortcuts.Shortcut(name: .createNoteFromClipboard)?.toKeyboardShortcut()
         )
