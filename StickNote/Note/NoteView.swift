@@ -22,17 +22,30 @@ struct NoteView: View {
     @State private var selection: TextSelection?
     @State private var showConfirmation = false
     @State private var showHideUntilSheet = false
-    @State private var width: CGFloat = 0
-    @State private var height: CGFloat = 0
-    
+    @State private var width: CGFloat
+    @State private var height: CGFloat
+    /// Cancels stale async markdown measurements when the note changes again before layout finishes.
+    @State private var markdownLayoutToken = UUID()
+
     private let windowTracker: WindowPositionTracker
     
     // MARK: - Initialization
     init(note: Note, isEditing: Bool = false) {
+        let collapsed = note.isMinimized && !isEditing
+        if note.isMarkdown, !collapsed,
+           let sw = note.markdownFrameWidth, let sh = note.markdownFrameHeight,
+           sw > 0, sh > 0
+        {
+            _width = State(initialValue: CGFloat(sw))
+            _height = State(initialValue: CGFloat(sh))
+        } else {
+            _width = State(initialValue: 0)
+            _height = State(initialValue: 0)
+        }
         self._note = State(initialValue: note)
         self._isEditing = State(initialValue: isEditing)
         self.windowTracker = WindowPositionTracker(note: note)
-        isCollapsed = note.isMinimized && !isEditing
+        isCollapsed = collapsed
         isTextEditorFocused = isEditing
     }
     
@@ -63,12 +76,21 @@ struct NoteView: View {
         .frame(width: width, height: height)
         .onAppear { updateWindowSize() }
         .onHover { handleHover($0) }
-        .onChange(of: note.fontSize, initial: false) { updateWindowSize() }
-        .onChange(of: note.fontName, initial: false) { updateWindowSize() }
+        .onChange(of: note.fontSize, initial: false) {
+            note.clearMarkdownDisplayFrame()
+            updateWindowSize()
+        }
+        .onChange(of: note.fontName, initial: false) {
+            note.clearMarkdownDisplayFrame()
+            updateWindowSize()
+        }
         .onChange(of: note.text, initial: false) { handleTextChange() }
-        .onChange(of: note.isMarkdown, initial: false) { updateWindowSize() }
+        .onChange(of: note.isMarkdown, initial: false) { _, new in
+            if !new { note.clearMarkdownDisplayFrame() }
+            updateWindowSize()
+        }
         .onChange(of: isCollapsed, initial: true) { updateWindowSize() }
-        .onChange(of: isEditing, initial: true) {old, new in
+        .onChange(of: isEditing, initial: true) { old, new in
             if new {
                 note.isMinimized = false
                 isCollapsed = false
@@ -76,6 +98,9 @@ struct NoteView: View {
                 isCollapsed = note.isMinimized
             }
             updateWindowSize()
+            if old == true, new == false, note.isMarkdown, !isCollapsed {
+                refineMarkdownFrameAfterEditing()
+            }
         }
     }
     
@@ -251,6 +276,9 @@ struct NoteView: View {
     }
     
     private func handleTextChange() {
+        if note.isMarkdown {
+            note.clearMarkdownDisplayFrame()
+        }
         if !note.isMinimized {
             updateWindowSize()
         }
@@ -270,43 +298,70 @@ struct NoteView: View {
     }
 
     private func updateWindowSize() {
-        var newHeight: CGFloat = 0
-        var newWidth: CGFloat = 0
-       
-        let fullSize: CGSize
-        if note.isMarkdown && !isCollapsed && !isEditing {
-            fullSize = MarkdownDisplaySize.fittingSize(for: note)
-        } else {
-            fullSize = note.text.sizeUsingFont(usingFont: note.nsFont)
+        if note.isMarkdown, !isCollapsed, !isEditing,
+           let sw = note.markdownFrameWidth, let sh = note.markdownFrameHeight,
+           sw > 0, sh > 0
+        {
+            applyPersistedMarkdownFrame(frameWidth: CGFloat(sw), frameHeight: CGFloat(sh))
+            return
         }
-        if (isCollapsed) {
-          
-            let collapsedSize = note.text.truncate(NoteView.trimmedLength).sizeUsingFont(usingFont: note.nsFont)
-            newHeight = min(fullSize.height, collapsedSize.height)
-            newWidth = min(fullSize.width, collapsedSize.width)
+
+        let fullSize = note.text.sizeUsingFont(usingFont: note.nsFont)
+        applyWindowFrame(fullContentSize: fullSize, persistMarkdownFrame: false)
+    }
+
+    /// Accurate markdown layout from an off-screen render; run only after editing so activating the note does not resize it.
+    private func refineMarkdownFrameAfterEditing() {
+        let token = UUID()
+        markdownLayoutToken = token
+        let provisional = note.text.sizeUsingFont(usingFont: note.nsFont)
+        MarkdownDisplayMeasurer.shared.measure(note: note, contentMaxWidth: provisional.width) { measured in
+            guard self.markdownLayoutToken == token else { return }
+            self.applyWindowFrame(fullContentSize: measured, persistMarkdownFrame: true)
         }
-        else {
-            newWidth = fullSize.width
-            newHeight = fullSize.height
-        }
-        
-        
-        newHeight += NoteView.verticalPadding * 2
-        newWidth += NoteView.horizonalPadding * 2
-        
-        newWidth = max(20, newWidth)
-        
-        if (isEditing){
-//            let wSize = "W".sizeUsingFont(usingFont: note.nsFont)
-//            newHeight += wSize.height
-            newWidth += 2
-        }
-        
+    }
+
+    /// Restores a previously saved markdown window size (full frame, including padding).
+    private func applyPersistedMarkdownFrame(frameWidth: CGFloat, frameHeight: CGFloat) {
+        let newWidth = max(20, frameWidth)
+        let newHeight = frameHeight
         let newY = height == 0 ? note.y : (note.y! + height - newHeight)
-        
         width = newWidth
         height = newHeight
         note.y = newY
+    }
+
+    /// `fullContentSize` is the text measurement only (before note padding).
+    private func applyWindowFrame(fullContentSize: CGSize, persistMarkdownFrame: Bool) {
+        let fullSize: CGSize
+        if isCollapsed {
+            let collapsedSize = note.text.truncate(NoteView.trimmedLength).sizeUsingFont(usingFont: note.nsFont)
+            fullSize = CGSize(
+                width: min(fullContentSize.width, collapsedSize.width),
+                height: min(fullContentSize.height, collapsedSize.height)
+            )
+        } else {
+            fullSize = fullContentSize
+        }
+
+        var newWidth = fullSize.width + NoteView.horizonalPadding * 2
+        var newHeight = fullSize.height + NoteView.verticalPadding * 2
+        newWidth = max(20, newWidth)
+
+        if isEditing {
+            newWidth += 2
+        }
+
+        let newY = height == 0 ? note.y : (note.y! + height - newHeight)
+
+        width = newWidth
+        height = newHeight
+        note.y = newY
+
+        if persistMarkdownFrame, note.isMarkdown, !isCollapsed, !isEditing {
+            note.markdownFrameWidth = Double(newWidth)
+            note.markdownFrameHeight = Double(newHeight)
+        }
     }
 }
 

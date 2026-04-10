@@ -33,6 +33,9 @@ final class Note: NoteAppearance, Identifiable {
     var isHidden: Bool = false
     /// When true, the note is shown as rendered Markdown while not editing; export uses `.md`.
     var isMarkdown: Bool = false
+    /// Last measured window width/height for markdown display (points), including ``NoteView`` padding. Used to avoid resizing on activation; cleared when text or font changes.
+    var markdownFrameWidth: Double?
+    var markdownFrameHeight: Double?
     /// When non-nil and in the future, the note is treated as hidden until this instant (then shown again).
     var hiddenUntil: Date?
     var createdAt: Date = Date()
@@ -71,6 +74,11 @@ final class Note: NoteAppearance, Identifiable {
             .components(separatedBy: .newlines)
             .map { $0.trimmingCharacters(in: .whitespaces) }
             .joined(separator: "\n")
+    }
+
+    func clearMarkdownDisplayFrame() {
+        markdownFrameWidth = nil
+        markdownFrameHeight = nil
     }
 
     /// If the trimmed body starts with `#` (Markdown heading), turn Markdown mode on.
