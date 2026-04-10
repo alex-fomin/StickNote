@@ -13,6 +13,8 @@ private enum SettingsWindowMetrics {
 }
 
 struct SettingsView: View {
+    @State private var isThirdPartyNoticesPresented = false
+
     @Default(.confirmOnDelete) var confirmOnDelete
     @Default(.trimAfterPaste) var trimAfterPaste
     @Default(.showOnAllSpaces) var showOnAllSpaces
@@ -103,9 +105,17 @@ struct SettingsView: View {
                                 .foregroundStyle(.secondary)
                         }
                     }
+                    Section {
+                        Button("Third-party licenses…") {
+                            isThirdPartyNoticesPresented = true
+                        }
+                    }
                 }
                 .formStyle(.grouped)
             }
+        }
+        .sheet(isPresented: $isThirdPartyNoticesPresented) {
+            ThirdPartyNoticesView()
         }
         .scenePadding()
         .frame(maxWidth: .infinity, maxHeight: .infinity)

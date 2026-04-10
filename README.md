@@ -70,10 +70,21 @@ Prebuilt downloads: **[Releases](https://github.com/alex-fomin/StickNote/release
 
 Swift package dependencies are resolved automatically via Xcode (see `StickNote.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved`).
 
-## Tech stack
+## Third-party software
 
-- SwiftUI, AppKit, SwiftData  
-- Swift Package Manager dependencies include [Defaults](https://github.com/sindresorhus/Defaults), [KeyboardShortcuts](https://github.com/sindresorhus/KeyboardShortcuts), [LaunchAtLogin](https://github.com/sindresorhus/LaunchAtLogin-Modern), [FontPicker](https://github.com/tyagishi/FontPicker), [MenuBarExtraAccess](https://github.com/orchetect/MenuBarExtraAccess), [Down](https://github.com/johnxnguyen/Down), and [Textual](https://github.com/gonzalezreal/textual).
+StickNote is built with **Swift**, **SwiftUI**, **SwiftData**, and **AppKit** (subject to Apple’s SDK and developer terms). It links these **direct** Swift Package Manager dependencies (transitive packages are not listed):
+
+| Package | License |
+|--------|---------|
+| [Defaults](https://github.com/sindresorhus/Defaults) | MIT |
+| [Down](https://github.com/johnxnguyen/Down) | MIT (see upstream for bundled components) |
+| [FontPicker](https://github.com/tyagishi/FontPicker) | MIT |
+| [KeyboardShortcuts](https://github.com/sindresorhus/KeyboardShortcuts) | MIT |
+| [LaunchAtLogin-Modern](https://github.com/sindresorhus/LaunchAtLogin-Modern) | MIT |
+| [MenuBarExtraAccess](https://github.com/orchetect/MenuBarExtraAccess) | MIT |
+| [Textual](https://github.com/gonzalezreal/textual) | MIT |
+
+**Full attribution** (pinned versions, links to upstream license files, and an Apple tools note): [`StickNote/ThirdPartyNotices.md`](StickNote/ThirdPartyNotices.md). The same text is available in the app under **Settings → About → Third-party licenses…**.
 
 ## License
 
