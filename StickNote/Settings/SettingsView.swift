@@ -6,10 +6,10 @@ import LaunchAtLogin
 import SwiftData
 import SwiftUI
 
-enum SettingsTab {
-    case Settings
-    case Layouts
-    case About
+private enum SettingsWindowMetrics {
+    static let width: CGFloat = 400
+    /// Fixed height: fits General (shortcuts) and Note tabs without excess empty space.
+    static let height: CGFloat = 450
 }
 
 struct SettingsView: View {
@@ -74,9 +74,59 @@ struct SettingsView: View {
                 }
                 .formStyle(.grouped)
             }
+            Tab("About", systemImage: "info.circle") {
+                Form {
+                    Section {
+                        HStack(alignment: .center, spacing: 16) {
+                            if let icon = NSApp.applicationIconImage {
+                                Image(nsImage: icon)
+                                    .resizable()
+                                    .interpolation(.high)
+                                    .frame(width: 64, height: 64)
+                            }
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("StickNote")
+                                    .font(.headline)
+                                Text(
+                                    "Version \(Self.appMarketingVersion) (\(Self.appBuildVersion))"
+                                )
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                            }
+                            Spacer(minLength: 0)
+                        }
+                        .padding(.vertical, 4)
+                    }
+                    if let copyright = Self.appCopyright, !copyright.isEmpty {
+                        Section {
+                            Text(copyright)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                }
+                .formStyle(.grouped)
+            }
         }
         .scenePadding()
-        .frame(maxWidth: 400, minHeight: 100)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .frame(
+            minWidth: SettingsWindowMetrics.width,
+            maxWidth: SettingsWindowMetrics.width,
+            minHeight: SettingsWindowMetrics.height,
+            maxHeight: SettingsWindowMetrics.height
+        )
+    }
+
+    private static var appMarketingVersion: String {
+        (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String) ?? "—"
+    }
+
+    private static var appBuildVersion: String {
+        (Bundle.main.infoDictionary?["CFBundleVersion"] as? String) ?? "—"
+    }
+
+    private static var appCopyright: String? {
+        Bundle.main.infoDictionary?["NSHumanReadableCopyright"] as? String
     }
 }
 #Preview {

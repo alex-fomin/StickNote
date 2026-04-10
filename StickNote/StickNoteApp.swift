@@ -59,6 +59,9 @@ struct StickNoteApp: App {
         .windowResizability(.contentSize)
         .windowLevel(.floating)
         .modelContext(AppState.shared.context)
+        .commands {
+            CommandGroup(replacing: .appInfo) { }
+        }
         
         Window("Note list", id: "note-list") {
             NoteListView()
@@ -69,7 +72,6 @@ struct StickNoteApp: App {
         
         Settings {
             SettingsView()
-                .fixedSize()
         }
         .windowLevel(.floating)
         .windowResizability(.contentSize)
