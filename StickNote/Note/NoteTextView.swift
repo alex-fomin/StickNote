@@ -13,7 +13,7 @@ struct NoteTextView: View {
                 if note.isMarkdown, !isCollapsed {
                     StructuredText(note.text, parser: StickNoteMarkdownParser())
                         .textual.textSelection(.enabled)
-                        .textual.structuredTextStyle(.default)
+                        .textual.structuredTextStyle(StickNoteStructuredTextStyle())
                         .font(Font(note.nsFont))
                         .foregroundStyle(Color.fromString(note.fontColor))
                         .multilineTextAlignment(.leading)

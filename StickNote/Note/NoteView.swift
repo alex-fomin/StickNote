@@ -100,9 +100,6 @@ struct NoteView: View {
                 isCollapsed = note.isMinimized
             }
             updateWindowSize()
-            if old == true, new == false, note.isMarkdown, !isCollapsed {
-                refineMarkdownFrameAfterEditing()
-            }
         }
     }
     
@@ -311,6 +308,13 @@ struct NoteView: View {
            sw > 0, sh > 0
         {
             applyPersistedMarkdownFrame(frameWidth: CGFloat(sw), frameHeight: CGFloat(sh))
+            return
+        }
+
+        // Rendered markdown size can differ a lot from plain `sizeUsingFont` (headings, lists, code).
+        // Whenever we show markdown without a stored frame, measure off-screen layout instead of plain text.
+        if note.isMarkdown, !isCollapsed, !isEditing {
+            refineMarkdownFrameAfterEditing()
             return
         }
 

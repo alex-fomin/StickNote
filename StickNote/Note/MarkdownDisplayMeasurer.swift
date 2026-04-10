@@ -20,7 +20,7 @@ final class MarkdownDisplayMeasurer {
         let finishOnce: @MainActor (CGSize) -> Void = { size in
             guard !finished else { return }
             finished = true
-            let w = max(20, size.width)
+            let w = max(20, size.width) + 1
             let h = max(1, size.height)
             completion(CGSize(width: w, height: h))
         }
@@ -123,7 +123,7 @@ private struct MarkdownMeasureRoot: View {
     var body: some View {
         StructuredText(text, parser: StickNoteMarkdownParser())
             .textual.textSelection(.enabled)
-            .textual.structuredTextStyle(.default)
+            .textual.structuredTextStyle(StickNoteStructuredTextStyle())
             .font(Font(nsFont))
             .foregroundStyle(fontColor)
             .multilineTextAlignment(.leading)
