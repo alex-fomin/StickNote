@@ -121,7 +121,11 @@ struct NoteView: View {
             DispatchQueue.main.async { syncLaunchOriginFromWindowOnce() }
         }
         .onHover { handleHover($0) }
-        .onChange(of: note.fontSize, initial: false) {
+        .onChange(of: note.fontSize, initial: false) { oldFont, newFont in
+            if note.isImageNote {
+                resizeImageNoteWindowForFontChange(from: oldFont, to: newFont)
+                return
+            }
             note.clearMarkdownDisplayFrame()
             updateWindowSize()
         }
@@ -405,6 +409,38 @@ struct NoteView: View {
         didSyncLaunchOriginFromWindow = true
         note.x = w.frame.origin.x
         note.y = w.frame.origin.y
+    }
+
+    /// Cmd+/Cmd- scales window dimensions by `newFont/oldFont` and keeps the top edge fixed; ``Note/imageData`` is unchanged.
+    private func resizeImageNoteWindowForFontChange(from oldFont: CGFloat, to newFont: CGFloat) {
+        guard note.isImageNote, oldFont > 0, newFont > 0, oldFont != newFont else { return }
+        let ratio = newFont / oldFont
+
+        let curW = resolvedFrameWidth
+        let curH = resolvedFrameHeight
+        let newW = max(20, curW * ratio)
+        let newH = max(20, curH * ratio)
+
+        let oldH = anchorWindowHeightForResize()
+        let newY = height == 0 ? note.y : (note.y! + oldH - newH)
+
+        width = newW
+        height = newH
+        note.imageFrameWidth = Double(newW)
+        note.imageFrameHeight = Double(newH)
+        note.y = newY
+        note.updatedAt = Date.now
+
+        if let win = nsWindow {
+            var f = win.frame
+            let top = f.maxY
+            f.size.width = newW
+            f.size.height = newH
+            f.origin.y = top - newH
+            win.setFrame(f, display: true)
+        }
+
+        try? AppState.shared.context.save()
     }
 
     private func updateWindowSize() {

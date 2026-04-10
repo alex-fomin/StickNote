@@ -32,13 +32,11 @@ class NoteWindow: NSWindow {
         }
         else if (event.keyCode == 24 && isCmd(event)) //Cmd +
         {
-            if !note.isImageNote {
-                note.fontSize += 1
-            }
+            note.fontSize += 1
         }
         else if (event.keyCode == 27 && isCmd(event)) //Cmd -
         {
-            if !note.isImageNote, note.fontSize > 5 {
+            if note.fontSize > 5 {
                 note.fontSize -= 1
             }
         }

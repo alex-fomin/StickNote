@@ -400,9 +400,10 @@ private struct NoteListImagePreview: View {
     var body: some View {
         ScrollView(.vertical, showsIndicators: true) {
             NoteImageDisplay(imageData: note.imageData)
-                .frame(maxWidth: .infinity)
-                .padding(8)
-                .background(Color.fromString(note.color))
+                .scaleEffect(CGFloat(note.fontSize) / NoteImageDisplay.referenceFontSize)
+            .frame(maxWidth: .infinity)
+            .padding(8)
+            .background(Color.fromString(note.color))
         }
     }
 }
