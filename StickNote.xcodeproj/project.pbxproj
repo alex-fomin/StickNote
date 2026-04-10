@@ -14,6 +14,7 @@
 		249FA1252EC6279600596F74 /* MenuBarExtraAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 249FA1242EC6279600596F74 /* MenuBarExtraAccess */; };
 		24F832122D0C484C00285731 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 24F832112D0C484C00285731 /* KeyboardShortcuts */; };
 		A4E8F0012F00484C00910E03 /* Textual in Frameworks */ = {isa = PBXBuildFile; productRef = A4E8F0012F00484C00910E02 /* Textual */; };
+		B5E8F0012F00484C00910E03 /* Down in Frameworks */ = {isa = PBXBuildFile; productRef = B5E8F0012F00484C00910E02 /* Down */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -59,6 +60,7 @@
 				249FA1252EC6279600596F74 /* MenuBarExtraAccess in Frameworks */,
 				2450DA962D11EB4800F0FB0F /* DefaultsMacros in Frameworks */,
 				A4E8F0012F00484C00910E03 /* Textual in Frameworks */,
+				B5E8F0012F00484C00910E03 /* Down in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -124,6 +126,7 @@
 				2450DA982D11EBA100F0FB0F /* LaunchAtLogin */,
 				249FA1242EC6279600596F74 /* MenuBarExtraAccess */,
 				A4E8F0012F00484C00910E02 /* Textual */,
+				B5E8F0012F00484C00910E02 /* Down */,
 			);
 			productName = StickNote;
 			productReference = 246856FB2D017FDF005EDD1F /* StickNote.app */;
@@ -208,6 +211,7 @@
 				2450DA972D11EBA100F0FB0F /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */,
 				249FA1232EC6279600596F74 /* XCRemoteSwiftPackageReference "MenuBarExtraAccess" */,
 				A4E8F0012F00484C00910E01 /* XCRemoteSwiftPackageReference "textual" */,
+				B5E8F0012F00484C00910E01 /* XCRemoteSwiftPackageReference "Down" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 246856FC2D017FDF005EDD1F /* Products */;
@@ -635,6 +639,14 @@
 				minimumVersion = 0.3.1;
 			};
 		};
+		B5E8F0012F00484C00910E01 /* XCRemoteSwiftPackageReference "Down" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/johnxnguyen/Down";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.11.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -672,6 +684,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = A4E8F0012F00484C00910E01 /* XCRemoteSwiftPackageReference "textual" */;
 			productName = Textual;
+		};
+		B5E8F0012F00484C00910E02 /* Down */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B5E8F0012F00484C00910E01 /* XCRemoteSwiftPackageReference "Down" */;
+			productName = Down;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

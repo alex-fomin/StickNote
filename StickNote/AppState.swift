@@ -248,9 +248,16 @@ final class AppState {
         }
     }
     
+    @MainActor
     func copyToClipboard(_ note: Note) {
-        NSPasteboard.general.clearContents()
-        NSPasteboard.general.setString(note.text, forType: .string)
+        let pasteboard = NSPasteboard.general
+        pasteboard.clearContents()
+
+        if note.isMarkdown {
+            MarkdownClipboard.populatePasteboard(pasteboard, note: note)
+        } else {
+            pasteboard.setString(note.text, forType: .string)
+        }
     }
 
     func exportNoteToFile(_ note: Note) {

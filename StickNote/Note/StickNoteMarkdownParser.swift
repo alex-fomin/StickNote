@@ -12,6 +12,11 @@ struct StickNoteMarkdownParser: MarkupParser {
         return try inner.attributedString(for: preprocessed)
     }
 
+    /// Same preprocessing as ``attributedString(for:)`` (for clipboard export using a different parser).
+    static func preprocessedMarkdown(_ input: String) -> String {
+        singleNewlinesAsHardBreaksPreservingBlankLines(input)
+    }
+
     /// Within each CommonMark “paragraph” (text between `\n\n`), convert lone `\n` to hard line breaks.
     /// Skips regions between triple-backtick fences so fenced code is unchanged.
     private static func singleNewlinesAsHardBreaksPreservingBlankLines(_ s: String) -> String {
