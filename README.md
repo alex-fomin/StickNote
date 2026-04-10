@@ -13,15 +13,15 @@ Prebuilt downloads: **[Releases](https://github.com/alex-fomin/StickNote/release
 ## Screenshots
 
 <p align="center">
-  <img src="docs/screenshots/menubar-menu.png" width="720" alt="StickNote menu bar extra showing New note, Paste note, Note list, visibility, Settings, and Quit">
-  <br>
-  <em>Menu bar menu — global shortcuts are configurable in Settings.</em>
-</p>
-
-<p align="center">
   <img src="docs/screenshots/notes-overview.png" width="720" alt="Several floating sticky notes showing Markdown, multiline text, layouts, and an image pasted from the clipboard">
   <br>
   <em>Floating notes — Markdown, multiline text, layouts, and images from the clipboard.</em>
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/menubar-menu.png" width="720" alt="StickNote menu bar extra showing New note, Paste note, Note list, visibility, Settings, and Quit">
+  <br>
+  <em>Menu bar menu — global shortcuts are configurable in Settings.</em>
 </p>
 
 <p align="center">
