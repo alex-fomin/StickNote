@@ -26,16 +26,19 @@ description: >-
 
 3. The script **builds Release** with `-derivedDataPath .build`, writes **`dist/StickNote-<version>.dmg`** (version = current or post-bump), then **`open`s that DMG**.
 
+The DMG uses **`create-dmg` from Homebrew** (`brew install create-dmg`) with **`packaging/dmg/installer_background.png`**: light gradient plus a **left-to-right arrow** (StickNote icon and **Applications** alias are positioned by `create-dmg` on top of this background). The repo does not ship a vendored copy of `create-dmg`.
+
 ## Paths
 
 | Artifact | Location |
 |----------|----------|
 | Release app | `.build/Build/Products/Release/StickNote.app` |
 | DMG | `dist/StickNote-<MARKETING_VERSION>.dmg` |
+| DMG background | `packaging/dmg/installer_background.png` |
 
 ## Notes
 
-- Requires **Xcode** and **`hdiutil`** (standard on macOS).
+- Requires **Xcode**, **`create-dmg`** on `PATH` (Homebrew: `brew install create-dmg`), **`hdiutil`**, and **Finder/AppleScript** (used by `create-dmg` to set icon positions and background).
 - **`dist/`** is gitignored.
 - DMG packaging uses **Release**, not Debug.
 - If `xcodebuild` fails, fix errors and re-run.

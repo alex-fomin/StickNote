@@ -71,7 +71,30 @@ mkdir -p dist
 DMG="dist/StickNote-${VERSION_LABEL}.dmg"
 rm -f "$DMG"
 
-hdiutil create -volname "StickNote" -srcfolder "$APP" -ov -format UDZO "$DMG"
+# Staging folder: create-dmg expects a directory containing the .app (not the .app alone).
+STAGE="$(mktemp -d "${TMPDIR:-/tmp}/sticknote-dmg.XXXXXX")"
+trap 'rm -rf "${STAGE:-}"' EXIT
+cp -R "$APP" "$STAGE/StickNote.app"
+
+CREATE_DMG="$(command -v create-dmg || true)"
+BG="$ROOT/packaging/dmg/installer_background.png"
+if [[ -z "$CREATE_DMG" || ! -f "$BG" ]]; then
+  echo "Missing DMG tooling: install create-dmg (brew install create-dmg) and ensure packaging/dmg/installer_background.png exists." >&2
+  exit 1
+fi
+
+# Standard layout: background with arrow (800×400), app icon left, Applications drop right.
+"$CREATE_DMG" \
+  --volname "StickNote" \
+  --background "$BG" \
+  --window-pos 200 120 \
+  --window-size 800 400 \
+  --icon-size 100 \
+  --icon "StickNote.app" 175 120 \
+  --hide-extension "StickNote.app" \
+  --app-drop-link 600 120 \
+  "$DMG" \
+  "$STAGE"
 
 echo "Created $DMG"
 open "$DMG"
