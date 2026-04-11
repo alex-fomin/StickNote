@@ -87,10 +87,8 @@ final class AppState {
         }
         if let text = NSPasteboard.general.string(forType: .string) {
             if !text.isEmpty {
-                let note = Note(layout: getDefaultLayout(), text: text)
-                if (trimAfterPaste){
-                    note.trim()
-                }
+                let content = trimAfterPaste ? text.trimmingNoteWhitespace() : text
+                let note = Note(layout: getDefaultLayout(), text: content)
                 note.showOnAllSpaces = Defaults[.showOnAllSpaces]
                 self.context.insert(note)
                 

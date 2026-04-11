@@ -328,6 +328,15 @@ struct NoteView: View {
             }
         }
 
+        if !note.isImageNote && !note.isMarkdown {
+            Menu("Text", systemImage: "text.alignleft") {
+                Button("Trim whitespaces") {
+                    note.text = note.text.trimmingNoteWhitespace()
+                    updateWindowSize()
+                }
+            }
+        }
+
         Button {
             AppState.shared.exportNoteToFile(note)
         } label: {
