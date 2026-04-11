@@ -22,6 +22,8 @@ struct NoteView: View {
     @State private var note: Note
     @State private var isCollapsed: Bool = false
     @State private var nsWindow: NSWindow?
+    /// Key window (focused note); used for a light border when unfocused so edge is visible without shadow.
+    @State private var isKeyWindow = true
     @State private var isEditing: Bool
     @FocusState private var isTextEditorFocused: Bool
     @State private var selection: TextSelection?
@@ -130,11 +132,28 @@ struct NoteView: View {
         .background(WindowClickOutsideListener(isEditing: $isEditing))
         .background(windowAccessor)
         .frame(width: resolvedFrameWidth, height: resolvedFrameHeight)
+        .overlay {
+            if !isKeyWindow {
+                Rectangle()
+                    .strokeBorder(Color.primary.opacity(0.14), lineWidth: 1)
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSWindow.didBecomeKeyNotification)) { n in
+            guard let w = n.object as? NSWindow, w === nsWindow else { return }
+            isKeyWindow = true
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSWindow.didResignKeyNotification)) { n in
+            guard let w = n.object as? NSWindow, w === nsWindow else { return }
+            isKeyWindow = false
+        }
         .onAppear {
             if note.isImageNote { isEditing = false }
             updateWindowSize()
         }
         .onChange(of: nsWindow) { _, window in
+            if let window {
+                isKeyWindow = window.isKeyWindow
+            }
             guard window != nil else { return }
             DispatchQueue.main.async { syncLaunchOriginFromWindowOnce() }
         }
