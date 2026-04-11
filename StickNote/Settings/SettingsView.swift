@@ -104,7 +104,7 @@ struct SettingsView: View {
                                 )
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
-                                Link("github.com/alex-fomin/StickNote", destination: URL(string: "https://github.com/alex-fomin/StickNote")!)
+                                Link("alex-fomin.github.io/StickNote", destination: URL(string: "https://alex-fomin.github.io/StickNote/")!)
                                     .font(.subheadline)
                             }
                             Spacer(minLength: 0)
