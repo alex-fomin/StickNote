@@ -334,6 +334,10 @@ struct NoteView: View {
                     note.text = note.text.trimmingNoteWhitespace()
                     updateWindowSize()
                 }
+                Button("Wrap lines") {
+                    note.text = note.text.wrappingLongLinesAtWordBoundaries()
+                    updateWindowSize()
+                }
             }
         }
 

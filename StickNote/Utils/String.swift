@@ -1,5 +1,11 @@
 import AppKit
 
+/// Default width for ``String.wrappingLongLinesAtWordBoundaries()`` in plain-text notes.
+enum NoteLineWrap {
+    /// Hard-wrap lines longer than this at spaces; long unbroken tokens stay on one line.
+    static let maxCharactersPerLine = 80
+}
+
 extension String {
     public func truncate(_ maxLength: Int, maxLines: Int = 1) -> String {
         if self.count == 0 {
@@ -48,6 +54,49 @@ extension String {
             let withoutLeadingDeduction = index > refIdx ? line.removingLeadingWhitespace(upTo: n) : line
             return withoutLeadingDeduction.removingTrailingWhitespaceFromLine()
         }.joined(separator: "\n")
+    }
+
+    /// Wraps each line that exceeds `maxCharactersPerLine` by breaking only at whitespace between words.
+    /// Runs of spaces collapse to single spaces inside wrapped segments; lines already short enough are unchanged.
+    func wrappingLongLinesAtWordBoundaries(maxCharactersPerLine: Int = NoteLineWrap.maxCharactersPerLine) -> String {
+        guard maxCharactersPerLine > 0 else { return self }
+        return components(separatedBy: "\n").map { $0.wrappingSingleLineAtWordBoundaries(maxCharactersPerLine: maxCharactersPerLine) }.joined(separator: "\n")
+    }
+
+    private func wrappingSingleLineAtWordBoundaries(maxCharactersPerLine: Int) -> String {
+        let trimmed = trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.isEmpty { return self }
+
+        let words = trimmed.split(whereSeparator: { $0.isWhitespace }).map(String.init)
+        guard !words.isEmpty else { return self }
+
+        var lines: [String] = []
+        var current = ""
+
+        func appendLine(_ line: String) {
+            if !line.isEmpty { lines.append(line) }
+        }
+
+        for word in words {
+            if word.count > maxCharactersPerLine {
+                appendLine(current)
+                current = ""
+                lines.append(word)
+                continue
+            }
+            if current.isEmpty {
+                current = word
+                continue
+            }
+            if current.count + 1 + word.count <= maxCharactersPerLine {
+                current += " " + word
+            } else {
+                appendLine(current)
+                current = word
+            }
+        }
+        appendLine(current)
+        return lines.joined(separator: "\n")
     }
 
     fileprivate var leadingWhitespaceCount: Int {

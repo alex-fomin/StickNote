@@ -10,6 +10,7 @@ final class AppState {
     static let shared: AppState = AppState()
     @Default(.deleteToTrashBin) var deleteToTrashBin
     @Default(.trimAfterPaste) var trimAfterPaste
+    @Default(.wrapLongLinesAfterPaste) var wrapLongLinesAfterPaste
 
     var sharedModelContainer: ModelContainer
     var context: ModelContext
@@ -87,7 +88,13 @@ final class AppState {
         }
         if let text = NSPasteboard.general.string(forType: .string) {
             if !text.isEmpty {
-                let content = trimAfterPaste ? text.trimmingNoteWhitespace() : text
+                var content = text
+                if trimAfterPaste {
+                    content = content.trimmingNoteWhitespace()
+                }
+                if wrapLongLinesAfterPaste {
+                    content = content.wrappingLongLinesAtWordBoundaries()
+                }
                 let note = Note(layout: getDefaultLayout(), text: content)
                 note.showOnAllSpaces = Defaults[.showOnAllSpaces]
                 self.context.insert(note)
