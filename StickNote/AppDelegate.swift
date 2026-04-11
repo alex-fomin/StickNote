@@ -1,7 +1,9 @@
 import Cocoa
 import Defaults
 import KeyboardShortcuts
+import SwiftData
 
+@MainActor
 class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationWillFinishLaunching(_ notification: Notification) {
 
@@ -17,6 +19,25 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         AppState.shared.processDueScheduledUnhides()
         AppState.shared.openAllNotes()
+    }
+
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        migrateFirstLaunchFlagIfUpgradingFromVersionWithoutKey()
+        guard !Defaults[.hasCompletedFirstLaunch] else { return }
+        DispatchQueue.main.async {
+            AppState.shared.presentSettingsWindow()
+            Defaults[.hasCompletedFirstLaunch] = true
+        }
+    }
+
+    /// If the key was never written, treat installs that already have notes as not first launch (app upgrade).
+    private func migrateFirstLaunchFlagIfUpgradingFromVersionWithoutKey() {
+        let key = Defaults.Keys.hasCompletedFirstLaunch.name
+        guard UserDefaults.standard.object(forKey: key) == nil else { return }
+        let noteCount = (try? AppState.shared.context.fetchCount(FetchDescriptor<Note>())) ?? 0
+        if noteCount > 0 {
+            Defaults[.hasCompletedFirstLaunch] = true
+        }
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {

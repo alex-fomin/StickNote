@@ -1,6 +1,8 @@
 import Defaults
 
 extension Defaults.Keys {
+    /// Set after the first-launch Settings presentation so a fresh install shows Settings once.
+    static let hasCompletedFirstLaunch = Key<Bool>("has-completed-first-launch", default: false)
     static let confirmOnDelete = Key<Bool>("confirm-on-delete", default: true)
     static let showOnAllSpaces = Key<Bool>("show-on-all-spaces", default: true)
     static let deleteToTrashBin = Key<Bool>("delete-to-trash-bin", default: true)
