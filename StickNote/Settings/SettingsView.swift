@@ -22,6 +22,7 @@ struct SettingsView: View {
     @Default(.maximizeOnHover) var maximizeOnHover
     @Default(.maximizeOnEdit) var maximizeOnEdit
     @Default(.showNotesCount) var showNotesCount
+    @Default(.showMenuBarIcon) var showMenuBarIcon
 
     @Environment(\.modelContext) var modelContext
     @Query var layouts: [NoteLayout]
@@ -33,7 +34,16 @@ struct SettingsView: View {
             Tab("General", systemImage: "gear") {
                 Form {
                     LaunchAtLogin.Toggle()
+                    Toggle("Show menu bar icon", isOn: $showMenuBarIcon)
+                    Text(
+                        "With the menu bar icon hidden, open Settings from a note’s StickNote menu, or use the keyboard shortcuts below."
+                    )
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
                     Toggle("Show notes count in menubar", isOn: $showNotesCount)
+                        .disabled(!showMenuBarIcon)
+                    
                     
                     Section("Shortcuts") {
                         KeyboardShortcuts.Recorder("Add new note", name: .createNote)

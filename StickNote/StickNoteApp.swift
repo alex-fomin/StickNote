@@ -10,14 +10,13 @@ struct StickNoteApp: App {
     
     @StateObject private var appStateModel = AppState.shared.model
     @Default(.showNotesCount) var showNotesCount
+    @Default(.showMenuBarIcon) var showMenuBarIcon
     
     @State var isMenuExtraPresented: Bool = false
-    @State var isMenuExtraEnabled: Bool = true
-    @State var statusItem: NSStatusItem?
     
     var body: some Scene {
 #if !targetEnvironment(simulator)
-        MenuBarExtra {
+        MenuBarExtra(isInserted: $showMenuBarIcon) {
             MainMenu(model: AppState.shared.model)
                 .environment(appStateModel)
         } label: {
@@ -26,7 +25,7 @@ struct StickNoteApp: App {
                 Text(appStateModel.notesCount > 0 ? "\(appStateModel.notesCount)" : "")
             }
         }
-        .menuBarExtraAccess(isPresented: $isMenuExtraPresented, isEnabled: $isMenuExtraEnabled) { statusItem in
+        .menuBarExtraAccess(isPresented: $isMenuExtraPresented, isEnabled: .constant(true)) { statusItem in
             
             if let button = statusItem.button {
                 let mouseHandlerView = MouseHandlerView(frame: button.frame)

@@ -8,4 +8,5 @@ extension Defaults.Keys {
     static let maximizeOnEdit = Key<Bool>("maximize-on-edit", default: false)
     static let trimAfterPaste = Key<Bool>("trim-after-paste", default: false)
     static let showNotesCount = Key<Bool>("show-notes-count", default: true)
+    static let showMenuBarIcon = Key<Bool>("show-menu-bar-icon", default: true)
 }
