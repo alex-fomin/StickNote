@@ -29,6 +29,11 @@ struct NoteView: View {
     @State private var selection: TextSelection?
     @State private var showConfirmation = false
     @State private var showHideUntilSheet = false
+    @State private var showOCRConfirm = false
+    @State private var isOCRRunning = false
+    @State private var showOCREmptyAlert = false
+    @State private var showOCRFailureAlert = false
+    @State private var ocrErrorMessage = ""
     @State private var width: CGFloat
     @State private var height: CGFloat
     /// Cancels stale async markdown measurements when the note changes again before layout finishes.
@@ -125,6 +130,26 @@ struct NoteView: View {
         ) {
             deleteConfirmationButtons
         }
+        .confirmationDialog(
+            "Replace this image note with recognized text? This cannot be undone.",
+            isPresented: $showOCRConfirm,
+            titleVisibility: .visible
+        ) {
+            Button("Replace", role: .destructive) {
+                startOCRFromImage()
+            }
+            Button("Cancel", role: .cancel) {}
+        }
+        .alert("No text recognized", isPresented: $showOCREmptyAlert) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("No text could be recognized in this image. Try a clearer or higher-resolution image.")
+        }
+        .alert("Text recognition failed", isPresented: $showOCRFailureAlert) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(ocrErrorMessage)
+        }
         .sheet(isPresented: $showHideUntilSheet) {
             HideNoteUntilSheet(note: note)
         }
@@ -136,6 +161,15 @@ struct NoteView: View {
             if !isKeyWindow {
                 Rectangle()
                     .strokeBorder(Color.primary.opacity(0.14), lineWidth: 1)
+            }
+        }
+        .overlay {
+            if note.isImageNote && isOCRRunning {
+                ZStack {
+                    Color.black.opacity(0.22)
+                    ProgressView()
+                        .controlSize(.regular)
+                }
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: NSWindow.didBecomeKeyNotification)) { n in
@@ -332,6 +366,15 @@ struct NoteView: View {
             Label("Copy to clipboard", systemImage: "doc.on.doc")
         }
 
+        if note.isImageNote, note.imageData != nil {
+            Button {
+                showOCRConfirm = true
+            } label: {
+                Label("Recognize Text (OCR)…", systemImage: "text.viewfinder")
+            }
+            .disabled(isOCRRunning)
+        }
+
         if !note.isImageNote {
             Toggle(
                 isOn: Binding(
@@ -463,6 +506,53 @@ struct NoteView: View {
         } else {
             self.nsWindow?.close()
             AppState.shared.deleteNote(note)
+        }
+    }
+
+    private func startOCRFromImage() {
+        guard let data = note.imageData, !data.isEmpty else {
+            ocrErrorMessage = ImageOCR.Failure.couldNotCreateCGImage.localizedDescription
+            showOCRFailureAlert = true
+            return
+        }
+        isOCRRunning = true
+        DispatchQueue.global(qos: .userInitiated).async {
+            let result = Result { try ImageOCR.recognizeText(from: data) }
+            DispatchQueue.main.async {
+                isOCRRunning = false
+                switch result {
+                case .success(let text):
+                    let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+                    if trimmed.isEmpty {
+                        showOCREmptyAlert = true
+                    } else {
+                        applyRecognizedOCRText(text)
+                    }
+                case .failure(let error):
+                    ocrErrorMessage = error.localizedDescription
+                    showOCRFailureAlert = true
+                }
+            }
+        }
+    }
+
+    private func applyRecognizedOCRText(_ text: String) {
+        note.text = text
+        note.isImageNote = false
+        note.imageData = nil
+        note.imageFrameWidth = nil
+        note.imageFrameHeight = nil
+        note.isMarkdown = false
+        note.clearMarkdownDisplayFrame()
+        note.applyLikelyMarkdownFlagFromContent()
+        note.isMinimized = false
+        isCollapsed = false
+        isEditing = true
+        note.updatedAt = Date.now
+        try? AppState.shared.context.save()
+        updateWindowSize()
+        DispatchQueue.main.async {
+            isTextEditorFocused = true
         }
     }
     
