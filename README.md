@@ -10,6 +10,8 @@
 
 Prebuilt downloads: **[Releases](https://github.com/alex-fomin/StickNote/releases)**.
 
+**Website:** [alex-fomin.github.io/StickNote](https://alex-fomin.github.io/StickNote/) — static site from the [`docs/`](docs/) folder (`index.html`, `site.css`, assets). Enable **Settings → Pages →** branch `main`, folder `/docs` if the site is not live yet.
+
 ## Screenshots
 
 <p align="center">

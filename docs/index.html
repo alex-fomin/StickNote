@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#faf8f5" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0908" media="(prefers-color-scheme: dark)">
+  <title>StickNote — floating sticky notes for macOS</title>
+  <meta name="description" content="StickNote is a macOS menu bar utility for lightweight floating sticky notes with Markdown, layouts, and SwiftData storage.">
+  <meta property="og:title" content="StickNote — floating sticky notes for macOS">
+  <meta property="og:description" content="Lightweight floating notes with Markdown, layouts, and menu bar quick actions.">
+  <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,500;0,600;0,700;0,800;1,500&family=Inter:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="site.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="bg-grid" aria-hidden="true"></div>
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="brand" href="#top" aria-label="StickNote home">
+        <img src="assets/icon-128.png" width="32" height="32" alt="" class="brand-icon">
+        <span class="brand-text">StickNote</span>
+      </a>
+      <nav class="site-nav" aria-label="Primary">
+        <a class="nav-link" href="#features">Features</a>
+        <a class="nav-link" href="#screenshots">Screenshots</a>
+        <a class="btn btn-ghost" href="https://github.com/alex-fomin/StickNote">GitHub</a>
+        <a class="btn btn-primary btn-sm" href="https://github.com/alex-fomin/StickNote/releases">Download</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="wrap" id="top">
+    <main id="main">
+      <section class="hero" aria-labelledby="hero-heading">
+        <div class="hero-layout">
+          <div class="hero-visual">
+            <p class="hero-badge"><span class="hero-badge-dot" aria-hidden="true"></span> macOS menu bar app</p>
+            <div class="hero-icon-shell">
+              <img class="hero-icon" src="assets/icon-128.png" width="128" height="128" alt="">
+            </div>
+          </div>
+          <div class="hero-copy">
+            <h1 id="hero-heading">Notes that float <span class="hero-accent">with you</span></h1>
+            <p class="tagline">Floating sticky notes for your Mac — Markdown, layouts, clipboard images, and quick actions from the menu bar. Stored with <strong>SwiftData</strong>.</p>
+            <div class="cta-row" id="download">
+              <a class="btn btn-primary" href="https://github.com/alex-fomin/StickNote/releases">Download for Mac</a>
+              <a class="btn btn-secondary" href="https://github.com/alex-fomin/StickNote">View source</a>
+            </div>
+            <p class="hero-meta">Requires macOS 15 or later · MIT License</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="features" aria-labelledby="features-heading">
+        <div class="section-head">
+          <p class="eyebrow">Product</p>
+          <h2 id="features-heading">Everything in one light utility</h2>
+          <p class="section-lede">Designed to stay out of the way until you need it — then snap open a note, paste an image, or jump to the list.</p>
+        </div>
+
+        <div class="feature-grid">
+          <article class="feature-card">
+            <div class="feature-icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+            </div>
+            <h3 class="feature-title">Menu bar</h3>
+            <p class="feature-desc">Quick actions from the status item — single-click toggles note visibility; double-click opens a new note.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+            </div>
+            <h3 class="feature-title">Floating notes</h3>
+            <p class="feature-desc">Always-on-top windows with draggable chrome and optional maximize behaviors.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg>
+            </div>
+            <h3 class="feature-title">Markdown</h3>
+            <p class="feature-desc">Render Markdown in the note view for readable, structured content.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+            </div>
+            <h3 class="feature-title">Note list</h3>
+            <p class="feature-desc">Browse every note, including hidden ones, from a dedicated window.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+            </div>
+            <h3 class="feature-title">Layouts</h3>
+            <p class="feature-desc">Default layout presets for new notes — editable in Settings.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </div>
+            <h3 class="feature-title">Clipboard</h3>
+            <p class="feature-desc">Create a note from a pasted image when the pasteboard holds image data.</p>
+          </article>
+          <article class="feature-card feature-card-wide">
+            <div class="feature-icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3H6a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 3 3 0 0 0-3-3z"/></svg>
+            </div>
+            <h3 class="feature-title">Shortcuts &amp; settings</h3>
+            <p class="feature-desc">Global shortcuts for new note, paste-from-clipboard note, and show/hide all notes. Launch at login, delete confirmation, trash vs permanent delete, show on all spaces, menubar note count, and more.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section section-shots" id="screenshots" aria-labelledby="screenshots-heading">
+        <div class="section-head">
+          <p class="eyebrow">Interface</p>
+          <h2 id="screenshots-heading">Screenshots</h2>
+          <p class="section-lede">A quick look at floating notes, the menu bar menu, and context actions.</p>
+        </div>
+
+        <div class="shot-showcase">
+          <figure class="shot shot-hero">
+            <div class="shot-frame">
+              <img src="screenshots/notes-overview.png" width="1200" alt="Several floating sticky notes showing Markdown, multiline text, layouts, and an image pasted from the clipboard" loading="lazy" decoding="async">
+            </div>
+            <figcaption><span class="shot-label">01</span> Floating notes — Markdown, multiline text, layouts, and images from the clipboard.</figcaption>
+          </figure>
+
+          <div class="shot-pair">
+            <figure class="shot">
+              <div class="shot-frame">
+                <img src="screenshots/menubar-menu.png" width="720" alt="StickNote menu bar extra showing New note, Paste note, Note list, visibility, Settings, and Quit" loading="lazy" decoding="async">
+              </div>
+              <figcaption><span class="shot-label">02</span> Menu bar — shortcuts are configurable in Settings.</figcaption>
+            </figure>
+            <figure class="shot">
+              <div class="shot-frame">
+                <img src="screenshots/note-context-menus.png" width="720" alt="StickNote context menus for a note and global actions including export, layout, hide until, and note list" loading="lazy" decoding="async">
+              </div>
+              <figcaption><span class="shot-label">03</span> Per-note menu and quick global actions.</figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="section requirements" aria-labelledby="requirements-heading">
+        <div class="requirements-card">
+          <h2 id="requirements-heading">Requirements</h2>
+          <p>macOS 15.0 or later. Built with Swift, SwiftUI, SwiftData, and AppKit.</p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p><a href="https://github.com/alex-fomin/StickNote/blob/main/LICENSE">MIT License</a> · Copyright © 2025–2026 Alex Fomin</p>
+    </footer>
+  </div>
+</body>
+</html>
