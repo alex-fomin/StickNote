@@ -126,6 +126,9 @@ struct SettingsView: View {
                         Button("Third-party licenses…") {
                             isThirdPartyNoticesPresented = true
                         }
+                        Button("Quit") {
+                            NSApplication.shared.terminate(nil)
+                        }
                     }
                 }
                 .formStyle(.grouped)
