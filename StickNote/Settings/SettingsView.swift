@@ -118,6 +118,9 @@ struct SettingsView: View {
                         }
                     }
                     Section {
+                        Button("Check for Updates…") {
+                            AppDelegate.checkForUpdates()
+                        }
                         Button("Third-party licenses…") {
                             isThirdPartyNoticesPresented = true
                         }

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/" version="2.0">
+  <channel>
+    <title>StickNote</title>
+    <link>https://github.com/alex-fomin/StickNote/releases</link>
+    <description>StickNote application updates</description>
+    <language>en</language>
+    <!-- Add a new &lt;item&gt; for each release; sign the DMG with sign_update and set sparkle:edSignature. -->
+  </channel>
+</rss>

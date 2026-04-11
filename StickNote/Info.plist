@@ -4,5 +4,11 @@
 <dict>
 	<key>LSMultipleInstancesProhibited</key>
 	<true/>
+	<key>SUEnableInstallerLauncherService</key>
+	<true/>
+	<key>SUFeedURL</key>
+	<string>https://raw.githubusercontent.com/alex-fomin/StickNote/main/packaging/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>d8cXDki3sq6F0DZiDadaPbbGkUHYE0wQe5TpNLzhi/o=</string>
 </dict>
 </plist>

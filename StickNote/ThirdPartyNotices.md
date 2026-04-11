@@ -13,6 +13,7 @@ StickNote incorporates open-source libraries distributed under the licenses belo
 | [LaunchAtLogin-Modern](https://github.com/sindresorhus/LaunchAtLogin-Modern) | main @ `a04ec1c` | MIT | [license](https://github.com/sindresorhus/LaunchAtLogin-Modern/blob/main/license) |
 | [MenuBarExtraAccess](https://github.com/orchetect/MenuBarExtraAccess) | 1.2.2 | MIT | [LICENSE](https://github.com/orchetect/MenuBarExtraAccess/blob/main/LICENSE) |
 | [Textual](https://github.com/gonzalezreal/textual) | 0.3.1 | MIT | [LICENSE](https://github.com/gonzalezreal/textual/blob/main/LICENSE) |
+| [Sparkle](https://github.com/sparkle-project/Sparkle) | 2.9.1 | MIT | [LICENSE](https://github.com/sparkle-project/Sparkle/blob/2.9.1/LICENSE) |
 
 Transitive dependencies (for example libraries used by Textual or Defaults at build or run time) are omitted here; see each package’s repository for its full dependency tree and licenses.
 

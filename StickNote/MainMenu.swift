@@ -42,6 +42,9 @@ struct MainMenu: View {
             Button("Settings...") {
                 AppState.shared.presentSettingsWindow()
             }
+            Button("Check for Updates…") {
+                AppDelegate.checkForUpdates()
+            }
             Button("Quit") { NSApplication.shared.terminate(nil) }
                 .keyboardShortcut("Q")
         }

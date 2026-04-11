@@ -1,11 +1,21 @@
 import Cocoa
 import Defaults
 import KeyboardShortcuts
+import Sparkle
 import SwiftData
 
 @MainActor
 class AppDelegate: NSObject, NSApplicationDelegate {
+    static weak var shared: AppDelegate?
+
+    private(set) lazy var sparkleUpdaterController = SPUStandardUpdaterController(
+        startingUpdater: true,
+        updaterDelegate: nil,
+        userDriverDelegate: nil
+    )
+
     func applicationWillFinishLaunching(_ notification: Notification) {
+        Self.shared = self
 
         KeyboardShortcuts.onKeyUp(for: .createNote) {
             AppState.shared.openNewNote()
@@ -43,5 +53,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
         AppState.shared.presentSettingsWindow()
         return true
+    }
+
+    static func checkForUpdates() {
+        shared?.sparkleUpdaterController.checkForUpdates(nil)
     }
 }
