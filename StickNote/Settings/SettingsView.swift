@@ -9,7 +9,7 @@ import SwiftUI
 enum SettingsWindowMetrics {
     static let width: CGFloat = 400
     /// Fixed height: fits General (shortcuts) and Note tabs without excess empty space.
-    static let height: CGFloat = 450
+    static let height: CGFloat = 500
 }
 
 struct SettingsView: View {
@@ -17,6 +17,7 @@ struct SettingsView: View {
 
     @Default(.confirmOnDelete) var confirmOnDelete
     @Default(.trimAfterPaste) var trimAfterPaste
+    @Default(.wrapLongLinesAfterPaste) var wrapLongLinesAfterPaste
     @Default(.showOnAllSpaces) var showOnAllSpaces
     @Default(.deleteToTrashBin) var deleteToTrashBin
     @Default(.maximizeOnHover) var maximizeOnHover
@@ -82,6 +83,7 @@ struct SettingsView: View {
                     }
                     Section("Paste note") {
                         Toggle("Trim whitespaces", isOn: $trimAfterPaste)
+                        Toggle("Wrap long lines", isOn: $wrapLongLinesAfterPaste)
                     }
                 }
                 .formStyle(.grouped)
