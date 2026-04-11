@@ -1,10 +1,18 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/" version="2.0">
-  <channel>
-    <title>StickNote</title>
-    <link>https://github.com/alex-fomin/StickNote/releases</link>
-    <description>StickNote application updates</description>
-    <language>en</language>
-    <!-- Add a new &lt;item&gt; for each release; sign the DMG with sign_update and set sparkle:edSignature. -->
-  </channel>
+    <channel>
+        <title>StickNote</title>
+        <link>https://github.com/alex-fomin/StickNote/releases</link>
+        <description>StickNote application updates</description>
+        <language>en</language>
+        <item>
+            <title>1.3.0</title>
+            <pubDate>Sat, 11 Apr 2026 14:11:11 +0300</pubDate>
+            <sparkle:version>1.3.0</sparkle:version>
+            <sparkle:shortVersionString>1.3.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <enclosure url="https://github.com/alex-fomin/StickNote/releases/download/v1.3.0/StickNote-1.3.0.dmg" length="9171619" type="application/octet-stream" sparkle:edSignature="ZKHDNBrllUwyBry1lgkEN+X2dZTIznPxpb4TOFNotE1PoihjRecjfBPrE6SHD1F+OVa/SEJL7YkI7NbmQuPxCQ=="/>
+        </item>
+    </channel>
 </rss>
