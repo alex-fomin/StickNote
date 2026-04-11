@@ -453,6 +453,10 @@ final class AppState {
         NotificationCenter.default.post(name: .stickNoteResetZoom, object: note)
     }
 
+    func presentSettingsWindow() {
+        SettingsWindowController.shared.present()
+    }
+
     var model: AppStateModel = AppStateModel()
 }
 

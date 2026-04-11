@@ -4,7 +4,6 @@ import SwiftData
 import SwiftUI
 
 struct NoteView: View {
-    
     static let horizonalPadding: CGFloat = 2
     static let verticalPadding: CGFloat = 2
     static let trimmedLength = 4
@@ -18,7 +17,6 @@ struct NoteView: View {
 
     @Environment(AppStateModel.self) private var appStateModel
     @Environment(\.modelContext) private var modelContext
-    @Environment(\.openSettings) private var openSettings
     @Environment(\.openWindow) private var openWindow
     
     @State private var note: Note
@@ -378,8 +376,7 @@ struct NoteView: View {
             }
             Divider()
             Button("Settings...") {
-                NSApp.activate(ignoringOtherApps: true)
-                openSettings()
+                AppState.shared.presentSettingsWindow()
             }
             Button("Quit") {
                 NSApplication.shared.terminate(nil)

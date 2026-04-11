@@ -427,6 +427,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSBackgroundOnly = YES;
+				INFOPLIST_FILE = StickNote/Info.plist;
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2025-2026 Alex Fomin.";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -462,6 +463,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSBackgroundOnly = YES;
+				INFOPLIST_FILE = StickNote/Info.plist;
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2025-2026 Alex Fomin.";
 				LD_RUNPATH_SEARCH_PATHS = (

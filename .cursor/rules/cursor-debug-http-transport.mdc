@@ -1,0 +1,17 @@
+---
+description: For Cursor debug workflows, always use HTTP transport (not stdio)
+alwaysApply: true
+---
+
+# Cursor debug: HTTP transport
+
+When setting up, troubleshooting, or documenting anything related to **debugging in Cursor** (including MCP servers, remote adapters, or transport settings that offer multiple options), **use HTTP transport** by default.
+
+## What to do
+
+- Prefer **HTTP** (or HTTPS / SSE where that is the HTTP-based option) over **stdio**, named pipes, or other local transports when the choice affects Cursor debug or MCP connectivity.
+- If a tool or server only supports one transport, use what it requires; otherwise default to HTTP for Cursor-facing debug paths.
+
+## When this does not apply
+
+- Targets or tooling that are not Cursor (e.g. native Xcode debugging for StickNote) unless the task explicitly ties them to Cursor’s debug/MCP setup.

@@ -18,4 +18,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         AppState.shared.processDueScheduledUnhides()
         AppState.shared.openAllNotes()
     }
+
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        AppState.shared.presentSettingsWindow()
+        return true
+    }
 }

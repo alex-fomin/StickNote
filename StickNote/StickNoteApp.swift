@@ -17,7 +17,7 @@ struct StickNoteApp: App {
     var body: some Scene {
 #if !targetEnvironment(simulator)
         MenuBarExtra(isInserted: $showMenuBarIcon) {
-            MainMenu(model: AppState.shared.model)
+            MainMenu()
                 .environment(appStateModel)
         } label: {
             Image(systemName: (appStateModel.isNotesHidden ? "note" : "note.text"))
@@ -67,13 +67,6 @@ struct StickNoteApp: App {
                 .environment(appStateModel)
         }
         .windowLevel(.floating)
-        .modelContext(AppState.shared.context)
-        
-        Settings {
-            SettingsView()
-        }
-        .windowLevel(.floating)
-        .windowResizability(.contentSize)
         .modelContext(AppState.shared.context)
     }
 }

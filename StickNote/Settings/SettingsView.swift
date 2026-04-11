@@ -6,7 +6,7 @@ import LaunchAtLogin
 import SwiftData
 import SwiftUI
 
-private enum SettingsWindowMetrics {
+enum SettingsWindowMetrics {
     static let width: CGFloat = 400
     /// Fixed height: fits General (shortcuts) and Note tabs without excess empty space.
     static let height: CGFloat = 450
@@ -36,7 +36,7 @@ struct SettingsView: View {
                     LaunchAtLogin.Toggle()
                     Toggle("Show menu bar icon", isOn: $showMenuBarIcon)
                     Text(
-                        "With the menu bar icon hidden, open Settings from a note’s StickNote menu, or use the keyboard shortcuts below."
+                        "With the menu bar icon hidden, open Settings from a note’s StickNote menu, start StickNote again (for example from Finder or Launchpad) to show this window, or use the keyboard shortcuts below."
                     )
                     .font(.caption)
                     .foregroundStyle(.secondary)
