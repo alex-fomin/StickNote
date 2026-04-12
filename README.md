@@ -10,7 +10,7 @@
 
 Prebuilt downloads: **[Releases](https://github.com/alex-fomin/StickNote/releases)**.
 
-**Website:** [alex-fomin.github.io/StickNote](https://alex-fomin.github.io/StickNote/) — static site from the [`docs/`](docs/) folder (`index.html`, `site.css`, assets). Enable **Settings → Pages →** branch `main`, folder `/docs` if the site is not live yet.
+**Product page:** [alex-fomin.github.io/StickNote](https://alex-fomin.github.io/StickNote/) — static site served from [`docs/`](docs/) on GitHub Pages (`index.html`, `site.css`, shared screenshot assets). It mirrors this README: hero pitch, feature grid, screenshot, requirements, and links to releases and the repo.
 
 ## Screenshots
 
