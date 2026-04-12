@@ -12,25 +12,15 @@ Prebuilt downloads: **[Releases](https://github.com/alex-fomin/StickNote/release
 
 **Product page:** [alex-fomin.github.io/StickNote](https://alex-fomin.github.io/StickNote/) — static site served from [`docs/`](docs/) on GitHub Pages (`index.html`, `site.css`, shared screenshot assets). It mirrors this README: hero pitch, feature grid, screenshot, requirements, and links to releases and the repo.
 
-## Screenshots
+## Screenshot
 
 <p align="center">
-  <img src="docs/screenshots/notes-overview.png" width="720" alt="Several floating sticky notes showing Markdown, multiline text, layouts, and an image pasted from the clipboard">
+  <img src="docs/screenshots/notes-overview.png" width="720" alt="Several floating sticky notes showing simple text, Markdown, layouts, and an image pasted from the clipboard">
   <br>
-  <em>Floating notes — Markdown, multiline text, layouts, and images from the clipboard.</em>
+  <em>Floating notes — simple text, Markdown, layouts, and an image from the clipboard.</em>
 </p>
 
-<p align="center">
-  <img src="docs/screenshots/menubar-menu.png" width="720" alt="StickNote menu bar extra showing New note, Paste note, Note list, visibility, Settings, and Quit">
-  <br>
-  <em>Menu bar menu — global shortcuts are configurable in Settings.</em>
-</p>
-
-<p align="center">
-  <img src="docs/screenshots/note-context-menus.png" width="720" alt="StickNote context menus for a note and global actions including export, layout, hide until, and note list">
-  <br>
-  <em>Per-note menu (minimize, spaces, Markdown, export, layout, hide, delete) and quick global actions.</em>
-</p>
+The same file is used on the [product page](https://alex-fomin.github.io/StickNote/) (`docs/screenshots/notes-overview.png`, **1932×1274** px).
 
 ## Features
 
