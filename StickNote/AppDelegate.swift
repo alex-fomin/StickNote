@@ -17,6 +17,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationWillFinishLaunching(_ notification: Notification) {
         Self.shared = self
 
+        AppAppearance.applyFromDefaults()
+
         KeyboardShortcuts.onKeyUp(for: .createNote) {
             AppState.shared.openNewNote()
         }

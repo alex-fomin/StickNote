@@ -31,11 +31,16 @@ final class MarkdownDisplayMeasurer {
         // passes (e.g. headings), so we must not complete measurement on the first value.
         var reportedSize: CGSize = .zero
 
+        let display = NoteDisplayColors.displayColors(
+            storedBgHex: note.color,
+            storedFgHex: note.fontColor,
+            isDark: NoteDisplayColors.isEffectiveDarkInterface
+        )
         let root = MarkdownMeasureRoot(
             text: note.text,
             nsFont: note.nsFont,
-            fontColor: Color.fromString(note.fontColor),
-            noteColor: Color.fromString(note.color),
+            fontColor: display.foreground,
+            noteColor: display.background,
             contentMaxWidth: maxW,
             onGeometryUpdate: { reportedSize = $0 }
         )

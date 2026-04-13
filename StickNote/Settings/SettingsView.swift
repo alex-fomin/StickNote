@@ -24,6 +24,7 @@ struct SettingsView: View {
     @Default(.maximizeOnEdit) var maximizeOnEdit
     @Default(.showNotesCount) var showNotesCount
     @Default(.showMenuBarIcon) var showMenuBarIcon
+    @Default(.appAppearance) var appAppearanceRaw
 
     @Environment(\.modelContext) var modelContext
     @Query var layouts: [NoteLayout]
@@ -35,6 +36,21 @@ struct SettingsView: View {
             Tab("General", systemImage: "gear") {
                 Form {
                     LaunchAtLogin.Toggle()
+                    Picker(
+                        "Appearance",
+                        selection: Binding(
+                            get: { AppAppearancePreference(rawValue: appAppearanceRaw) ?? .system },
+                            set: { newValue in
+                                appAppearanceRaw = newValue.rawValue
+                                AppAppearance.applyFromDefaults()
+                            }
+                        )
+                    ) {
+                        ForEach(AppAppearancePreference.allCases) { pref in
+                            Text(pref.title).tag(pref)
+                        }
+                    }
+                    .pickerStyle(.segmented)
                     Toggle("Show menu bar icon", isOn: $showMenuBarIcon)
                     Text(
                         "With the menu bar icon hidden, open Settings from a note’s StickNote menu, start StickNote again (for example from Finder or Launchpad) to show this window, or use the keyboard shortcuts below."

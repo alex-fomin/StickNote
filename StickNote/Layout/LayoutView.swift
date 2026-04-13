@@ -20,6 +20,7 @@ struct LayoutInfo: Hashable {
 
 struct LayoutView: View {
     @Environment(\.modelContext) var modelContext
+    @Environment(\.colorScheme) private var colorScheme
     @Query var layouts: [NoteLayout]
 
     @State var info: NoteAppearance
@@ -33,6 +34,14 @@ struct LayoutView: View {
     @State private var showingAlert = false
 
     @State var newLayoutName: String = ""
+
+    private var layoutPreviewDisplayColors: (background: Color, foreground: Color) {
+        NoteDisplayColors.displayColors(
+            storedBgHex: color.toHex(),
+            storedFgHex: fontColor.toHex(),
+            colorScheme: colorScheme
+        )
+    }
 
     init(info: NoteAppearance, text: String? = nil) {
         self.info = info
@@ -55,8 +64,8 @@ struct LayoutView: View {
                 }
                 Text(text)
                     .font(Font(font))
-                    .foregroundStyle(fontColor)
-                    .background(color)
+                    .foregroundStyle(layoutPreviewDisplayColors.foreground)
+                    .background(layoutPreviewDisplayColors.background)
                     .padding(.all)
                     .frame(maxWidth: 200, maxHeight: 150)
             }
@@ -65,12 +74,17 @@ struct LayoutView: View {
                     ForEach(self.layouts.indices, id: \.self) {
                         let layout = self.layouts[$0]
                         HStack {
+                            let swatch = NoteDisplayColors.displayColors(
+                                storedBgHex: layout.color,
+                                storedFgHex: layout.fontColor,
+                                colorScheme: colorScheme
+                            )
                             Image(
                                 systemName: "square.fill"
                             )
                             .foregroundStyle(
-                                Color.fromString(layout.color),
-                                Color.fromString(layout.color))
+                                swatch.background,
+                                swatch.background)
                             Text(layout.name)
                         }
                     }

@@ -134,7 +134,6 @@ final class AppState {
         note.window = window
 
         let contentView = NoteView(note: note, isEditing: effectiveEditing)
-            .preferredColorScheme(.light)
             .environment(\.modelContext, self.sharedModelContainer.mainContext)
             .environment(AppState.shared.model)
 

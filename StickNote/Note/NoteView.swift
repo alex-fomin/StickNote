@@ -18,6 +18,7 @@ struct NoteView: View {
     @Environment(AppStateModel.self) private var appStateModel
     @Environment(\.modelContext) private var modelContext
     @Environment(\.openWindow) private var openWindow
+    @Environment(\.colorScheme) private var colorScheme
     
     @State private var note: Note
     @State private var isCollapsed: Bool = false
@@ -153,7 +154,13 @@ struct NoteView: View {
         .sheet(isPresented: $showHideUntilSheet) {
             HideNoteUntilSheet(note: note)
         }
-        .background(Color.fromString($note.color.wrappedValue))
+        .background(
+            NoteDisplayColors.displayColors(
+                storedBgHex: note.color,
+                storedFgHex: note.fontColor,
+                colorScheme: colorScheme
+            ).background
+        )
         .background(WindowClickOutsideListener(isEditing: $isEditing))
         .background(windowAccessor)
         .frame(width: resolvedFrameWidth, height: resolvedFrameHeight)
@@ -189,7 +196,14 @@ struct NoteView: View {
                 isKeyWindow = window.isKeyWindow
             }
             guard window != nil else { return }
+            syncNoteWindowBackground()
             DispatchQueue.main.async { syncLaunchOriginFromWindowOnce() }
+        }
+        .onChange(of: colorScheme) { _, _ in
+            syncNoteWindowBackground()
+        }
+        .onChange(of: note.color) { _, _ in
+            syncNoteWindowBackground()
         }
         .onHover { handleHover($0) }
         .onReceive(NotificationCenter.default.publisher(for: .stickNoteResetZoom)) { notification in
@@ -498,10 +512,20 @@ struct NoteView: View {
         WindowAccessor { window in
             self.nsWindow = window
             window?.styleMask.remove(.titled)
-            window?.backgroundColor = NSColor.fromString($note.color.wrappedValue)
+            window?.backgroundColor = NoteDisplayColors.displayBackgroundNSColor(
+                storedBgHex: note.color,
+                isDark: colorScheme == .dark
+            )
             window?.delegate = self.windowTracker
             window?.level = .floating
         }
+    }
+
+    private func syncNoteWindowBackground() {
+        nsWindow?.backgroundColor = NoteDisplayColors.displayBackgroundNSColor(
+            storedBgHex: note.color,
+            isDark: colorScheme == .dark
+        )
     }
     
     // MARK: - Methods

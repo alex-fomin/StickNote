@@ -13,4 +13,7 @@ extension Defaults.Keys {
     static let wrapLongLinesAfterPaste = Key<Bool>("wrap-long-lines-after-paste", default: false)
     static let showNotesCount = Key<Bool>("show-notes-count", default: true)
     static let showMenuBarIcon = Key<Bool>("show-menu-bar-icon", default: true)
+
+    /// `system` | `light` | `dark` — drives `NSApp.appearance` via ``AppAppearance``.
+    static let appAppearance = Key<String>("app-appearance", default: "system")
 }

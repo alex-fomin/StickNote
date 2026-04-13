@@ -396,6 +396,7 @@ struct NoteListView: View {
 /// Image note preview in the list detail pane.
 private struct NoteListImagePreview: View {
     let note: Note
+    @Environment(\.colorScheme) private var colorScheme
 
     /// Avoids ``NoteImageDisplay``’s ``GeometryReader`` collapsing to a tiny height inside ``ScrollView``.
     private static let minPreviewHeight: CGFloat = 320
@@ -429,7 +430,13 @@ private struct NoteListImagePreview: View {
                 }
                 .frame(maxWidth: .infinity)
                 .padding(pad)
-                .background(Color.fromString(note.color))
+                .background(
+                    NoteDisplayColors.displayColors(
+                        storedBgHex: note.color,
+                        storedFgHex: note.fontColor,
+                        colorScheme: colorScheme
+                    ).background
+                )
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -439,18 +446,24 @@ private struct NoteListImagePreview: View {
 /// Read-only rendered Markdown for the note list detail pane (same styling as the note window).
 private struct NoteListMarkdownPreview: View {
     let note: Note
+    @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
+        let display = NoteDisplayColors.displayColors(
+            storedBgHex: note.color,
+            storedFgHex: note.fontColor,
+            colorScheme: colorScheme
+        )
         ScrollView(.vertical, showsIndicators: true) {
             StructuredText(note.text, parser: StickNoteMarkdownParser())
                 .textual.textSelection(.enabled)
                 .textual.structuredTextStyle(StickNoteStructuredTextStyle())
                 .font(Font(note.nsFont))
-                .foregroundStyle(Color.fromString(note.fontColor))
+                .foregroundStyle(display.foreground)
                 .multilineTextAlignment(.leading)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .fixedSize(horizontal: false, vertical: true)
-                .background(Color.fromString(note.color))
+                .background(display.background)
                 .id("\(note.fontSize)-\(note.fontName)")
         }
     }
