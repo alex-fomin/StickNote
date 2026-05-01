@@ -344,6 +344,29 @@ final class AppState {
         }
     }
 
+    @MainActor
+    func presentSystemShare(for note: Note, anchorWindow: NSWindow? = nil) {
+        let items: [Any]
+        if note.isImageNote {
+            guard let data = note.imageData, let image = NSImage(data: data) else { return }
+            items = [image]
+        } else {
+            items = [note.text as NSString]
+        }
+
+        let window = anchorWindow ?? NSApp.keyWindow
+        guard let view = window?.contentView else { return }
+
+        let rect = NSRect(
+            x: view.bounds.midX,
+            y: view.bounds.midY,
+            width: 1,
+            height: 1
+        )
+        let picker = NSSharingServicePicker(items: items)
+        picker.show(relativeTo: rect, of: view, preferredEdge: .minY)
+    }
+
     func exportNoteToFile(_ note: Note) {
         if note.isImageNote, let data = note.imageData {
             DispatchQueue.main.async {

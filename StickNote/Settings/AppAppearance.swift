@@ -1,5 +1,6 @@
 import AppKit
 import Defaults
+import SwiftUI
 
 enum AppAppearancePreference: String, CaseIterable, Identifiable {
     case system
@@ -22,6 +23,15 @@ enum AppAppearancePreference: String, CaseIterable, Identifiable {
         case .system: return nil
         case .light: return NSAppearance(named: .aqua)
         case .dark: return NSAppearance(named: .darkAqua)
+        }
+    }
+
+    /// For ``SwiftUI.View/preferredColorScheme(_:)``. `nil` means follow the system appearance.
+    var preferredColorScheme: ColorScheme? {
+        switch self {
+        case .system: return nil
+        case .light: return .light
+        case .dark: return .dark
         }
     }
 }

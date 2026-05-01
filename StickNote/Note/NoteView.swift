@@ -380,6 +380,13 @@ struct NoteView: View {
             Label("Copy to clipboard", systemImage: "doc.on.doc")
         }
 
+        Button {
+            AppState.shared.presentSystemShare(for: note, anchorWindow: nsWindow)
+        } label: {
+            Label("Share…", systemImage: "square.and.arrow.up")
+        }
+        .disabled(note.isImageNote && note.imageData == nil)
+
         if note.isImageNote, note.imageData != nil {
             Button {
                 showOCRConfirm = true

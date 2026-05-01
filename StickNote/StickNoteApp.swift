@@ -11,6 +11,7 @@ struct StickNoteApp: App {
     @StateObject private var appStateModel = AppState.shared.model
     @Default(.showNotesCount) var showNotesCount
     @Default(.showMenuBarIcon) var showMenuBarIcon
+    @Default(.appAppearance) private var appAppearanceRaw
     
     @State var isMenuExtraPresented: Bool = false
     
@@ -50,9 +51,13 @@ struct StickNoteApp: App {
                 .first
             {
                 NoteLayoutView(note: note)
+                    .preferredColorScheme(
+                        (AppAppearancePreference(rawValue: appAppearanceRaw) ?? .system)
+                            .preferredColorScheme
+                    )
                     .frame(
-                        minWidth: 400, maxWidth: 400,
-                        minHeight: 200, maxHeight: 200)
+                        minWidth: 420, maxWidth: 420,
+                        minHeight: 340, maxHeight: 420)
             }
         }
         .windowResizability(.contentSize)
