@@ -42,6 +42,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    func applicationDidResignActive(_ notification: Notification) {
+        AppState.shared.clearSelection()
+    }
+
     /// If the key was never written, treat installs that already have notes as not first launch (app upgrade).
     private func migrateFirstLaunchFlagIfUpgradingFromVersionWithoutKey() {
         let key = Defaults.Keys.hasCompletedFirstLaunch.name

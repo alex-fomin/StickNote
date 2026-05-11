@@ -171,6 +171,14 @@ struct NoteView: View {
             }
         }
         .overlay {
+            if appStateModel.selectedNoteIDs.count > 1,
+                appStateModel.selectedNoteIDs.contains(note.persistentModelID)
+            {
+                Rectangle()
+                    .strokeBorder(Color.accentColor.opacity(0.9), lineWidth: 1)
+            }
+        }
+        .overlay {
             if note.isImageNote && isOCRRunning {
                 ZStack {
                     Color.black.opacity(0.22)
@@ -428,6 +436,14 @@ struct NoteView: View {
             AppState.shared.exportNoteToFile(note)
         } label: {
             Label("Export to file…", systemImage: "square.and.arrow.down")
+        }
+
+        if AppState.shared.canMergeSelectedNotes() {
+            Button {
+                AppState.shared.presentMergeSelectedNotesConfirmation()
+            } label: {
+                Label("Merge selected notes…", systemImage: "arrow.merge")
+            }
         }
         
         Divider()
