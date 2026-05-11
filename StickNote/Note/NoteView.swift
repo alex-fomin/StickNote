@@ -420,13 +420,33 @@ struct NoteView: View {
         Button {
             AppState.shared.hideNote(note)
         } label: {
-            Label("Hide", systemImage: "eye.slash")
+            Label("Hide note", systemImage: "eye.slash")
         }
 
-        Button {
-            showHideUntilSheet = true
-        } label: {
-            Label("Hide note until…", systemImage: "calendar.badge.clock")
+        Menu("Hide until…", systemImage: "calendar.badge.clock") {
+            Button {
+                AppState.shared.hideNote(note, hiddenUntil: Date.now.addingTimeInterval(60 * 60))
+            } label: {
+                Label("For 1 Hour", systemImage: "clock")
+            }
+
+            Button {
+                AppState.shared.hideNote(note, hiddenUntil: hideUntilTomorrowMorning())
+            } label: {
+                Label("Until Tomorrow", systemImage: "sunrise")
+            }
+
+            Button {
+                AppState.shared.hideNote(note, hiddenUntil: hideUntilNextWeekMorning())
+            } label: {
+                Label("Until Next Week", systemImage: "calendar")
+            }
+
+            Button {
+                showHideUntilSheet = true
+            } label: {
+                Label("Custom…", systemImage: "calendar.badge.clock")
+            }
         }
 
         Divider()
@@ -507,6 +527,28 @@ struct NoteView: View {
             self.nsWindow?.close()
             AppState.shared.deleteNote(note)
         }
+    }
+
+    private func hideUntilTomorrowMorning() -> Date {
+        let cal = Calendar.current
+        let now = Date.now
+        let tomorrow = cal.date(byAdding: .day, value: 1, to: now) ?? now
+        return cal.date(bySettingHour: 9, minute: 0, second: 0, of: tomorrow) ?? tomorrow
+    }
+
+    private func hideUntilNextWeekMorning() -> Date {
+        let cal = Calendar.current
+        let now = Date.now
+        var components = DateComponents()
+        components.weekday = 2 // Monday
+        components.hour = 9
+        components.minute = 0
+        components.second = 0
+        return cal.nextDate(
+            after: now,
+            matching: components,
+            matchingPolicy: .nextTime
+        ) ?? now.addingTimeInterval(7 * 24 * 60 * 60)
     }
 
     private func startOCRFromImage() {

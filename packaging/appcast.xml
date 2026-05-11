@@ -6,6 +6,18 @@
         <description>StickNote application updates</description>
         <language>en</language>
         <item>
+            <title>1.3.2</title>
+            <pubDate>Fri, 08 May 2026 10:35:54 +0300</pubDate>
+            <sparkle:version>1.3.2</sparkle:version>
+            <sparkle:shortVersionString>1.3.2</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <enclosure url="https://github.com/alex-fomin/StickNote/releases/download/v1.3.2/StickNote-1.3.2.dmg" length="9208293" type="application/octet-stream" sparkle:edSignature="vM1P4Zncootvci052+6xwbqAwgS2SXp7Y+SYigUjbdQpEW3/RqX03ytapZV2fBFr6ju3GuM1ACajztEUyTNnBg=="/>
+            <sparkle:deltas>
+                <enclosure url="https://github.com/alex-fomin/StickNote/releases/download/v1.3.2/StickNote1.3.2-1.3.1.delta" sparkle:deltaFrom="1.3.1" length="337926" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="977824" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,uk" sparkle:edSignature="iC+UQqZEDi2Rwfl6T1kIFEETQ8On6WgwWq3rkW5EqlYjTQdFXO8voF4VWkyVQ1r2BaoOtStZ5jwFa2Ir+bfJAw=="/>
+            </sparkle:deltas>
+        </item>
+        <item>
             <title>1.3.1</title>
             <pubDate>Sat, 11 Apr 2026 15:05:40 +0300</pubDate>
             <sparkle:version>1.3.1</sparkle:version>
