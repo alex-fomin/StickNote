@@ -45,6 +45,8 @@ struct NoteView: View {
     @State private var didSyncLaunchOriginFromWindow = false
     /// Skips ``resizeImageNoteWindowForFontChange`` / markdown resize while applying Cmd+0 default zoom.
     @State private var isApplyingZoomReset = false
+    /// Cached; full markdown parse is too heavy to run from computed properties every layout.
+    @State private var markdownHasLinksForCmdTooltip = false
 
     private let windowTracker: WindowPositionTracker
 
@@ -152,7 +154,7 @@ struct NoteView: View {
             Text(ocrErrorMessage)
         }
         .sheet(isPresented: $showHideUntilSheet) {
-            HideNoteUntilSheet(note: note)
+            HideNoteUntilSheet(notes: contextTargets)
         }
         .background(
             NoteDisplayColors.displayColors(
@@ -198,6 +200,7 @@ struct NoteView: View {
         .onAppear {
             if note.isImageNote { isEditing = false }
             updateWindowSize()
+            refreshMarkdownLinkPresenceForTooltip()
         }
         .onChange(of: nsWindow) { _, window in
             if let window {
@@ -235,8 +238,12 @@ struct NoteView: View {
         .onChange(of: note.isMarkdown, initial: false) { _, new in
             if !new { note.clearMarkdownDisplayFrame() }
             updateWindowSize()
+            refreshMarkdownLinkPresenceForTooltip()
         }
-        .onChange(of: isCollapsed, initial: true) { updateWindowSize() }
+        .onChange(of: isCollapsed, initial: true) {
+            updateWindowSize()
+            refreshMarkdownLinkPresenceForTooltip()
+        }
         .onChange(of: note.isMinimized, initial: false) { _, new in
             guard !isEditing else { return }
             isCollapsed = new
@@ -253,14 +260,79 @@ struct NoteView: View {
                 isCollapsed = note.isMinimized
             }
             updateWindowSize()
+            refreshMarkdownLinkPresenceForTooltip()
         }
     }
 
+    /// Notes affected by context menu actions (multi-selection or single anchor).
+    private var contextTargets: [Note] {
+        let _ = appStateModel.selectedNoteIDs
+        return AppState.shared.notesTargetedForContextMenu(anchorNote: note)
+    }
+
+    private var isBulkContextMenu: Bool {
+        contextTargets.count > 1
+    }
+
+    private var deleteMenuItemTitle: String {
+        let n = contextTargets.count
+        return n > 1 ? "Delete \(n) notes" : "Delete"
+    }
+
     private var deleteConfirmationTitle: String {
-        if note.isImageNote {
-            return "Delete this image note?"
+        let _ = appStateModel.selectedNoteIDs
+        return AppState.shared.deleteConfirmationMessage(anchorNote: note)
+    }
+
+    private var minimizeMaximizeMenuTitle: String {
+        if contextTargets.count > 1 {
+            return note.isMinimized
+                ? "Maximize \(contextTargets.count) notes"
+                : "Minimize \(contextTargets.count) notes"
         }
-        return #"Are you sure you want to delete "\#(note.text.truncate(15))"?"#
+        return note.isMinimized ? "Maximize" : "Minimize"
+    }
+
+    private var copyMenuTitle: String {
+        contextTargets.count > 1 ? "Copy \(contextTargets.count) notes" : "Copy to clipboard"
+    }
+
+    private var shareMenuTitle: String {
+        contextTargets.count > 1 ? "Share \(contextTargets.count) notes…" : "Share…"
+    }
+
+    private var hideNoteMenuTitle: String {
+        contextTargets.count > 1 ? "Hide \(contextTargets.count) notes" : "Hide note"
+    }
+
+    private var hideUntilMenuTitle: String {
+        contextTargets.count > 1 ? "Hide \(contextTargets.count) notes until…" : "Hide until…"
+    }
+
+    private var shareDisabledForSelection: Bool {
+        contextTargets.contains { $0.isImageNote && $0.imageData == nil }
+    }
+
+    private var allTargetsPlainTextForTextTools: Bool {
+        contextTargets.allSatisfy { !$0.isImageNote && !$0.isMarkdown }
+    }
+
+    private var allTargetsNonImageForMarkdownToggle: Bool {
+        contextTargets.allSatisfy { !$0.isImageNote }
+    }
+
+    /// Shown as ``NSView.toolTip`` on the drag overlay (SwiftUI `help` does not receive hover above that layer).
+    private var markdownLinkCommandHelpTooltip: String? {
+        guard markdownHasLinksForCmdTooltip else { return nil }
+        return "⌘-click to open links"
+    }
+
+    private func refreshMarkdownLinkPresenceForTooltip() {
+        guard !note.isImageNote, note.isMarkdown, !isCollapsed, !isEditing else {
+            markdownHasLinksForCmdTooltip = false
+            return
+        }
+        markdownHasLinksForCmdTooltip = StickNoteMarkdownParser.containsRenderableLink(in: note.text)
     }
     
     // MARK: - Subviews
@@ -353,7 +425,7 @@ struct NoteView: View {
     @ViewBuilder
     private var displayView: some View {
         NoteTextView(note: note, isCollapsed: $isCollapsed)
-            .overlay(DraggableArea(isEditing: $isEditing))
+            .overlay(DraggableArea(isEditing: $isEditing, toolTip: markdownLinkCommandHelpTooltip))
             .padding(.horizontal, NoteView.horizonalPadding)
             .padding(.vertical, NoteView.verticalPadding)
             .frame(width: width, height: height, alignment: .topLeading)
@@ -362,18 +434,30 @@ struct NoteView: View {
     @ViewBuilder
     private var contextMenuContent: some View {
         Button {
-            note.isMinimized.toggle()
+            let setMinimized = !note.isMinimized
+            for n in contextTargets {
+                n.isMinimized = setMinimized
+            }
             isCollapsed = note.isMinimized
         } label: {
-            Label(note.isMinimized ? "Maximize" : "Minimize", systemImage: note.isMinimized ? "arrow.up.left.and.arrow.down.right" : "arrow.down.right.and.arrow.up.left")
+            Label(
+                minimizeMaximizeMenuTitle,
+                systemImage: note.isMinimized
+                    ? "arrow.up.left.and.arrow.down.right" : "arrow.down.right.and.arrow.up.left"
+            )
         }
-        
+
         Toggle(
             isOn: Binding(
-                get: { note.showOnAllSpaces },
+                get: {
+                    if contextTargets.count <= 1 { return note.showOnAllSpaces }
+                    return contextTargets.allSatisfy(\.showOnAllSpaces)
+                },
                 set: { newValue in
-                    note.showOnAllSpaces = newValue
-                    AppState.shared.applyShowOnAllSpaces(note: note)
+                    for n in contextTargets {
+                        n.showOnAllSpaces = newValue
+                        AppState.shared.applyShowOnAllSpaces(note: n)
+                    }
                 }
             )
         ) {
@@ -381,19 +465,19 @@ struct NoteView: View {
         }
 
         Divider()
-        
+
         Button {
-            AppState.shared.copyToClipboard(note)
+            AppState.shared.copyNotesToClipboard(contextTargets)
         } label: {
-            Label("Copy to clipboard", systemImage: "doc.on.doc")
+            Label(copyMenuTitle, systemImage: "doc.on.doc")
         }
 
         Button {
-            AppState.shared.presentSystemShare(for: note, anchorWindow: nsWindow)
+            AppState.shared.presentSystemShare(forNotes: contextTargets, anchorWindow: nsWindow)
         } label: {
-            Label("Share…", systemImage: "square.and.arrow.up")
+            Label(shareMenuTitle, systemImage: "square.and.arrow.up")
         }
-        .disabled(note.isImageNote && note.imageData == nil)
+        .disabled(shareDisabledForSelection)
 
         if note.isImageNote, note.imageData != nil {
             Button {
@@ -401,16 +485,21 @@ struct NoteView: View {
             } label: {
                 Label("Recognize Text (OCR)…", systemImage: "text.viewfinder")
             }
-            .disabled(isOCRRunning)
+            .disabled(isBulkContextMenu || isOCRRunning)
         }
 
-        if !note.isImageNote {
+        if allTargetsNonImageForMarkdownToggle {
             Toggle(
                 isOn: Binding(
-                    get: { note.isMarkdown },
+                    get: {
+                        if contextTargets.count <= 1 { return note.isMarkdown }
+                        return contextTargets.allSatisfy(\.isMarkdown)
+                    },
                     set: { newValue in
-                        note.isMarkdown = newValue
-                        note.markdownAutoDisabledByUser = !newValue
+                        for n in contextTargets {
+                            n.isMarkdown = newValue
+                            n.markdownAutoDisabledByUser = !newValue
+                        }
                         updateWindowSize()
                     }
                 )
@@ -419,14 +508,18 @@ struct NoteView: View {
             }
         }
 
-        if !note.isImageNote && !note.isMarkdown {
+        if allTargetsPlainTextForTextTools {
             Menu("Text", systemImage: "text.alignleft") {
                 Button("Trim whitespaces") {
-                    note.text = note.text.trimmingNoteWhitespace()
+                    for n in contextTargets {
+                        n.text = n.text.trimmingNoteWhitespace()
+                    }
                     updateWindowSize()
                 }
                 Button("Wrap lines") {
-                    note.text = note.text.wrappingLongLinesAtWordBoundaries()
+                    for n in contextTargets {
+                        n.text = n.text.wrappingLongLinesAtWordBoundaries()
+                    }
                     updateWindowSize()
                 }
             }
@@ -437,6 +530,7 @@ struct NoteView: View {
         } label: {
             Label("Export to file…", systemImage: "square.and.arrow.down")
         }
+        .disabled(isBulkContextMenu)
 
         if AppState.shared.canMergeSelectedNotes() {
             Button {
@@ -445,36 +539,47 @@ struct NoteView: View {
                 Label("Merge selected notes…", systemImage: "arrow.merge")
             }
         }
-        
+
         Divider()
-        
+
         Menu("Layout", systemImage: "textformat") {
-            LayoutMenu(note: $note)
+            LayoutMenu(note: $note, bulkApplyTargets: isBulkContextMenu ? contextTargets : nil)
         }
-        
+
         Divider()
 
         Button {
-            AppState.shared.hideNote(note)
+            for n in contextTargets {
+                AppState.shared.hideNote(n)
+            }
         } label: {
-            Label("Hide note", systemImage: "eye.slash")
+            Label(hideNoteMenuTitle, systemImage: "eye.slash")
         }
 
-        Menu("Hide until…", systemImage: "calendar.badge.clock") {
+        Menu(hideUntilMenuTitle, systemImage: "calendar.badge.clock") {
             Button {
-                AppState.shared.hideNote(note, hiddenUntil: Date.now.addingTimeInterval(60 * 60))
+                let until = Date.now.addingTimeInterval(60 * 60)
+                for n in contextTargets {
+                    AppState.shared.hideNote(n, hiddenUntil: until)
+                }
             } label: {
                 Label("For 1 Hour", systemImage: "clock")
             }
 
             Button {
-                AppState.shared.hideNote(note, hiddenUntil: hideUntilTomorrowMorning())
+                let until = hideUntilTomorrowMorning()
+                for n in contextTargets {
+                    AppState.shared.hideNote(n, hiddenUntil: until)
+                }
             } label: {
                 Label("Until Tomorrow", systemImage: "sunrise")
             }
 
             Button {
-                AppState.shared.hideNote(note, hiddenUntil: hideUntilNextWeekMorning())
+                let until = hideUntilNextWeekMorning()
+                for n in contextTargets {
+                    AppState.shared.hideNote(n, hiddenUntil: until)
+                }
             } label: {
                 Label("Until Next Week", systemImage: "calendar")
             }
@@ -518,15 +623,16 @@ struct NoteView: View {
         Button(role: .destructive) {
             handleDelete()
         } label: {
-            Label("Delete", systemImage: "trash")
+            Label(deleteMenuItemTitle, systemImage: "trash")
         }
     }
     
     @ViewBuilder
     private var deleteConfirmationButtons: some View {
         Button("Delete", role: .destructive) {
-            AppState.shared.deleteNote(self.note)
-            nsWindow?.close()
+            for n in contextTargets {
+                AppState.shared.deleteNote(n)
+            }
         }
         Button("Cancel", role: .cancel) {}
     }
@@ -571,8 +677,9 @@ struct NoteView: View {
         if confirmOnDelete {
             showConfirmation = true
         } else {
-            self.nsWindow?.close()
-            AppState.shared.deleteNote(note)
+            for n in contextTargets {
+                AppState.shared.deleteNote(n)
+            }
         }
     }
 
@@ -652,6 +759,9 @@ struct NoteView: View {
         }
         if !note.isMinimized {
             updateWindowSize()
+        }
+        if !isEditing {
+            refreshMarkdownLinkPresenceForTooltip()
         }
     }
     

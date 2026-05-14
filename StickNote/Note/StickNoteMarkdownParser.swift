@@ -49,6 +49,23 @@ struct StickNoteMarkdownParser: MarkupParser {
         singleNewlinesAsHardBreaksPreservingBlankLines(gfmTaskListsPreservingCodeFences(input))
     }
 
+    /// True when parsed markdown includes at least one hyperlink (inline, autolink, etc.).
+    static func containsRenderableLink(in input: String) -> Bool {
+        guard quickPlausibleMarkdownLinkSyntax(in: input) else { return false }
+        let parser = StickNoteMarkdownParser()
+        guard let attributed = try? parser.attributedString(for: input) else { return false }
+        return attributed.runs.contains { $0.link != nil }
+    }
+
+    /// Cheap filter before running the markdown parser (used for tooltips and hover hints).
+    private static func quickPlausibleMarkdownLinkSyntax(in s: String) -> Bool {
+        if s.contains("](") { return true }
+        if s.contains("<http") || s.contains("<https") || s.contains("<mailto") { return true }
+        if s.contains("https://") || s.contains("http://") { return true }
+        if s.contains("www.") { return true }
+        return false
+    }
+
     /// Converts GFM task list lines to plain lines with checkbox glyphs so list bullets are not doubled in Textual.
     /// Skips regions between triple-backtick fences so fenced code is unchanged.
     private static func gfmTaskListsPreservingCodeFences(_ s: String) -> String {

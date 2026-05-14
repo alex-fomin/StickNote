@@ -4,6 +4,16 @@ import SwiftUI
 
 /// Presents ``SettingsView`` in an `NSWindow` so Settings is available when the menu bar extra is hidden
 /// and when opening from `applicationShouldHandleReopen`.
+private final class SettingsHostWindow: NSWindow {
+    override func performKeyEquivalent(with event: NSEvent) -> Bool {
+        if event.stickNote_isCommandPlainN {
+            AppState.shared.openNewNote()
+            return true
+        }
+        return super.performKeyEquivalent(with: event)
+    }
+}
+
 @MainActor
 final class SettingsWindowController {
     static let shared = SettingsWindowController()
@@ -29,7 +39,7 @@ final class SettingsWindowController {
             height: SettingsWindowMetrics.height
         )
 
-        let w = NSWindow(
+        let w = SettingsHostWindow(
             contentRect: NSRect(origin: .zero, size: size),
             styleMask: [.titled, .closable, .miniaturizable],
             backing: .buffered,

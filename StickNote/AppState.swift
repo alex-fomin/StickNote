@@ -65,16 +65,24 @@ final class AppState {
     }
 
     func openNewNote() {
+        if !Thread.isMainThread {
+            DispatchQueue.main.async { self.openNewNote() }
+            return
+        }
         let note = Note(layout: getDefaultLayout())
         note.showOnAllSpaces = Defaults[.showOnAllSpaces]
         self.context.insert(note)
-       
-        
+
         self.openNote(note, isEditing: true)
+        replaceSelection(with: note)
         NSApp.activate(ignoringOtherApps: true)
     }
 
     func openNewNoteFromClipboard() {
+        if !Thread.isMainThread {
+            DispatchQueue.main.async { self.openNewNoteFromClipboard() }
+            return
+        }
         if let pngData = NoteClipboardImage.exportPastedImageToPNGData() {
             let note = Note(layout: getDefaultLayout(), text: "Image")
             note.isImageNote = true
@@ -346,6 +354,27 @@ final class AppState {
         }
     }
 
+    /// Concatenates several notes as plain text (image notes become a short placeholder line).
+    @MainActor
+    func copyNotesToClipboard(_ notes: [Note]) {
+        guard let first = notes.first else { return }
+        if notes.count == 1 {
+            copyToClipboard(first)
+            return
+        }
+        let pasteboard = NSPasteboard.general
+        pasteboard.clearContents()
+        let separator = "\n\n────────\n\n"
+        let combined = notes.map { n -> String in
+            if n.isImageNote {
+                let label = n.text.trimmingCharacters(in: .whitespacesAndNewlines)
+                return label.isEmpty ? "[Image]" : "[Image: \(label)]"
+            }
+            return n.text
+        }.joined(separator: separator)
+        pasteboard.setString(combined, forType: .string)
+    }
+
     @MainActor
     func presentSystemShare(for note: Note, anchorWindow: NSWindow? = nil) {
         let items: [Any]
@@ -365,6 +394,28 @@ final class AppState {
             width: 1,
             height: 1
         )
+        let picker = NSSharingServicePicker(items: items)
+        picker.show(relativeTo: rect, of: view, preferredEdge: .minY)
+    }
+
+    @MainActor
+    func presentSystemShare(forNotes notes: [Note], anchorWindow: NSWindow? = nil) {
+        guard let first = notes.first else { return }
+        if notes.count == 1 {
+            presentSystemShare(for: first, anchorWindow: anchorWindow)
+            return
+        }
+        var items: [Any] = []
+        for n in notes {
+            if n.isImageNote, let data = n.imageData, let image = NSImage(data: data) {
+                items.append(image)
+            } else {
+                items.append(n.text as NSString)
+            }
+        }
+        let window = anchorWindow ?? NSApp.keyWindow
+        guard let view = window?.contentView else { return }
+        let rect = NSRect(x: view.bounds.midX, y: view.bounds.midY, width: 1, height: 1)
         let picker = NSSharingServicePicker(items: items)
         picker.show(relativeTo: rect, of: view, preferredEdge: .minY)
     }
@@ -445,6 +496,10 @@ final class AppState {
     }
 
     func toggleNotesVisibility() {
+        if !Thread.isMainThread {
+            DispatchQueue.main.async { self.toggleNotesVisibility() }
+            return
+        }
         if !model.isNotesHidden {
             clearSelection()
         }
@@ -507,6 +562,29 @@ final class AppState {
         model.selectedNoteIDs = model.selectedNoteIDs.intersection(openIDs)
     }
 
+    /// When several floating notes are selected and the user acts on one of them, menu commands apply to every selected open note. Otherwise only `anchorNote`.
+    func notesTargetedForContextMenu(anchorNote: Note) -> [Note] {
+        pruneSelectionForClosedWindows()
+        let ordered = orderedSelectedNotesFrontToBack()
+        guard ordered.count > 1,
+            model.selectedNoteIDs.contains(anchorNote.persistentModelID)
+        else {
+            return [anchorNote]
+        }
+        return ordered
+    }
+
+    func deleteConfirmationMessage(anchorNote: Note) -> String {
+        let targets = notesTargetedForContextMenu(anchorNote: anchorNote)
+        if targets.count > 1 {
+            return "Are you sure you want to delete \(targets.count) notes?"
+        }
+        if anchorNote.isImageNote {
+            return "Delete this image note?"
+        }
+        return #"Are you sure you want to delete "\#(anchorNote.text.truncate(15))"?"#
+    }
+
     func replaceSelection(with note: Note) {
         model.selectedNoteIDs = [note.persistentModelID]
     }
@@ -549,7 +627,7 @@ final class AppState {
         pruneSelectionForClosedWindows()
         let ordered = orderedSelectedNotesFrontToBack()
         guard ordered.count >= 2 else { return false }
-        return !ordered.contains { $0.isImageNote }
+        return !ordered.contains(where: { $0.isImageNote })
     }
 
     /// Presents a confirmation alert, then merges selected windows into one note.
@@ -605,6 +683,6 @@ extension Notification.Name {
     public var isNotesHidden: Bool = false
     public var notesCount: Int = 0
     public var noteListRevealHiddenToken: Int = 0
-    /// Note windows in the current multi-selection (e.g. Command-click on non-text chrome).
+    /// Note windows in the current multi-selection (e.g. Shift-click on non-text chrome).
     public var selectedNoteIDs: Set<Note.ID> = []
 }

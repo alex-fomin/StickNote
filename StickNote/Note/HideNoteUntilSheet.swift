@@ -24,23 +24,36 @@ private enum HideNoteUntilDefaults {
 struct HideNoteUntilSheet: View {
     @Environment(\.dismiss) private var dismiss
 
-    let note: Note
+    private let notes: [Note]
     private let onDidScheduleHide: (() -> Void)?
     @State private var chosenDate: Date
 
-    init(note: Note, onDidScheduleHide: (() -> Void)? = nil) {
-        self.note = note
+    init(notes: [Note], onDidScheduleHide: (() -> Void)? = nil) {
+        precondition(!notes.isEmpty)
+        self.notes = notes
         self.onDidScheduleHide = onDidScheduleHide
         _chosenDate = State(initialValue: HideNoteUntilDefaults.initialPickerDate())
+    }
+
+    init(note: Note, onDidScheduleHide: (() -> Void)? = nil) {
+        self.init(notes: [note], onDidScheduleHide: onDidScheduleHide)
     }
 
     private var isValid: Bool {
         chosenDate > Date.now
     }
 
+    private var sheetTitle: String {
+        notes.count > 1 ? "Hide \(notes.count) notes until later" : "Hide until later"
+    }
+
+    private var confirmButtonTitle: String {
+        notes.count > 1 ? "Hide \(notes.count) notes" : "Hide note"
+    }
+
     var body: some View {
         VStack(alignment: .center, spacing: 12) {
-            Text("Hide until later")
+            Text(sheetTitle)
                 .font(.headline)
                 .multilineTextAlignment(.center)
 
@@ -82,8 +95,10 @@ struct HideNoteUntilSheet: View {
                     dismiss()
                 }
                 .keyboardShortcut(.cancelAction)
-                Button("Hide note") {
-                    AppState.shared.hideNote(note, hiddenUntil: chosenDate)
+                Button(confirmButtonTitle) {
+                    for n in notes {
+                        AppState.shared.hideNote(n, hiddenUntil: chosenDate)
+                    }
                     onDidScheduleHide?()
                     dismiss()
                 }

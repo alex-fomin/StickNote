@@ -65,6 +65,12 @@ struct StickNoteApp: App {
         .modelContext(AppState.shared.context)
         .commands {
             CommandGroup(replacing: .appInfo) { }
+            CommandGroup(after: .appInfo) {
+                Button("New Note") {
+                    AppState.shared.openNewNote()
+                }
+                .keyboardShortcut("n", modifiers: .command)
+            }
         }
         
         Window("Note list", id: "note-list") {

@@ -8,14 +8,23 @@ struct LayoutMenu: View {
     @Query(sort: \NoteLayout.name) var layouts: [NoteLayout]
 
     @Binding var note: Note
+    /// When set with more than one note, choosing a layout applies it to each note (multi-selected floating notes).
+    var bulkApplyTargets: [Note]? = nil
+
+    private var notesToApplyLayout: [Note] {
+        if let bulk = bulkApplyTargets, bulk.count > 1 { return bulk }
+        return [note]
+    }
 
     var body: some View {
         VStack {
             ForEach(layouts.sorted { a, b in a.isDefault }, id: \.self) { layout in
                 Button {
-                    note.apply(layout: layout)
+                    for n in notesToApplyLayout {
+                        n.apply(layout: layout)
+                    }
                 } label: {
-                    let sameLayout = note.isSameAppearance(layout)
+                    let sameLayout = notesToApplyLayout.allSatisfy { $0.isSameAppearance(layout) }
                     let swatch = NoteDisplayColors.displayColors(
                         storedBgHex: layout.color,
                         storedFgHex: layout.fontColor,

@@ -5,7 +5,15 @@ class NoteWindow: NSWindow {
     var note: Note?
     @Default(.confirmOnDelete) var confirmOnDelete
 
-    /// True if `view` or any ancestor is an ``NSTextView`` (so Command+click stays for text selection).
+    override func performKeyEquivalent(with event: NSEvent) -> Bool {
+        if event.stickNote_isCommandPlainN {
+            AppState.shared.openNewNote()
+            return true
+        }
+        return super.performKeyEquivalent(with: event)
+    }
+
+    /// True if `view` or any ancestor is an ``NSTextView`` (so Shift+click multi-select skips the editor).
     private static func viewHierarchyContainsTextView(_ view: NSView?) -> Bool {
         var v: NSView? = view
         while let cur = v {
@@ -27,7 +35,10 @@ class NoteWindow: NSWindow {
             let inTextEditor = Self.viewHierarchyContainsTextView(hitView)
             let flags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
 
+            // Command+click: no selection change so link handling (Textual / openURL) can run unobstructed.
             if flags.contains(.command) {
+                // intentionally no selection update
+            } else if flags.contains(.shift) {
                 if !inTextEditor {
                     AppState.shared.toggleSelection(for: note)
                 }
@@ -42,22 +53,24 @@ class NoteWindow: NSWindow {
         guard let note = note else { return }
         if event.keyCode == 117 || (event.keyCode == 51 && isCmd(event)) // fn+delete || cmd+delete
         {
+            let targets = AppState.shared.notesTargetedForContextMenu(anchorNote: note)
             if confirmOnDelete {
                 let alert: NSAlert = NSAlert()
-                alert.messageText =
-                    #"Are you sure you want to delete "\#(note.text.truncate(15))"?"#
+                alert.messageText = AppState.shared.deleteConfirmationMessage(anchorNote: note)
                 alert.alertStyle = .warning
 
                 alert.addButton(withTitle: "Delete")
                 alert.addButton(withTitle: "Cancel")
                 let res = alert.runModal()
                 if res == .alertFirstButtonReturn {
-                    self.close()
-                    AppState.shared.deleteNote(note)
+                    for n in targets {
+                        AppState.shared.deleteNote(n)
+                    }
                 }
             } else {
-                self.close()
-                AppState.shared.deleteNote(note)
+                for n in targets {
+                    AppState.shared.deleteNote(n)
+                }
             }
         } else if event.keyCode == 8 && isCmd(event)  // Cmd+c
         {
