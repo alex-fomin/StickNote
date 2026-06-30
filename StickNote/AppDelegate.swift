@@ -31,6 +31,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         AppState.shared.processDueScheduledUnhides()
         AppState.shared.openAllNotes()
+        FullscreenAppMonitor.shared.start()
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {

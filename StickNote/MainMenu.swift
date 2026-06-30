@@ -42,7 +42,7 @@ struct MainMenu: View {
                 openWindow(id: "note-list")
             }
             Divider()
-            Button(model.isNotesHidden ? "Show notes" : "Hide notes") {
+            Button(model.areNotesEffectivelyHidden ? "Show notes" : "Hide notes") {
                 AppState.shared.toggleNotesVisibility()
             }
             .keyboardShortcut(

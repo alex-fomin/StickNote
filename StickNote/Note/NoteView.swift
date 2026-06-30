@@ -607,8 +607,8 @@ struct NoteView: View {
                 AppState.shared.toggleNotesVisibility()
             } label: {
                 Label(
-                    appStateModel.isNotesHidden ? "Show notes" : "Hide notes",
-                    systemImage: appStateModel.isNotesHidden ? "eye" : "eye.slash"
+                    appStateModel.areNotesEffectivelyHidden ? "Show notes" : "Hide notes",
+                    systemImage: appStateModel.areNotesEffectivelyHidden ? "eye" : "eye.slash"
                 )
             }
             Divider()

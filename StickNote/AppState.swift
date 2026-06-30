@@ -167,6 +167,8 @@ final class AppState {
         try? context.save()
         self.updateNotesCount()
         self.windows.append(window);
+
+        applyFullscreenSuppressionToOpenWindowsIfNeeded()
     }
 
     /// Initial window frame. Uses saved markdown size or measured text instead of a 10×10 stub
@@ -500,17 +502,65 @@ final class AppState {
             DispatchQueue.main.async { self.toggleNotesVisibility() }
             return
         }
-        if !model.isNotesHidden {
+        let effectivelyHidden = model.areNotesEffectivelyHidden
+        if !effectivelyHidden {
             clearSelection()
         }
         for window in self.windows {
-            if model.isNotesHidden {
+            if effectivelyHidden {
                 window.orderFront(nil)
             } else {
                 window.orderOut(nil)
             }
         }
-        model.isNotesHidden = !model.isNotesHidden
+        model.isNotesHidden = effectivelyHidden ? false : true
+        model.suppressedByFullscreen = false
+    }
+
+    func updateFullscreenSuppression() {
+        if !Thread.isMainThread {
+            DispatchQueue.main.async { self.updateFullscreenSuppression() }
+            return
+        }
+        guard Defaults[.hideNotesWhenFullscreenApp] else {
+            restoreFromFullscreenSuppression()
+            return
+        }
+        if FullscreenAppDetector.isActiveFullscreenAppPresent() {
+            suppressForFullscreenIfNeeded()
+        } else {
+            restoreFromFullscreenSuppression()
+        }
+    }
+
+    private func suppressForFullscreenIfNeeded() {
+        guard !model.isNotesHidden else { return }
+        guard !model.suppressedByFullscreen else { return }
+        for window in windows {
+            window.orderOut(nil)
+        }
+        model.suppressedByFullscreen = true
+    }
+
+    private func restoreFromFullscreenSuppression() {
+        guard model.suppressedByFullscreen else { return }
+        model.suppressedByFullscreen = false
+        if !model.isNotesHidden {
+            for window in windows {
+                window.orderFront(nil)
+            }
+        }
+    }
+
+    private func applyFullscreenSuppressionToOpenWindowsIfNeeded() {
+        guard Defaults[.hideNotesWhenFullscreenApp],
+              FullscreenAppDetector.isActiveFullscreenAppPresent(),
+              !model.isNotesHidden
+        else { return }
+        for window in windows {
+            window.orderOut(nil)
+        }
+        model.suppressedByFullscreen = true
     }
 
     func applyShowOnAllSpaces(note: Note) {
@@ -681,8 +731,14 @@ extension Notification.Name {
 
 @Observable class AppStateModel: ObservableObject {
     public var isNotesHidden: Bool = false
+    /// Temporary hide while another app is fullscreen (see Settings).
+    public var suppressedByFullscreen: Bool = false
     public var notesCount: Int = 0
     public var noteListRevealHiddenToken: Int = 0
     /// Note windows in the current multi-selection (e.g. Shift-click on non-text chrome).
     public var selectedNoteIDs: Set<Note.ID> = []
+
+    var areNotesEffectivelyHidden: Bool {
+        isNotesHidden || suppressedByFullscreen
+    }
 }

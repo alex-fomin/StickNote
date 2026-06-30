@@ -21,7 +21,7 @@ struct StickNoteApp: App {
             MainMenu()
                 .environment(appStateModel)
         } label: {
-            Image(systemName: (appStateModel.isNotesHidden ? "note" : "note.text"))
+            Image(systemName: (appStateModel.areNotesEffectivelyHidden ? "note" : "note.text"))
             if (showNotesCount){
                 Text(appStateModel.notesCount > 0 ? "\(appStateModel.notesCount)" : "")
             }
