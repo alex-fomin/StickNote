@@ -11,6 +11,7 @@ struct StickNoteApp: App {
     @StateObject private var appStateModel = AppState.shared.model
     @Default(.showNotesCount) var showNotesCount
     @Default(.showMenuBarIcon) var showMenuBarIcon
+    @Default(.appAppearance) private var appAppearanceRaw
     
     @State var isMenuExtraPresented: Bool = false
     
@@ -20,7 +21,7 @@ struct StickNoteApp: App {
             MainMenu()
                 .environment(appStateModel)
         } label: {
-            Image(systemName: (appStateModel.isNotesHidden ? "note" : "note.text"))
+            Image(systemName: (appStateModel.areNotesEffectivelyHidden ? "note" : "note.text"))
             if (showNotesCount){
                 Text(appStateModel.notesCount > 0 ? "\(appStateModel.notesCount)" : "")
             }
@@ -50,9 +51,13 @@ struct StickNoteApp: App {
                 .first
             {
                 NoteLayoutView(note: note)
+                    .preferredColorScheme(
+                        (AppAppearancePreference(rawValue: appAppearanceRaw) ?? .system)
+                            .preferredColorScheme
+                    )
                     .frame(
-                        minWidth: 400, maxWidth: 400,
-                        minHeight: 200, maxHeight: 200)
+                        minWidth: 420, maxWidth: 420,
+                        minHeight: 340, maxHeight: 420)
             }
         }
         .windowResizability(.contentSize)
@@ -60,6 +65,12 @@ struct StickNoteApp: App {
         .modelContext(AppState.shared.context)
         .commands {
             CommandGroup(replacing: .appInfo) { }
+            CommandGroup(after: .appInfo) {
+                Button("New Note") {
+                    AppState.shared.openNewNote()
+                }
+                .keyboardShortcut("n", modifiers: .command)
+            }
         }
         
         Window("Note list", id: "note-list") {

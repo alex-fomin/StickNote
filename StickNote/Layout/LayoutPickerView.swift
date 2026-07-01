@@ -4,6 +4,7 @@ struct LayoutPickerView: View {
     var title: LocalizedStringKey
     @Binding var selectedLayout: NoteLayout?
     var layouts: [NoteLayout]
+    @Environment(\.colorScheme) private var colorScheme
 
     init(_ title: LocalizedStringKey, selectedLayout: Binding<NoteLayout?>, layouts: [NoteLayout]) {
         self.title = title
@@ -14,14 +15,19 @@ struct LayoutPickerView: View {
         return Picker(title, selection: $selectedLayout) {
             ForEach(layouts) { layout in
                 let nsFont = layout.nsFont.withSize(NSFont.systemFontSize)
+                let swatch = NoteDisplayColors.displayColors(
+                    storedBgHex: layout.color,
+                    storedFgHex: layout.fontColor,
+                    colorScheme: colorScheme
+                )
 
                 HStack {
                     Image(
                         systemName: "square.fill"
                     )
                     .foregroundStyle(
-                        Color.fromString(layout.color),
-                        Color.fromString(layout.color))
+                        swatch.background,
+                        swatch.background)
 
                     Text(layout.name)
                         .font(Font(nsFont))

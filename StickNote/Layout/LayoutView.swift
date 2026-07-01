@@ -20,6 +20,7 @@ struct LayoutInfo: Hashable {
 
 struct LayoutView: View {
     @Environment(\.modelContext) var modelContext
+    @Environment(\.colorScheme) private var colorScheme
     @Query var layouts: [NoteLayout]
 
     @State var info: NoteAppearance
@@ -34,6 +35,14 @@ struct LayoutView: View {
 
     @State var newLayoutName: String = ""
 
+    private var layoutPreviewDisplayColors: (background: Color, foreground: Color) {
+        NoteDisplayColors.displayColors(
+            storedBgHex: color.toHex(),
+            storedFgHex: fontColor.toHex(),
+            colorScheme: colorScheme
+        )
+    }
+
     init(info: NoteAppearance, text: String? = nil) {
         self.info = info
         self.font = info.nsFont
@@ -46,66 +55,81 @@ struct LayoutView: View {
     }
 
     var body: some View {
-        Form {
-            HStack(alignment: .center) {
-                VStack(alignment: .trailing) {
-                    FontPicker("Font", selection: $font)
-                    ColorPicker("Background", selection: $color)
-                    ColorPicker("Font color", selection: $fontColor)
+        VStack(alignment: .leading, spacing: 10) {
+            Form {
+                HStack(alignment: .center) {
+                    VStack(alignment: .trailing) {
+                        FontPicker("Font", selection: $font)
+                        ColorPicker("Background", selection: $color)
+                        ColorPicker("Font color", selection: $fontColor)
+                    }
+                    Text(text)
+                        .font(Font(font))
+                        .foregroundStyle(layoutPreviewDisplayColors.foreground)
+                        .background(layoutPreviewDisplayColors.background)
+                        .padding(.all)
+                        .frame(maxWidth: 200, maxHeight: 150)
                 }
-                Text(text)
-                    .font(Font(font))
-                    .foregroundStyle(fontColor)
-                    .background(color)
-                    .padding(.all)
-                    .frame(maxWidth: 200, maxHeight: 150)
-            }
-            HStack(alignment: .bottom) {
-                Picker("Save as layout", selection: $selectedLayoutIndex) {
-                    ForEach(self.layouts.indices, id: \.self) {
-                        let layout = self.layouts[$0]
-                        HStack {
-                            Image(
-                                systemName: "square.fill"
-                            )
-                            .foregroundStyle(
-                                Color.fromString(layout.color),
-                                Color.fromString(layout.color))
-                            Text(layout.name)
+                HStack(alignment: .bottom) {
+                    Picker("Save as layout", selection: $selectedLayoutIndex) {
+                        ForEach(self.layouts.indices, id: \.self) {
+                            let layout = self.layouts[$0]
+                            HStack {
+                                let swatch = NoteDisplayColors.displayColors(
+                                    storedBgHex: layout.color,
+                                    storedFgHex: layout.fontColor,
+                                    colorScheme: colorScheme
+                                )
+                                Image(
+                                    systemName: "square.fill"
+                                )
+                                .foregroundStyle(
+                                    swatch.background,
+                                    swatch.background)
+                                Text(layout.name)
+                            }
+                        }
+                        Text("New...").tag(Int.max)
+                    }
+                    Button("Save layout") {
+                        if $selectedLayoutIndex.wrappedValue < Int.max {
+                            let layout = self.layouts[$selectedLayoutIndex.wrappedValue]
+
+                            layout.fontName = $font.wrappedValue.fontName
+                            layout.fontSize = $font.wrappedValue.pointSize
+                            layout.color = $color.wrappedValue.toHex()
+                            layout.fontColor = $fontColor.wrappedValue.toHex()
+                            try? self.modelContext.save()
+                        } else {
+                            showingAlert = true
                         }
                     }
-                    Text("New...").tag(Int.max)
-                }
-                Button("Save layout") {
-                    if $selectedLayoutIndex.wrappedValue < Int.max {
-                        let layout = self.layouts[$selectedLayoutIndex.wrappedValue]
+                    .alert("Enter layout name", isPresented: $showingAlert) {
+                        TextField("Enter layout name", text: $newLayoutName)
+                        Button("Save") {
+                            let layout = NoteLayout(
+                                name: $newLayoutName.wrappedValue,
+                                color: $color.wrappedValue.toHex(),
+                                fontName: $font.wrappedValue.fontName,
+                                fontSize: $font.wrappedValue.pointSize,
+                                fontColor: $fontColor.wrappedValue.toHex())
 
-                        layout.fontName = $font.wrappedValue.fontName
-                        layout.fontSize = $font.wrappedValue.pointSize
-                        layout.color = $color.wrappedValue.toHex()
-                        layout.fontColor = $fontColor.wrappedValue.toHex()
-                        try? self.modelContext.save()
-                    } else {
-                        showingAlert = true
+                            self.modelContext.insert(layout)
+                            try? self.modelContext.save()
+                            selectedLayoutIndex = layouts.count - 1
+                        }
                     }
+                    .disabled($selectedLayoutIndex.wrappedValue < 0)
                 }
-                .alert("Enter layout name", isPresented: $showingAlert) {
-                    TextField("Enter layout name", text: $newLayoutName)
-                    Button("Save") {
-                        let layout = NoteLayout(
-                            name: $newLayoutName.wrappedValue,
-                            color: $color.wrappedValue.toHex(),
-                            fontName: $font.wrappedValue.fontName,
-                            fontSize: $font.wrappedValue.pointSize,
-                            fontColor: $fontColor.wrappedValue.toHex())
-
-                        self.modelContext.insert(layout)
-                        try? self.modelContext.save()
-                        selectedLayoutIndex = layouts.count - 1
-                    }
-                }
-                .disabled($selectedLayoutIndex.wrappedValue < 0)
             }
+            .formStyle(.grouped)
+
+            Text(
+                "In dark mode, on-screen note colors are adjusted for readability. Saved layout colors are stored unchanged."
+            )
+            .font(.caption)
+            .foregroundStyle(.secondary)
+            .fixedSize(horizontal: false, vertical: true)
         }
         .padding()
         .onChange(of: font) { _, newValue in

@@ -17,6 +17,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationWillFinishLaunching(_ notification: Notification) {
         Self.shared = self
 
+        AppAppearance.applyFromDefaults()
+
         KeyboardShortcuts.onKeyUp(for: .createNote) {
             AppState.shared.openNewNote()
         }
@@ -29,6 +31,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         AppState.shared.processDueScheduledUnhides()
         AppState.shared.openAllNotes()
+        FullscreenAppMonitor.shared.start()
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -38,6 +41,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             AppState.shared.presentSettingsWindow()
             Defaults[.hasCompletedFirstLaunch] = true
         }
+    }
+
+    func applicationDidResignActive(_ notification: Notification) {
+        AppState.shared.clearSelection()
     }
 
     /// If the key was never written, treat installs that already have notes as not first launch (app upgrade).

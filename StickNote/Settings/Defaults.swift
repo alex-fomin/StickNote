@@ -13,4 +13,9 @@ extension Defaults.Keys {
     static let wrapLongLinesAfterPaste = Key<Bool>("wrap-long-lines-after-paste", default: false)
     static let showNotesCount = Key<Bool>("show-notes-count", default: true)
     static let showMenuBarIcon = Key<Bool>("show-menu-bar-icon", default: true)
+    /// Hides floating notes while another app is in native fullscreen on the active space.
+    static let hideNotesWhenFullscreenApp = Key<Bool>("hide-notes-when-fullscreen-app", default: false)
+
+    /// `system` | `light` | `dark` — drives `NSApp.appearance` via ``AppAppearance``.
+    static let appAppearance = Key<String>("app-appearance", default: "system")
 }

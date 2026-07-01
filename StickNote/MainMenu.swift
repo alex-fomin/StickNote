@@ -6,6 +6,11 @@ struct MainMenu: View {
     @Environment(\.openWindow) private var openWindow
     @Environment(AppStateModel.self) private var model
 
+    private var isMergeSelectedNotesDisabled: Bool {
+        _ = model.selectedNoteIDs
+        return !AppState.shared.canMergeSelectedNotes()
+    }
+
     var body: some View {
         Group {
             Button("New note") {
@@ -22,6 +27,10 @@ struct MainMenu: View {
             .keyboardShortcut(
                 KeyboardShortcuts.Shortcut(name: .createNoteFromClipboard)?.toKeyboardShortcut()
             )
+            Button("Merge selected notes…") {
+                AppState.shared.presentMergeSelectedNotesConfirmation()
+            }
+            .disabled(isMergeSelectedNotesDisabled)
             Divider()
             Button("Note list...") {
                 NSApp.activate(ignoringOtherApps: true)
@@ -33,7 +42,7 @@ struct MainMenu: View {
                 openWindow(id: "note-list")
             }
             Divider()
-            Button(model.isNotesHidden ? "Show notes" : "Hide notes") {
+            Button(model.areNotesEffectivelyHidden ? "Show notes" : "Hide notes") {
                 AppState.shared.toggleNotesVisibility()
             }
             .keyboardShortcut(

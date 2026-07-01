@@ -65,16 +65,24 @@ final class AppState {
     }
 
     func openNewNote() {
+        if !Thread.isMainThread {
+            DispatchQueue.main.async { self.openNewNote() }
+            return
+        }
         let note = Note(layout: getDefaultLayout())
         note.showOnAllSpaces = Defaults[.showOnAllSpaces]
         self.context.insert(note)
-       
-        
+
         self.openNote(note, isEditing: true)
+        replaceSelection(with: note)
         NSApp.activate(ignoringOtherApps: true)
     }
 
     func openNewNoteFromClipboard() {
+        if !Thread.isMainThread {
+            DispatchQueue.main.async { self.openNewNoteFromClipboard() }
+            return
+        }
         if let pngData = NoteClipboardImage.exportPastedImageToPNGData() {
             let note = Note(layout: getDefaultLayout(), text: "Image")
             note.isImageNote = true
@@ -134,7 +142,6 @@ final class AppState {
         note.window = window
 
         let contentView = NoteView(note: note, isEditing: effectiveEditing)
-            .preferredColorScheme(.light)
             .environment(\.modelContext, self.sharedModelContainer.mainContext)
             .environment(AppState.shared.model)
 
@@ -160,6 +167,8 @@ final class AppState {
         try? context.save()
         self.updateNotesCount()
         self.windows.append(window);
+
+        applyFullscreenSuppressionToOpenWindowsIfNeeded()
     }
 
     /// Initial window frame. Uses saved markdown size or measured text instead of a 10×10 stub
@@ -262,6 +271,7 @@ final class AppState {
     }
 
     func deleteNote(_ note: Note, forceDelete: Bool = false) {
+        removeNoteFromSelection(note)
         if let window = note.window {
             note.window = nil
             window.close()
@@ -294,6 +304,7 @@ final class AppState {
         if let until, until <= Date.now {
             return
         }
+        removeNoteFromSelection(note)
         let noteId = note.persistentModelID
         if let window = note.window ?? windows.first(where: { $0.note?.persistentModelID == noteId }) {
             note.window = nil
@@ -343,6 +354,72 @@ final class AppState {
         } else {
             pasteboard.setString(note.text, forType: .string)
         }
+    }
+
+    /// Concatenates several notes as plain text (image notes become a short placeholder line).
+    @MainActor
+    func copyNotesToClipboard(_ notes: [Note]) {
+        guard let first = notes.first else { return }
+        if notes.count == 1 {
+            copyToClipboard(first)
+            return
+        }
+        let pasteboard = NSPasteboard.general
+        pasteboard.clearContents()
+        let separator = "\n\n────────\n\n"
+        let combined = notes.map { n -> String in
+            if n.isImageNote {
+                let label = n.text.trimmingCharacters(in: .whitespacesAndNewlines)
+                return label.isEmpty ? "[Image]" : "[Image: \(label)]"
+            }
+            return n.text
+        }.joined(separator: separator)
+        pasteboard.setString(combined, forType: .string)
+    }
+
+    @MainActor
+    func presentSystemShare(for note: Note, anchorWindow: NSWindow? = nil) {
+        let items: [Any]
+        if note.isImageNote {
+            guard let data = note.imageData, let image = NSImage(data: data) else { return }
+            items = [image]
+        } else {
+            items = [note.text as NSString]
+        }
+
+        let window = anchorWindow ?? NSApp.keyWindow
+        guard let view = window?.contentView else { return }
+
+        let rect = NSRect(
+            x: view.bounds.midX,
+            y: view.bounds.midY,
+            width: 1,
+            height: 1
+        )
+        let picker = NSSharingServicePicker(items: items)
+        picker.show(relativeTo: rect, of: view, preferredEdge: .minY)
+    }
+
+    @MainActor
+    func presentSystemShare(forNotes notes: [Note], anchorWindow: NSWindow? = nil) {
+        guard let first = notes.first else { return }
+        if notes.count == 1 {
+            presentSystemShare(for: first, anchorWindow: anchorWindow)
+            return
+        }
+        var items: [Any] = []
+        for n in notes {
+            if n.isImageNote, let data = n.imageData, let image = NSImage(data: data) {
+                items.append(image)
+            } else {
+                items.append(n.text as NSString)
+            }
+        }
+        let window = anchorWindow ?? NSApp.keyWindow
+        guard let view = window?.contentView else { return }
+        let rect = NSRect(x: view.bounds.midX, y: view.bounds.midY, width: 1, height: 1)
+        let picker = NSSharingServicePicker(items: items)
+        picker.show(relativeTo: rect, of: view, preferredEdge: .minY)
     }
 
     func exportNoteToFile(_ note: Note) {
@@ -421,15 +498,69 @@ final class AppState {
     }
 
     func toggleNotesVisibility() {
-       
+        if !Thread.isMainThread {
+            DispatchQueue.main.async { self.toggleNotesVisibility() }
+            return
+        }
+        let effectivelyHidden = model.areNotesEffectivelyHidden
+        if !effectivelyHidden {
+            clearSelection()
+        }
         for window in self.windows {
-            if model.isNotesHidden {
+            if effectivelyHidden {
                 window.orderFront(nil)
             } else {
                 window.orderOut(nil)
             }
         }
-        model.isNotesHidden = !model.isNotesHidden
+        model.isNotesHidden = effectivelyHidden ? false : true
+        model.suppressedByFullscreen = false
+    }
+
+    func updateFullscreenSuppression() {
+        if !Thread.isMainThread {
+            DispatchQueue.main.async { self.updateFullscreenSuppression() }
+            return
+        }
+        guard Defaults[.hideNotesWhenFullscreenApp] else {
+            restoreFromFullscreenSuppression()
+            return
+        }
+        if FullscreenAppDetector.isActiveFullscreenAppPresent() {
+            suppressForFullscreenIfNeeded()
+        } else {
+            restoreFromFullscreenSuppression()
+        }
+    }
+
+    private func suppressForFullscreenIfNeeded() {
+        guard !model.isNotesHidden else { return }
+        guard !model.suppressedByFullscreen else { return }
+        for window in windows {
+            window.orderOut(nil)
+        }
+        model.suppressedByFullscreen = true
+    }
+
+    private func restoreFromFullscreenSuppression() {
+        guard model.suppressedByFullscreen else { return }
+        model.suppressedByFullscreen = false
+        if !model.isNotesHidden {
+            for window in windows {
+                window.orderFront(nil)
+            }
+        }
+    }
+
+    private func applyFullscreenSuppressionToOpenWindowsIfNeeded() {
+        guard Defaults[.hideNotesWhenFullscreenApp],
+              FullscreenAppDetector.isActiveFullscreenAppPresent(),
+              !model.isNotesHidden
+        else { return }
+        for window in windows {
+            window.orderOut(nil)
+        }
+        model.suppressedByFullscreen = true
     }
 
     func applyShowOnAllSpaces(note: Note) {
@@ -462,6 +593,134 @@ final class AppState {
         SettingsWindowController.shared.present()
     }
 
+    // MARK: - Multi-select (floating note windows)
+
+    func clearSelection() {
+        model.selectedNoteIDs = []
+    }
+
+    func removeNoteFromSelection(_ note: Note) {
+        let id = note.persistentModelID
+        if model.selectedNoteIDs.contains(id) {
+            model.selectedNoteIDs = model.selectedNoteIDs.subtracting([id])
+        }
+    }
+
+    /// Drops IDs that no longer have an open note window.
+    func pruneSelectionForClosedWindows() {
+        let openIDs = Set(windows.compactMap { $0.note?.persistentModelID })
+        model.selectedNoteIDs = model.selectedNoteIDs.intersection(openIDs)
+    }
+
+    /// When several floating notes are selected and the user acts on one of them, menu commands apply to every selected open note. Otherwise only `anchorNote`.
+    func notesTargetedForContextMenu(anchorNote: Note) -> [Note] {
+        pruneSelectionForClosedWindows()
+        let ordered = orderedSelectedNotesFrontToBack()
+        guard ordered.count > 1,
+            model.selectedNoteIDs.contains(anchorNote.persistentModelID)
+        else {
+            return [anchorNote]
+        }
+        return ordered
+    }
+
+    func deleteConfirmationMessage(anchorNote: Note) -> String {
+        let targets = notesTargetedForContextMenu(anchorNote: anchorNote)
+        if targets.count > 1 {
+            return "Are you sure you want to delete \(targets.count) notes?"
+        }
+        if anchorNote.isImageNote {
+            return "Delete this image note?"
+        }
+        return #"Are you sure you want to delete "\#(anchorNote.text.truncate(15))"?"#
+    }
+
+    func replaceSelection(with note: Note) {
+        model.selectedNoteIDs = [note.persistentModelID]
+    }
+
+    func toggleSelection(for note: Note) {
+        let id = note.persistentModelID
+        if model.selectedNoteIDs.contains(id) {
+            model.selectedNoteIDs = model.selectedNoteIDs.subtracting([id])
+        } else {
+            model.selectedNoteIDs = model.selectedNoteIDs.union([id])
+        }
+    }
+
+    /// Selected notes with open windows, **front-to-back** (first = frontmost).
+    private func orderedSelectedNotesFrontToBack() -> [Note] {
+        pruneSelectionForClosedWindows()
+        let idSet = model.selectedNoteIDs
+        var ordered: [Note] = []
+        for w in NSApp.windows.reversed() {
+            guard let nw = w as? NoteWindow, let n = nw.note, idSet.contains(n.persistentModelID) else {
+                continue
+            }
+            ordered.append(n)
+        }
+        return ordered
+    }
+
+    private func mergeSurvivorNote(orderedFrontToBack: [Note]) -> Note? {
+        guard let first = orderedFrontToBack.first else { return nil }
+        if let keyWin = NSApp.keyWindow as? NoteWindow,
+            let keyNote = keyWin.note,
+            orderedFrontToBack.contains(where: { $0.persistentModelID == keyNote.persistentModelID })
+        {
+            return keyNote
+        }
+        return first
+    }
+
+    func canMergeSelectedNotes() -> Bool {
+        pruneSelectionForClosedWindows()
+        let ordered = orderedSelectedNotesFrontToBack()
+        guard ordered.count >= 2 else { return false }
+        return !ordered.contains(where: { $0.isImageNote })
+    }
+
+    /// Presents a confirmation alert, then merges selected windows into one note.
+    func presentMergeSelectedNotesConfirmation() {
+        pruneSelectionForClosedWindows()
+        guard canMergeSelectedNotes() else { return }
+
+        let ordered = orderedSelectedNotesFrontToBack()
+        guard ordered.count >= 2, let survivor = mergeSurvivorNote(orderedFrontToBack: ordered) else {
+            return
+        }
+        let others = ordered.filter { $0.persistentModelID != survivor.persistentModelID }
+
+        let alert = NSAlert()
+        alert.messageText = "Merge \(ordered.count) notes into one?"
+        alert.informativeText =
+            "Text from the other notes will be appended to the note you keep. Other notes will be moved to the Trash or deleted permanently, depending on your settings."
+        alert.alertStyle = .informational
+        alert.addButton(withTitle: "Merge")
+        alert.addButton(withTitle: "Cancel")
+        let choice = alert.runModal()
+        guard choice == .alertFirstButtonReturn else { return }
+
+        mergeNotes(survivor: survivor, sourcesToAppend: others)
+    }
+
+    /// Concatenates `sourcesToAppend` onto `survivor`, then deletes each source via ``deleteNote``.
+    func mergeNotes(survivor: Note, sourcesToAppend: [Note]) {
+        guard !sourcesToAppend.isEmpty else { return }
+        var combined = survivor.text
+        for s in sourcesToAppend {
+            combined += "\n\n" + s.text
+        }
+        survivor.text = combined
+        survivor.applyLikelyMarkdownFlagFromContent()
+        for s in sourcesToAppend {
+            deleteNote(s)
+        }
+        clearSelection()
+        survivor.window?.orderFront(nil)
+        NSApplication.shared.activate(ignoringOtherApps: true)
+    }
+
     var model: AppStateModel = AppStateModel()
 }
 
@@ -472,6 +731,14 @@ extension Notification.Name {
 
 @Observable class AppStateModel: ObservableObject {
     public var isNotesHidden: Bool = false
+    /// Temporary hide while another app is fullscreen (see Settings).
+    public var suppressedByFullscreen: Bool = false
     public var notesCount: Int = 0
     public var noteListRevealHiddenToken: Int = 0
+    /// Note windows in the current multi-selection (e.g. Shift-click on non-text chrome).
+    public var selectedNoteIDs: Set<Note.ID> = []
+
+    var areNotesEffectivelyHidden: Bool {
+        isNotesHidden || suppressedByFullscreen
+    }
 }

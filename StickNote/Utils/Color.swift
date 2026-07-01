@@ -80,7 +80,6 @@ extension NSColor {
         let green = Double((hexNumber & 0x00FF00) >> 8) / 255.0
         let blue = Double(hexNumber & 0x0000FF) / 255.0
 
-        // Initialize the Color
-        return NSColor(red: red, green: green, blue: blue, alpha: 0.0)
+        return NSColor(red: red, green: green, blue: blue, alpha: 1.0)
     }
 }
