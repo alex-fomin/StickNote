@@ -112,6 +112,46 @@ final class AppState {
         }
     }
 
+    /// Appends clipboard string to the most recently updated non-image note (new line).
+    func appendClipboardToLatestEditedNote() {
+        guard let text = NSPasteboard.general.string(forType: .string), !text.isEmpty else { return }
+
+        var content = text
+        if trimAfterPaste {
+            content = content.trimmingNoteWhitespace()
+        }
+        if wrapLongLinesAfterPaste {
+            content = content.wrappingLongLinesAtWordBoundaries()
+        }
+        guard !content.isEmpty else { return }
+
+        var descriptor = FetchDescriptor<Note>(
+            predicate: #Predicate { $0.isInTrashBin == false && $0.isImageNote == false },
+            sortBy: [SortDescriptor(\.updatedAt, order: .reverse)]
+        )
+        descriptor.fetchLimit = 1
+        guard let note = try? context.fetch(descriptor).first else { return }
+
+        let existing = note.text
+        if existing.isEmpty {
+            note.text = content
+        } else if existing.hasSuffix("\n") {
+            note.text = existing + content
+        } else {
+            note.text = existing + "\n" + content
+        }
+        note.clearMarkdownDisplayFrame()
+        note.applyLikelyMarkdownFlagFromContent()
+        try? context.save()
+
+        if note.isHidden {
+            unhideNote(note)
+        } else {
+            openNote(note, isEditing: false)
+        }
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
     func openNote(_ note: Note, isEditing: Bool) {
         let effectiveEditing = isEditing && !note.isImageNote
         if let existing = note.window {

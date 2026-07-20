@@ -30,7 +30,7 @@ The same file is used on the [product page](https://alex-fomin.github.io/StickNo
 - **Note list** — browse notes, including hidden ones, from a dedicated window.
 - **Layouts** — choose default layout presets for new notes (editable in Settings).
 - **Clipboard** — create a note from a pasted image when the pasteboard contains suitable image data.
-- **Configurable shortcuts** — record global shortcuts in **Settings → General** for new note, paste-from-clipboard note, and show/hide all notes.
+- **Configurable shortcuts** — record global shortcuts in **Settings → General** for new note, paste-from-clipboard note, append clipboard to the latest note, and show/hide all notes.
 - **Optional launch at login** and other behaviors (delete confirmation, trash vs permanent delete, “show on all spaces,” menubar note count, etc.) in **Settings**.
 
 ## Requirements
