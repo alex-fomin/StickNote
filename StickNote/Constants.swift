@@ -18,5 +18,6 @@ extension Notification.Name {
 extension KeyboardShortcuts.Name {
     static let createNote = Self("createNote")
     static let createNoteFromClipboard = Self("createNoteFromClipboard")
+    static let appendClipboardToLatestNote = Self("appendClipboardToLatestNote")
     static let showHideNotes = Self("showHideNotes")
 }

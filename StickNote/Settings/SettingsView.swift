@@ -9,7 +9,7 @@ import SwiftUI
 enum SettingsWindowMetrics {
     static let width: CGFloat = 400
     /// Fixed height: fits General (shortcuts) and Note tabs without excess empty space.
-    static let height: CGFloat = 500
+    static let height: CGFloat = 560
 }
 
 struct SettingsView: View {
@@ -73,6 +73,8 @@ struct SettingsView: View {
                         KeyboardShortcuts.Recorder("Add new note", name: .createNote)
                         KeyboardShortcuts.Recorder(
                             "Paste note from clipboard", name: .createNoteFromClipboard)
+                        KeyboardShortcuts.Recorder(
+                            "Append clipboard to latest note", name: .appendClipboardToLatestNote)
                         KeyboardShortcuts.Recorder(
                             "Show/Hide notes", name: .showHideNotes)
                     }
