@@ -113,6 +113,7 @@ final class AppState {
     }
 
     /// Appends clipboard string to the most recently updated non-image note (new line).
+    /// If that note is hidden, creates a new note with the clipboard content instead.
     func appendClipboardToLatestEditedNote() {
         guard let text = NSPasteboard.general.string(forType: .string), !text.isEmpty else { return }
 
@@ -132,6 +133,15 @@ final class AppState {
         descriptor.fetchLimit = 1
         guard let note = try? context.fetch(descriptor).first else { return }
 
+        if note.isHidden {
+            let newNote = Note(layout: getDefaultLayout(), text: content)
+            newNote.showOnAllSpaces = Defaults[.showOnAllSpaces]
+            context.insert(newNote)
+            openNote(newNote, isEditing: false)
+            NSApp.activate(ignoringOtherApps: true)
+            return
+        }
+
         let existing = note.text
         if existing.isEmpty {
             note.text = content
@@ -144,11 +154,7 @@ final class AppState {
         note.applyLikelyMarkdownFlagFromContent()
         try? context.save()
 
-        if note.isHidden {
-            unhideNote(note)
-        } else {
-            openNote(note, isEditing: false)
-        }
+        openNote(note, isEditing: false)
         NSApp.activate(ignoringOtherApps: true)
     }
 
