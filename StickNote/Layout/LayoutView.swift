@@ -175,7 +175,7 @@ struct LayoutView: View {
     }
 
     private func saveLayout() {
-        guard selectedLayoutIndex < Int.max, layouts.indices.contains(selectedLayoutIndex) else {
+        guard layouts.indices.contains(selectedLayoutIndex) else {
             newLayoutName = ""
             showingAlert = true
             return

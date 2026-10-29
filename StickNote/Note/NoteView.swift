@@ -316,7 +316,7 @@ struct NoteView: View {
     }
 
     private var hideUntilMenuTitle: String {
-        contextTargets.count > 1 ? "Hide \(contextTargets.count) notes until…" : "Hide until…"
+        contextTargets.count > 1 ? "Hide \(contextTargets.count) notes until" : "Hide until"
     }
 
     private var shareDisabledForSelection: Bool {
@@ -475,18 +475,13 @@ struct NoteView: View {
         }
 
         if !isBulkContextMenu, !note.isImageNote {
-            if note.isInbox {
-                Button {
-                    AppState.shared.clearInbox(for: note)
-                } label: {
-                    Label("Clear Inbox", systemImage: "tray")
-                }
-            } else {
-                Button {
-                    AppState.shared.setInbox(note)
-                } label: {
-                    Label("Set as Inbox", systemImage: "tray.and.arrow.down")
-                }
+            Toggle(
+                isOn: Binding(
+                    get: { note.isInbox },
+                    set: { $0 ? AppState.shared.setInbox(note) : AppState.shared.clearInbox(for: note) }
+                )
+            ) {
+                Label("Inbox", systemImage: "tray")
             }
         }
 
@@ -584,30 +579,33 @@ struct NoteView: View {
 
         Menu(hideUntilMenuTitle, systemImage: "calendar.badge.clock") {
             Button {
-                let until = Date.now.addingTimeInterval(60 * 60)
-                for n in contextTargets {
-                    AppState.shared.hideNote(n, hiddenUntil: until)
-                }
+                hideTargets(until: Date.now.addingTimeInterval(30 * 60))
+            } label: {
+                Label("For 30 Minutes", systemImage: "clock")
+            }
+
+            Button {
+                hideTargets(until: Date.now.addingTimeInterval(60 * 60))
             } label: {
                 Label("For 1 Hour", systemImage: "clock")
             }
 
+            let tomorrow = hideUntilTomorrowMorning()
             Button {
-                let until = hideUntilTomorrowMorning()
-                for n in contextTargets {
-                    AppState.shared.hideNote(n, hiddenUntil: until)
-                }
+                hideTargets(until: tomorrow)
             } label: {
-                Label("Until Tomorrow", systemImage: "sunrise")
+                Label(
+                    "Until Tomorrow, \(tomorrow.formatted(date: .omitted, time: .shortened))",
+                    systemImage: "sunrise")
             }
 
+            let nextWeek = hideUntilNextWeekMorning()
             Button {
-                let until = hideUntilNextWeekMorning()
-                for n in contextTargets {
-                    AppState.shared.hideNote(n, hiddenUntil: until)
-                }
+                hideTargets(until: nextWeek)
             } label: {
-                Label("Until Next Week", systemImage: "calendar")
+                Label(
+                    "Until Next Week, \(nextWeek.formatted(.dateTime.weekday(.abbreviated).hour().minute()))",
+                    systemImage: "calendar")
             }
 
             Button {
@@ -706,6 +704,12 @@ struct NoteView: View {
             for n in contextTargets {
                 AppState.shared.deleteNote(n)
             }
+        }
+    }
+
+    private func hideTargets(until date: Date) {
+        for n in contextTargets {
+            AppState.shared.hideNote(n, hiddenUntil: date)
         }
     }
 

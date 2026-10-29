@@ -11,8 +11,7 @@ struct FontListPicker: View {
     private var faces: [(postscript: String, name: String)] {
         (NSFontManager.shared.availableMembers(ofFontFamily: family) ?? []).compactMap { member in
             guard let postscript = member.first as? String else { return nil }
-            let name = member.count > 1 ? (member[1] as? String ?? postscript) : postscript
-            return (postscript, name)
+            return (postscript, member.dropFirst().first as? String ?? postscript)
         }
     }
 

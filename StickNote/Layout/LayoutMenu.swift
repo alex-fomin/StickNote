@@ -29,7 +29,6 @@ struct LayoutMenu: View {
                         }
                     }
                 )) {
-                    // The menu icon slot is templated and drops the fill. An image inside the title keeps the color.
                     layoutTitle(layout)
                 }
             }
