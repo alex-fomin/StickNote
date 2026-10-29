@@ -6,6 +6,19 @@
         <description>StickNote application updates</description>
         <language>en</language>
         <item>
+            <title>1.4.0</title>
+            <pubDate>Thu, 29 Oct 2026 11:52:30 +0300</pubDate>
+            <sparkle:version>1.4.0</sparkle:version>
+            <sparkle:shortVersionString>1.4.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <enclosure url="https://github.com/alex-fomin/StickNote/releases/download/v1.4.0/StickNote-1.4.0.dmg" length="9391807" type="application/octet-stream" sparkle:edSignature="2mHDpPlrwCVrYgnodfxDyzPUiQvddfQl188wpQ2//7IGM3kNQtVwCTaPXaFi68gno48zTuSDpx+V5GAbqfwGDA=="/>
+            <sparkle:deltas>
+                <enclosure url="https://github.com/alex-fomin/StickNote/releases/download/v1.4.0/StickNote1.4.0-1.3.2.delta" sparkle:deltaFrom="1.3.2" length="1267834" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="977824" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,uk" sparkle:edSignature="jPl6bbIUGq6hbZk3RZDebqA9m0W37iqEZCSlRWtu/YcPCV/qsNuMMD3xM6UWgS/Kx5tyqQ5IHCEQHLcgvoesBA=="/>
+                <enclosure url="https://github.com/alex-fomin/StickNote/releases/download/v1.4.0/StickNote1.4.0-1.3.1.delta" sparkle:deltaFrom="1.3.1" length="1280870" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="977824" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,uk" sparkle:edSignature="sU5ddkx/8psKUs3Jmpm8Zwa9/BuOMmKHzyoQGUA2zD3tbK9j9GRkwFDgikfaKnWw8Eqh0igAn0ZMVVwlIWhSAg=="/>
+            </sparkle:deltas>
+        </item>
+        <item>
             <title>1.3.2</title>
             <pubDate>Fri, 08 May 2026 10:35:54 +0300</pubDate>
             <sparkle:version>1.3.2</sparkle:version>
