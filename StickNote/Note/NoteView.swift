@@ -444,50 +444,6 @@ struct NoteView: View {
     @ViewBuilder
     private var contextMenuContent: some View {
         Button {
-            let setMinimized = !note.isMinimized
-            for n in contextTargets {
-                n.isMinimized = setMinimized
-            }
-            isCollapsed = note.isMinimized
-        } label: {
-            Label(
-                minimizeMaximizeMenuTitle,
-                systemImage: note.isMinimized
-                    ? "arrow.up.left.and.arrow.down.right" : "arrow.down.right.and.arrow.up.left"
-            )
-        }
-
-        Toggle(
-            isOn: Binding(
-                get: {
-                    if contextTargets.count <= 1 { return note.showOnAllSpaces }
-                    return contextTargets.allSatisfy(\.showOnAllSpaces)
-                },
-                set: { newValue in
-                    for n in contextTargets {
-                        n.showOnAllSpaces = newValue
-                        AppState.shared.applyShowOnAllSpaces(note: n)
-                    }
-                }
-            )
-        ) {
-            Label("Show on all spaces", systemImage: "eye")
-        }
-
-        if !isBulkContextMenu, !note.isImageNote {
-            Toggle(
-                isOn: Binding(
-                    get: { note.isInbox },
-                    set: { $0 ? AppState.shared.setInbox(note) : AppState.shared.clearInbox(for: note) }
-                )
-            ) {
-                Label("Inbox", systemImage: "tray")
-            }
-        }
-
-        Divider()
-
-        Button {
             AppState.shared.copyNotesToClipboard(contextTargets)
         } label: {
             Label(copyMenuTitle, systemImage: "doc.on.doc")
@@ -507,26 +463,6 @@ struct NoteView: View {
                 Label("Recognize Text (OCR)…", systemImage: "text.viewfinder")
             }
             .disabled(isBulkContextMenu || isOCRRunning)
-        }
-
-        if allTargetsNonImageForMarkdownToggle {
-            Toggle(
-                isOn: Binding(
-                    get: {
-                        if contextTargets.count <= 1 { return note.isMarkdown }
-                        return contextTargets.allSatisfy(\.isMarkdown)
-                    },
-                    set: { newValue in
-                        for n in contextTargets {
-                            n.isMarkdown = newValue
-                            n.markdownAutoDisabledByUser = !newValue
-                        }
-                        updateWindowSize()
-                    }
-                )
-            ) {
-                Label("Markdown", systemImage: "doc.richtext")
-            }
         }
 
         if allTargetsPlainTextForTextTools {
@@ -563,11 +499,73 @@ struct NoteView: View {
 
         Divider()
 
+        if allTargetsNonImageForMarkdownToggle {
+            Toggle(
+                isOn: Binding(
+                    get: {
+                        if contextTargets.count <= 1 { return note.isMarkdown }
+                        return contextTargets.allSatisfy(\.isMarkdown)
+                    },
+                    set: { newValue in
+                        for n in contextTargets {
+                            n.isMarkdown = newValue
+                            n.markdownAutoDisabledByUser = !newValue
+                        }
+                        updateWindowSize()
+                    }
+                )
+            ) {
+                Label("Markdown", systemImage: "doc.richtext")
+            }
+        }
+
+        if !isBulkContextMenu, !note.isImageNote {
+            Toggle(
+                isOn: Binding(
+                    get: { note.isInbox },
+                    set: { $0 ? AppState.shared.setInbox(note) : AppState.shared.clearInbox(for: note) }
+                )
+            ) {
+                Label("Inbox", systemImage: "tray")
+            }
+        }
+
+        Toggle(
+            isOn: Binding(
+                get: {
+                    if contextTargets.count <= 1 { return note.showOnAllSpaces }
+                    return contextTargets.allSatisfy(\.showOnAllSpaces)
+                },
+                set: { newValue in
+                    for n in contextTargets {
+                        n.showOnAllSpaces = newValue
+                        AppState.shared.applyShowOnAllSpaces(note: n)
+                    }
+                }
+            )
+        ) {
+            Label("Show on all spaces", systemImage: "eye")
+        }
+
         Menu("Layout", systemImage: "textformat") {
             LayoutMenu(note: $note, bulkApplyTargets: isBulkContextMenu ? contextTargets : nil)
         }
 
         Divider()
+
+        Button {
+            let setMinimized = !note.isMinimized
+            for n in contextTargets {
+                n.isMinimized = setMinimized
+            }
+            isCollapsed = note.isMinimized
+        } label: {
+            Label(
+                minimizeMaximizeMenuTitle,
+                systemImage: note.isMinimized
+                    ? "arrow.up.left.and.arrow.down.right" : "arrow.down.right.and.arrow.up.left"
+            )
+        }
 
         Button {
             for n in contextTargets {
@@ -643,6 +641,8 @@ struct NoteView: View {
                 NSApplication.shared.terminate(nil)
             }
         }
+
+        Divider()
 
         Button(role: .destructive) {
             handleDelete()
