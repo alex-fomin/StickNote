@@ -173,6 +173,12 @@ struct NoteView: View {
             }
         }
         .overlay {
+            if note.isInbox {
+                Rectangle()
+                    .strokeBorder(Color.orange.opacity(0.95), lineWidth: 2)
+            }
+        }
+        .overlay {
             if appStateModel.selectedNoteIDs.count > 1,
                 appStateModel.selectedNoteIDs.contains(note.persistentModelID)
             {
@@ -208,7 +214,11 @@ struct NoteView: View {
             }
             guard window != nil else { return }
             syncNoteWindowBackground()
+            AppState.shared.applyWindowOpacity(for: note)
             DispatchQueue.main.async { syncLaunchOriginFromWindowOnce() }
+        }
+        .onChange(of: note.opacity, initial: false) { _, _ in
+            AppState.shared.applyWindowOpacity(for: note)
         }
         .onChange(of: colorScheme) { _, _ in
             syncNoteWindowBackground()
@@ -462,6 +472,22 @@ struct NoteView: View {
             )
         ) {
             Label("Show on all spaces", systemImage: "eye")
+        }
+
+        if !isBulkContextMenu, !note.isImageNote {
+            if note.isInbox {
+                Button {
+                    AppState.shared.clearInbox(for: note)
+                } label: {
+                    Label("Clear Inbox", systemImage: "tray")
+                }
+            } else {
+                Button {
+                    AppState.shared.setInbox(note)
+                } label: {
+                    Label("Set as Inbox", systemImage: "tray.and.arrow.down")
+                }
+            }
         }
 
         Divider()

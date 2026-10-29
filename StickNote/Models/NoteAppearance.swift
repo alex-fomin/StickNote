@@ -6,12 +6,13 @@ protocol NoteAppearance {
     var fontName: String { get set }
     var fontSize: CGFloat { get set }
     var fontColor: String { get set }
+    var opacity: Double { get set }
 }
 
 extension NoteAppearance {
     func isSameAppearance(_ ap: NoteAppearance) -> Bool {
         self.color == ap.color && self.fontColor == ap.fontColor && self.fontName == ap.fontName
-            && self.fontSize == ap.fontSize
+            && self.fontSize == ap.fontSize && abs(self.opacity - ap.opacity) < 0.01
     }
 
     var nsFont: NSFont {

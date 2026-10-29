@@ -42,6 +42,7 @@ enum NoteClipboardImage {
             NSPasteboard.PasteboardType.string.rawValue,
             NSPasteboard.PasteboardType.rtf.rawValue,
             NSPasteboard.PasteboardType.rtfd.rawValue,
+            UTType.html.identifier,
         ])
     }
 

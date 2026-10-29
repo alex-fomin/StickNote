@@ -74,7 +74,8 @@ struct SettingsView: View {
                         KeyboardShortcuts.Recorder(
                             "Paste note from clipboard", name: .createNoteFromClipboard)
                         KeyboardShortcuts.Recorder(
-                            "Append clipboard to latest note", name: .appendClipboardToLatestNote)
+                            "Append clipboard to inbox / latest note",
+                            name: .appendClipboardToLatestNote)
                         KeyboardShortcuts.Recorder(
                             "Show/Hide notes", name: .showHideNotes)
                     }
