@@ -63,7 +63,7 @@ final class AppState {
 
     // MARK: - Inbox
 
-    /// Visible, non-image inbox suitable for append/paste text.
+    /// Visible, non-image inbox that pasted text is appended to.
     func availableInboxNote() -> Note? {
         let descriptor = FetchDescriptor<Note>(
             predicate: #Predicate<Note> {
@@ -196,51 +196,6 @@ final class AppState {
         note.showOnAllSpaces = Defaults[.showOnAllSpaces]
         self.context.insert(note)
         self.openNote(note, isEditing: false)
-    }
-
-    /// Appends clipboard string to the inbox note when available; otherwise the most recently updated non-image note.
-    /// If the inbox is hidden, refuses with an alert; without an inbox, creates a new note when the latest is hidden.
-    func appendClipboardToLatestEditedNote() {
-        if !Thread.isMainThread {
-            DispatchQueue.main.async { self.appendClipboardToLatestEditedNote() }
-            return
-        }
-        guard let pasted = pastedClipboardText() else { return }
-        let content = pasted.text
-
-        let inboxDescriptor = FetchDescriptor<Note>(
-            predicate: #Predicate<Note> {
-                $0.isInbox == true && $0.isInTrashBin == false && $0.isImageNote == false
-            }
-        )
-        if let inbox = try? context.fetch(inboxDescriptor).first {
-            if inbox.isHidden {
-                presentInboxUnavailableAlert(
-                    message: "The inbox note is hidden. Unhide it or clear inbox, then try again.")
-                return
-            }
-            appendText(content, to: inbox, asMarkdown: pasted.isMarkdown)
-            return
-        }
-
-        var descriptor = FetchDescriptor<Note>(
-            predicate: #Predicate { $0.isInTrashBin == false && $0.isImageNote == false },
-            sortBy: [SortDescriptor(\.updatedAt, order: .reverse)]
-        )
-        descriptor.fetchLimit = 1
-        guard let note = try? context.fetch(descriptor).first else { return }
-
-        if note.isHidden {
-            let newNote = Note(layout: getDefaultLayout(), text: content)
-            newNote.isMarkdown = pasted.isMarkdown
-            newNote.showOnAllSpaces = Defaults[.showOnAllSpaces]
-            context.insert(newNote)
-            openNote(newNote, isEditing: false)
-            NSApp.activate(ignoringOtherApps: true)
-            return
-        }
-
-        appendText(content, to: note, asMarkdown: pasted.isMarkdown)
     }
 
     func openNote(_ note: Note, isEditing: Bool) {

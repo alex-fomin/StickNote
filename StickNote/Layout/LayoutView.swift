@@ -10,18 +10,14 @@ struct NoteLayoutView: View {
     }
     var body: some View {
         LayoutView(info: note, text: note.text)
+            .navigationTitle("Layout")
     }
-}
-
-struct LayoutInfo: Hashable {
-    var text: String
-    var color: String? = nil
 }
 
 struct LayoutView: View {
     @Environment(\.modelContext) var modelContext
     @Environment(\.colorScheme) private var colorScheme
-    @Query var layouts: [NoteLayout]
+    @Query(sort: \NoteLayout.name) var layouts: [NoteLayout]
 
     @State var info: NoteAppearance
     @State var font: NSFont
@@ -29,18 +25,56 @@ struct LayoutView: View {
     @State var fontColor: Color
     @State var opacity: Double
     @State var text: String
-    @State var layoutsWithNewPlaceholder: [LayoutInfo] = []
 
-    @State var selectedLayoutIndex: Int = -3
-    @State private var showingAlert = false
-
-    @State var newLayoutName: String = ""
+    @State private var selectedLayoutID: PersistentIdentifier?
+    @State private var showingNewLayoutAlert = false
+    @State private var newLayoutName: String = ""
 
     private var layoutPreviewDisplayColors: (background: Color, foreground: Color) {
         NoteDisplayColors.displayColors(
             storedBgHex: color.toHex(),
             storedFgHex: fontColor.toHex(),
             colorScheme: colorScheme
+        )
+    }
+
+    private var sortedLayouts: [NoteLayout] {
+        layouts.sorted { a, _ in a.isDefault }
+    }
+
+    private var selectedLayout: NoteLayout? {
+        layouts.first { $0.persistentModelID == selectedLayoutID }
+    }
+
+    private var isModified: Bool {
+        guard let layout = selectedLayout else { return false }
+        return layout.color != color.toHex() || layout.fontColor != fontColor.toHex()
+            || layout.fontName != font.fontName || layout.fontSize != font.pointSize
+            || abs(layout.opacity - opacity) >= 0.01
+    }
+
+    /// Picking a light background swaps white text for black (and the reverse). Only for user edits, not applied layouts.
+    private var backgroundBinding: Binding<Color> {
+        Binding(
+            get: { color },
+            set: { newColor in
+                color = newColor
+                if newColor.isLight() && fontColor.toHex() == "#FFFFFF" {
+                    fontColor = Color.fromString("#000000")
+                } else if !newColor.isLight() && fontColor.toHex() == "#000000" {
+                    fontColor = Color.fromString("#FFFFFF")
+                }
+            }
+        )
+    }
+
+    private var layoutSelection: Binding<PersistentIdentifier?> {
+        Binding(
+            get: { selectedLayoutID },
+            set: { id in
+                selectedLayoutID = id
+                if let layout = selectedLayout { apply(layout) }
+            }
         )
     }
 
@@ -53,7 +87,6 @@ struct LayoutView: View {
         self.text =
             text
             ?? "Est veniam mollit commodo laboris\nex exercitation sint amet"
-
     }
 
     var body: some View {
@@ -65,7 +98,7 @@ struct LayoutView: View {
 
             Section {
                 FontListPicker(font: $font)
-                ColorPicker("Background", selection: $color)
+                ColorPicker("Background", selection: backgroundBinding)
                 ColorPicker("Font color", selection: $fontColor)
                 LabeledContent("Opacity") {
                     HStack(spacing: 8) {
@@ -87,67 +120,66 @@ struct LayoutView: View {
             }
 
             Section {
-                LabeledContent("Save as") {
+                LabeledContent("Layout") {
                     HStack(spacing: 8) {
-                        Picker("Save as", selection: $selectedLayoutIndex) {
-                            ForEach(self.layouts.indices, id: \.self) { index in
-                                let layout = self.layouts[index]
+                        Picker("Layout", selection: layoutSelection) {
+                            ForEach(sortedLayouts) { layout in
                                 let swatch = Image(nsImage: LayoutMenuSwatch.image(
                                     storedBgHex: layout.color,
                                     isDark: colorScheme == .dark
                                 ))
-                                Text("\(swatch) \(layout.name)").tag(index)
+                                Text("\(swatch) \(layout.name)")
+                                    .tag(Optional(layout.persistentModelID))
                             }
-                            Divider()
-                            Text("New layout…").tag(Int.max)
                         }
                         .labelsHidden()
                         .fixedSize()
-                        Button("Save", action: saveLayout)
-                            .keyboardShortcut("s", modifiers: .command)
-                            .disabled(selectedLayoutIndex < 0)
+                        if isModified {
+                            Text("modified")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                }
+                HStack {
+                    Spacer()
+                    Button("Revert") {
+                        if let layout = selectedLayout { apply(layout) }
+                    }
+                    .disabled(!isModified)
+                    Button("Update", action: updateSelectedLayout)
+                        .keyboardShortcut("s", modifiers: .command)
+                        .disabled(!isModified)
+                    Button("Save as New…") {
+                        newLayoutName = ""
+                        showingNewLayoutAlert = true
                     }
                 }
             }
         }
         .formStyle(.grouped)
-        .alert("New layout", isPresented: $showingAlert) {
+        .alert("New layout", isPresented: $showingNewLayoutAlert) {
             TextField("Layout name", text: $newLayoutName)
             Button("Cancel", role: .cancel) {}
-            Button("Save") {
-                let layout = NoteLayout(
-                    name: newLayoutName,
-                    color: color.toHex(),
-                    fontName: font.fontName,
-                    fontSize: font.pointSize,
-                    fontColor: fontColor.toHex(),
-                    opacity: opacity)
-                modelContext.insert(layout)
-                try? modelContext.save()
-                selectedLayoutIndex = layouts.count - 1
-            }
-            .disabled(newLayoutName.trimmingCharacters(in: .whitespaces).isEmpty)
+            Button("Save", action: saveNewLayout)
+                .disabled(newLayoutName.trimmingCharacters(in: .whitespaces).isEmpty)
         }
-        .onAppear { selectCurrentLayoutIfNeeded() }
-        .onChange(of: layouts.count) { _, _ in selectCurrentLayoutIfNeeded() }
+        .onAppear {
+            selectInitialLayout()
+            // The size field would otherwise take focus and select its value on open.
+            DispatchQueue.main.async { NSApp.keyWindow?.makeFirstResponder(nil) }
+        }
         .onChange(of: font) { _, newValue in
             info.fontName = newValue.fontName
             info.fontSize = newValue.pointSize
             try? modelContext.save()
         }
-        .onChange(of: color) { _, color in
-            info.color = color.toHex()
-            if color.isLight() && fontColor.toHex() == "#FFFFFF" {
-                fontColor = Color.fromString("#000000")
-            } else if !color.isLight() && fontColor.toHex() == "#000000" {
-                fontColor = Color.fromString("#FFFFFF")
-            }
-
+        .onChange(of: color) { _, newValue in
+            info.color = newValue.toHex()
             try? modelContext.save()
-
         }
-        .onChange(of: fontColor) {
-            info.fontColor = $1.toHex()
+        .onChange(of: fontColor) { _, newValue in
+            info.fontColor = newValue.toHex()
             try? modelContext.save()
         }
         .onChange(of: opacity) { _, newValue in
@@ -163,24 +195,25 @@ struct LayoutView: View {
         Text(text)
             .font(Font(font))
             .foregroundStyle(layoutPreviewDisplayColors.foreground)
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            .lineLimit(4)
+            .frame(maxWidth: .infinity, alignment: .topLeading)
             .padding(10)
             .background(layoutPreviewDisplayColors.background)
             .clipShape(RoundedRectangle(cornerRadius: 6))
             .shadow(color: .black.opacity(0.18), radius: 4, y: 2)
             .opacity(opacity)
-            .padding(16)
-            .frame(height: 140)
-            .clipped()
+            .padding(12)
     }
 
-    private func saveLayout() {
-        guard layouts.indices.contains(selectedLayoutIndex) else {
-            newLayoutName = ""
-            showingAlert = true
-            return
-        }
-        let layout = layouts[selectedLayoutIndex]
+    private func apply(_ layout: NoteLayout) {
+        font = layout.nsFont
+        color = Color.fromString(layout.color)
+        fontColor = Color.fromString(layout.fontColor)
+        opacity = min(1, max(0.4, layout.opacity))
+    }
+
+    private func updateSelectedLayout() {
+        guard let layout = selectedLayout else { return }
         layout.fontName = font.fontName
         layout.fontSize = font.pointSize
         layout.color = color.toHex()
@@ -189,13 +222,27 @@ struct LayoutView: View {
         try? modelContext.save()
     }
 
-    private func selectCurrentLayoutIfNeeded() {
-        guard selectedLayoutIndex < 0 else { return }
-        if let index = layouts.firstIndex(where: { info.isSameAppearance($0) }) {
-            selectedLayoutIndex = index
-        } else if !layouts.isEmpty {
-            selectedLayoutIndex = Int.max
-        }
+    private func saveNewLayout() {
+        let layout = NoteLayout(
+            name: newLayoutName.trimmingCharacters(in: .whitespaces),
+            color: color.toHex(),
+            fontName: font.fontName,
+            fontSize: font.pointSize,
+            fontColor: fontColor.toHex(),
+            opacity: opacity)
+        modelContext.insert(layout)
+        try? modelContext.save()
+        selectedLayoutID = layout.persistentModelID
+    }
+
+    /// Exact match first, then a layout with the same background, then the default.
+    private func selectInitialLayout() {
+        let initial =
+            layouts.first { info.isSameAppearance($0) }
+            ?? layouts.first { $0.color == info.color }
+            ?? layouts.first { $0.isDefault }
+            ?? layouts.first
+        selectedLayoutID = initial?.persistentModelID
     }
 }
 

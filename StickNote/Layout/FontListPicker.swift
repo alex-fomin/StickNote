@@ -37,7 +37,7 @@ struct FontListPicker: View {
                             .font(.caption2.weight(.semibold))
                             .foregroundStyle(.secondary)
                     }
-                    .frame(width: 150)
+                    .frame(width: 190)
                 }
                 .popover(isPresented: $showingFamilies, arrowEdge: .bottom) {
                     FontFamilyList(selected: family) { newFamily in

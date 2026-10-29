@@ -55,7 +55,7 @@ struct StickNoteApp: App {
                         (AppAppearancePreference(rawValue: appAppearanceRaw) ?? .system)
                             .preferredColorScheme
                     )
-                    .frame(width: 460, height: 520)
+                    .frame(width: 500, height: 505)
             }
         }
         .windowResizability(.contentSize)

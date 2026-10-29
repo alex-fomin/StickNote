@@ -25,9 +25,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         KeyboardShortcuts.onKeyUp(for: .createNoteFromClipboard) {
             AppState.shared.openNewNoteFromClipboard()
         }
-        KeyboardShortcuts.onKeyUp(for: .appendClipboardToLatestNote) {
-            AppState.shared.appendClipboardToLatestEditedNote()
-        }
         KeyboardShortcuts.onKeyUp(for: .showHideNotes) {
             AppState.shared.toggleNotesVisibility()
         }

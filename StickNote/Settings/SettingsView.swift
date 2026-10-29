@@ -7,8 +7,8 @@ import SwiftData
 import SwiftUI
 
 enum SettingsWindowMetrics {
-    static let width: CGFloat = 400
-    /// Fixed height: fits General (shortcuts) and Note tabs without excess empty space.
+    static let width: CGFloat = 460
+    /// Fixed height: fits the Note tab without excess empty space.
     static let height: CGFloat = 560
 }
 
@@ -30,54 +30,49 @@ struct SettingsView: View {
     @Environment(\.modelContext) var modelContext
     @Query var layouts: [NoteLayout]
 
-    @State private var defaultLayout: NoteLayout? = NoteLayout.defaultLayouts().first!
+    @State private var defaultLayout: NoteLayout?
 
     var body: some View {
         TabView {
             Tab("General", systemImage: "gear") {
                 Form {
-                    LaunchAtLogin.Toggle()
-                    Picker(
-                        "Appearance",
-                        selection: Binding(
-                            get: { AppAppearancePreference(rawValue: appAppearanceRaw) ?? .system },
-                            set: { newValue in
-                                appAppearanceRaw = newValue.rawValue
-                                AppAppearance.applyFromDefaults()
+                    Section("General") {
+                        LaunchAtLogin.Toggle()
+                        Picker(
+                            "Appearance",
+                            selection: Binding(
+                                get: { AppAppearancePreference(rawValue: appAppearanceRaw) ?? .system },
+                                set: { newValue in
+                                    appAppearanceRaw = newValue.rawValue
+                                    AppAppearance.applyFromDefaults()
+                                }
+                            )
+                        ) {
+                            ForEach(AppAppearancePreference.allCases) { pref in
+                                Text(pref.title).tag(pref)
                             }
-                        )
-                    ) {
-                        ForEach(AppAppearancePreference.allCases) { pref in
-                            Text(pref.title).tag(pref)
                         }
+                        .pickerStyle(.segmented)
                     }
-                    .pickerStyle(.segmented)
-                    Toggle("Show menu bar icon", isOn: $showMenuBarIcon)
-                    Text(
-                        "With the menu bar icon hidden, open Settings from a note’s StickNote menu, start StickNote again (for example from Finder or Launchpad) to show this window, or use the keyboard shortcuts below."
-                    )
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-                    Toggle("Show notes count in menubar", isOn: $showNotesCount)
-                        .disabled(!showMenuBarIcon)
-                    Toggle("Hide notes when a fullscreen app is active", isOn: $hideNotesWhenFullscreenApp)
-                    Text(
-                        "Floating notes are hidden while another app is using native fullscreen. Use Show/Hide notes or the menu bar icon to bring them back temporarily."
-                    )
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-
-                    Section("Shortcuts") {
-                        KeyboardShortcuts.Recorder("Add new note", name: .createNote)
-                        KeyboardShortcuts.Recorder(
-                            "Paste note from clipboard", name: .createNoteFromClipboard)
-                        KeyboardShortcuts.Recorder(
-                            "Append clipboard to inbox / latest note",
-                            name: .appendClipboardToLatestNote)
-                        KeyboardShortcuts.Recorder(
-                            "Show/Hide notes", name: .showHideNotes)
+                    Section {
+                        Toggle("Show menu bar icon", isOn: $showMenuBarIcon)
+                        Toggle("Show notes count in menu bar", isOn: $showNotesCount)
+                            .disabled(!showMenuBarIcon)
+                    } header: {
+                        Text("Menu bar")
+                    } footer: {
+                        Self.footer(
+                            "With the icon hidden, open Settings from a note’s StickNote menu, launch StickNote again, or use the keyboard shortcuts."
+                        )
+                    }
+                    Section {
+                        Toggle("Hide notes when a fullscreen app is active", isOn: $hideNotesWhenFullscreenApp)
+                    } header: {
+                        Text("Fullscreen")
+                    } footer: {
+                        Self.footer(
+                            "Use Show/Hide notes or the menu bar icon to bring them back temporarily."
+                        )
                     }
                 }
                 .formStyle(.grouped)
@@ -97,20 +92,36 @@ struct SettingsView: View {
                             layouts: layouts
                         )
                         .onAppear {
-                            defaultLayout = layouts.first { $0.isDefault }!
+                            defaultLayout = layouts.first { $0.isDefault }
                         }
-                        .onChange(of: defaultLayout!) { old, new in
+                        .onChange(of: defaultLayout) { old, new in
+                            guard let new, old != new else { return }
                             try? self.modelContext.transaction {
-                                old.isDefault = false
+                                old?.isDefault = false
                                 new.isDefault = true
                             }
                         }
-
                     }
-                    Section("Paste note") {
+                    Section {
                         Toggle("Trim whitespaces", isOn: $trimAfterPaste)
                         Toggle("Wrap long lines", isOn: $wrapLongLinesAfterPaste)
+                    } header: {
+                        Text("Plain text paste")
+                    } footer: {
+                        Self.footer(
+                            "Formatted text from web pages and documents is pasted as Markdown. Pasting goes to the Inbox note when one is set."
+                        )
                     }
+                }
+                .formStyle(.grouped)
+            }
+            Tab("Shortcuts", systemImage: "keyboard") {
+                Form {
+                    KeyboardShortcuts.Recorder("Add new note", name: .createNote)
+                    KeyboardShortcuts.Recorder(
+                        "Paste note from clipboard", name: .createNoteFromClipboard)
+                    KeyboardShortcuts.Recorder(
+                        "Show/Hide notes", name: .showHideNotes)
                 }
                 .formStyle(.grouped)
             }
@@ -171,6 +182,13 @@ struct SettingsView: View {
             minHeight: SettingsWindowMetrics.height,
             maxHeight: SettingsWindowMetrics.height
         )
+    }
+
+    private static func footer(_ text: String) -> some View {
+        Text(text)
+            .font(.caption)
+            .foregroundStyle(.secondary)
+            .fixedSize(horizontal: false, vertical: true)
     }
 
     private static var appMarketingVersion: String {

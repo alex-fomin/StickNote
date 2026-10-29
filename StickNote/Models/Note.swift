@@ -48,7 +48,7 @@ final class Note: NoteAppearance, Identifiable {
     var hiddenUntil: Date?
     /// Window translucency (1 = opaque). Clamped when applied to ``NSWindow/alphaValue``.
     var opacity: Double = 1.0
-    /// At most one note should be inbox; append/paste text targets it when available.
+    /// At most one note should be inbox; pasted text is appended to it when available.
     var isInbox: Bool = false
     var createdAt: Date = Date()
     var updatedAt: Date = Date()
