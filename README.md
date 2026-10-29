@@ -10,6 +10,20 @@
 
 Prebuilt downloads: **[Releases](https://github.com/alex-fomin/StickNote/releases)**.
 
+### First launch (Gatekeeper quarantine)
+
+Release builds are not notarized by Apple yet, so macOS quarantines the downloaded app and blocks the first launch with “Apple could not verify StickNote…”. Drag **StickNote** from the DMG to **Applications**, then do one of:
+
+- **Right-click** StickNote in Applications → **Open** → **Open**.
+- Try to open it once, then go to **System Settings → Privacy & Security** and click **Open Anyway**.
+- Remove the quarantine flag in Terminal:
+
+  ```bash
+  xattr -d com.apple.quarantine /Applications/StickNote.app
+  ```
+
+This is needed only once; in-app updates (Sparkle) keep working afterwards.
+
 **Product page:** [alex-fomin.github.io/StickNote](https://alex-fomin.github.io/StickNote/) — static site served from [`docs/`](docs/) on GitHub Pages (`index.html`, `site.css`, shared screenshot assets). It mirrors this README: hero pitch, feature grid, screenshot, requirements, and links to releases and the repo.
 
 ## Screenshot

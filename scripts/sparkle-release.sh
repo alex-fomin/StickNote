@@ -90,18 +90,33 @@ case "${1:-}" in
     PREFIX="https://github.com/${REPO}/releases/download/${TAG}/"
     BIN="$(sparkle_bin_dir)"
     APPCAST_SRC="$ROOT/packaging/appcast.xml"
-    # generate_appcast merges with an existing appcast in the archives directory when present
-    if [[ -f "$APPCAST_SRC" ]]; then
-      cp "$APPCAST_SRC" "$ROOT/dist/appcast.xml"
-    fi
+    # generate_appcast applies one URL prefix to every archive and keeps only the newest few versions,
+    # so generate into a temp feed and merge just this version's item into the committed appcast.
+    TMP_APPCAST="$(mktemp -d)/appcast.xml"
+    rm -f "$ROOT/dist/appcast.xml"
     echo "Using generate_appcast from: $BIN"
     echo "Download URL prefix: $PREFIX"
     "$BIN/generate_appcast" \
-      -o "$APPCAST_SRC" \
+      -o "$TMP_APPCAST" \
       --download-url-prefix "$PREFIX" \
       "$ROOT/dist"
+    python3 - "$TMP_APPCAST" "$APPCAST_SRC" "$VERSION" <<'PY'
+import re, sys
+generated_path, appcast_path, version = sys.argv[1:]
+item_re = r'[ \t]*<item>\s*<title>{}</title>.*?</item>\n?'
+generated = open(generated_path).read()
+match = re.search(item_re.format(re.escape(version)), generated, re.S)
+if not match:
+    sys.exit(f"generate_appcast produced no item for {version}")
+appcast = open(appcast_path).read()
+appcast = re.sub(item_re.format(re.escape(version)), "", appcast, flags=re.S)
+anchor = "<language>en</language>\n"
+if anchor not in appcast:
+    sys.exit(f"{appcast_path}: missing {anchor.strip()}")
+open(appcast_path, "w").write(appcast.replace(anchor, anchor + match.group(0), 1))
+PY
     echo "Wrote $APPCAST_SRC"
-    echo "Next: create/publish GitHub Release $TAG with asset StickNote-${VERSION}.dmg at the URL above, then git add/commit packaging/appcast.xml."
+    echo "Next: create/publish GitHub Release $TAG with assets StickNote-${VERSION}.dmg and dist/StickNote${VERSION}-*.delta at the URL above, then git add/commit packaging/appcast.xml."
     ;;
   ""|-h|--help|help)
     usage
