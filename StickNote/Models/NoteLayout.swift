@@ -10,17 +10,20 @@ final class NoteLayout: Identifiable, NoteAppearance {
     var fontName: String
     var fontSize: CGFloat
     var fontColor: String
+    /// Window alpha stored with the layout. Clamped to 0.4...1 when edited.
+    var opacity: Double = 1.0
     var isDefault: Bool = false
 
     init(
         name: String, color: String, fontName: String, fontSize: CGFloat, fontColor: String,
-        isDefault: Bool = false
+        opacity: Double = 1.0, isDefault: Bool = false
     ) {
         self.name = name
         self.color = color
         self.fontName = fontName
         self.fontSize = fontSize
         self.fontColor = fontColor
+        self.opacity = opacity
         self.isDefault = isDefault
     }
 

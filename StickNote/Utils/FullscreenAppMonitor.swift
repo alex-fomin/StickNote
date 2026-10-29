@@ -23,7 +23,7 @@ final class FullscreenAppMonitor {
             let observer = workspaceCenter.addObserver(
                 forName: name, object: nil, queue: .main
             ) { _ in
-                AppState.shared.updateFullscreenSuppression()
+                Self.updateNowAndAfterAnimation()
             }
             observers.append(observer)
         }
@@ -45,5 +45,15 @@ final class FullscreenAppMonitor {
             .store(in: &cancellables)
 
         AppState.shared.updateFullscreenSuppression()
+    }
+
+    /// The space-change notification fires before the fullscreen animation ends, while the window is still small.
+    private static func updateNowAndAfterAnimation() {
+        AppState.shared.updateFullscreenSuppression()
+        for delay in [0.6, 1.5] {
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                AppState.shared.updateFullscreenSuppression()
+            }
+        }
     }
 }

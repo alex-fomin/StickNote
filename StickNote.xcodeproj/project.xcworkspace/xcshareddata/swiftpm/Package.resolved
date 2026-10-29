@@ -20,15 +20,6 @@
       }
     },
     {
-      "identity" : "fontpicker",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/tyagishi/FontPicker",
-      "state" : {
-        "revision" : "b11a5c4334c7b130d4e7463d637e7ba2a725e90b",
-        "version" : "1.2.0"
-      }
-    },
-    {
       "identity" : "keyboardshortcuts",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/sindresorhus/KeyboardShortcuts",

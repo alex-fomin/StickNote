@@ -57,6 +57,87 @@ final class AppState {
         scheduledUnhideTimer = timer
     }
 
+    func applyWindowOpacity(for note: Note) {
+        note.window?.alphaValue = note.windowAlpha
+    }
+
+    // MARK: - Inbox
+
+    /// Visible, non-image inbox that pasted text is appended to.
+    func availableInboxNote() -> Note? {
+        let descriptor = FetchDescriptor<Note>(
+            predicate: #Predicate<Note> {
+                $0.isInbox == true && $0.isInTrashBin == false && $0.isImageNote == false
+            }
+        )
+        guard let note = try? context.fetch(descriptor).first else { return nil }
+        if note.isHidden { return nil }
+        return note
+    }
+
+    func setInbox(_ note: Note) {
+        guard !note.isImageNote, !note.isInTrashBin else { return }
+        let descriptor = FetchDescriptor<Note>(predicate: #Predicate<Note> { $0.isInbox == true })
+        if let existing = try? context.fetch(descriptor) {
+            for n in existing where n.persistentModelID != note.persistentModelID {
+                n.isInbox = false
+            }
+        }
+        note.isInbox = true
+        try? context.save()
+    }
+
+    func clearInbox(for note: Note) {
+        guard note.isInbox else { return }
+        note.isInbox = false
+        try? context.save()
+    }
+
+    private func presentInboxUnavailableAlert(message: String) {
+        let alert = NSAlert()
+        alert.messageText = "Inbox unavailable"
+        alert.informativeText = message
+        alert.alertStyle = .informational
+        alert.addButton(withTitle: "OK")
+        alert.runModal()
+    }
+
+    private func appendText(_ content: String, to note: Note, asMarkdown: Bool = false) {
+        let existing = note.text
+        if existing.isEmpty {
+            note.text = content
+        } else if existing.hasSuffix("\n") {
+            note.text = existing + content
+        } else {
+            note.text = existing + "\n" + content
+        }
+        if asMarkdown, !note.markdownAutoDisabledByUser {
+            note.isMarkdown = true
+        }
+        note.clearMarkdownDisplayFrame()
+        note.applyLikelyMarkdownFlagFromContent()
+        try? context.save()
+        openNote(note, isEditing: false)
+        applyWindowOpacity(for: note)
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
+    /// HTML/RTF becomes Markdown. Plain text still honors trim and wrap.
+    private func pastedClipboardText() -> (text: String, isMarkdown: Bool)? {
+        guard let content = RichPaste.content(from: .general) else { return nil }
+        var text = content.text
+        if !content.isMarkdown {
+            if trimAfterPaste {
+                text = text.trimmingNoteWhitespace()
+            }
+            if wrapLongLinesAfterPaste {
+                text = text.wrappingLongLinesAtWordBoundaries()
+            }
+        }
+        guard !text.isEmpty else { return nil }
+        return (text, content.isMarkdown)
+    }
+
     func getDefaultLayout() -> NoteLayout {
         return
             (try? self.context.fetch<Category>(
@@ -94,68 +175,27 @@ final class AppState {
             NSApp.activate(ignoringOtherApps: true)
             return
         }
-        if let text = NSPasteboard.general.string(forType: .string) {
-            if !text.isEmpty {
-                var content = text
-                if trimAfterPaste {
-                    content = content.trimmingNoteWhitespace()
-                }
-                if wrapLongLinesAfterPaste {
-                    content = content.wrappingLongLinesAtWordBoundaries()
-                }
-                let note = Note(layout: getDefaultLayout(), text: content)
-                note.showOnAllSpaces = Defaults[.showOnAllSpaces]
-                self.context.insert(note)
-                
-                self.openNote(note, isEditing: false)
+        guard let pasted = pastedClipboardText() else { return }
+        if let inbox = availableInboxNote() {
+            appendText(pasted.text, to: inbox, asMarkdown: pasted.isMarkdown)
+            return
+        }
+        let inboxDescriptor = FetchDescriptor<Note>(
+            predicate: #Predicate<Note> {
+                $0.isInbox == true && $0.isInTrashBin == false && $0.isImageNote == false
             }
-        }
-    }
-
-    /// Appends clipboard string to the most recently updated non-image note (new line).
-    /// If that note is hidden, creates a new note with the clipboard content instead.
-    func appendClipboardToLatestEditedNote() {
-        guard let text = NSPasteboard.general.string(forType: .string), !text.isEmpty else { return }
-
-        var content = text
-        if trimAfterPaste {
-            content = content.trimmingNoteWhitespace()
-        }
-        if wrapLongLinesAfterPaste {
-            content = content.wrappingLongLinesAtWordBoundaries()
-        }
-        guard !content.isEmpty else { return }
-
-        var descriptor = FetchDescriptor<Note>(
-            predicate: #Predicate { $0.isInTrashBin == false && $0.isImageNote == false },
-            sortBy: [SortDescriptor(\.updatedAt, order: .reverse)]
         )
-        descriptor.fetchLimit = 1
-        guard let note = try? context.fetch(descriptor).first else { return }
-
-        if note.isHidden {
-            let newNote = Note(layout: getDefaultLayout(), text: content)
-            newNote.showOnAllSpaces = Defaults[.showOnAllSpaces]
-            context.insert(newNote)
-            openNote(newNote, isEditing: false)
-            NSApp.activate(ignoringOtherApps: true)
+        if let inbox = try? context.fetch(inboxDescriptor).first, inbox.isHidden {
+            presentInboxUnavailableAlert(
+                message: "The inbox note is hidden. Unhide it or clear inbox, then try again.")
             return
         }
 
-        let existing = note.text
-        if existing.isEmpty {
-            note.text = content
-        } else if existing.hasSuffix("\n") {
-            note.text = existing + content
-        } else {
-            note.text = existing + "\n" + content
-        }
-        note.clearMarkdownDisplayFrame()
-        note.applyLikelyMarkdownFlagFromContent()
-        try? context.save()
-
-        openNote(note, isEditing: false)
-        NSApp.activate(ignoringOtherApps: true)
+        let note = Note(layout: getDefaultLayout(), text: pasted.text)
+        note.isMarkdown = pasted.isMarkdown
+        note.showOnAllSpaces = Defaults[.showOnAllSpaces]
+        self.context.insert(note)
+        self.openNote(note, isEditing: false)
     }
 
     func openNote(_ note: Note, isEditing: Bool) {
@@ -196,6 +236,7 @@ final class AppState {
         window.level = .floating
         window.hasShadow = effectiveEditing
         window.isReleasedWhenClosed = false
+        window.alphaValue = note.windowAlpha
 
         applyShowOnAllSpaces(note: note)
 
@@ -215,6 +256,9 @@ final class AppState {
         self.windows.append(window);
 
         applyFullscreenSuppressionToOpenWindowsIfNeeded()
+        if model.areNotesEffectivelyHidden {
+            window.orderOut(nil)
+        }
     }
 
     /// Initial window frame. Uses saved markdown size or measured text instead of a 10×10 stub
@@ -304,7 +348,7 @@ final class AppState {
         let notes: [Note]? = try? self.context.fetch(
             FetchDescriptor<Note>(
                 predicate: #Predicate { $0.isInTrashBin == false && $0.isHidden == false }))
-        
+
         if let notes {
             for note in notes {
                 if note.text.isEmpty && !(note.isImageNote && note.imageData != nil) {

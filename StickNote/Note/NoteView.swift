@@ -173,6 +173,12 @@ struct NoteView: View {
             }
         }
         .overlay {
+            if note.isInbox {
+                Rectangle()
+                    .strokeBorder(Color.orange.opacity(0.95), lineWidth: 2)
+            }
+        }
+        .overlay {
             if appStateModel.selectedNoteIDs.count > 1,
                 appStateModel.selectedNoteIDs.contains(note.persistentModelID)
             {
@@ -208,7 +214,11 @@ struct NoteView: View {
             }
             guard window != nil else { return }
             syncNoteWindowBackground()
+            AppState.shared.applyWindowOpacity(for: note)
             DispatchQueue.main.async { syncLaunchOriginFromWindowOnce() }
+        }
+        .onChange(of: note.opacity, initial: false) { _, _ in
+            AppState.shared.applyWindowOpacity(for: note)
         }
         .onChange(of: colorScheme) { _, _ in
             syncNoteWindowBackground()
@@ -306,7 +316,7 @@ struct NoteView: View {
     }
 
     private var hideUntilMenuTitle: String {
-        contextTargets.count > 1 ? "Hide \(contextTargets.count) notes until…" : "Hide until…"
+        contextTargets.count > 1 ? "Hide \(contextTargets.count) notes until" : "Hide until"
     }
 
     private var shareDisabledForSelection: Bool {
@@ -434,39 +444,6 @@ struct NoteView: View {
     @ViewBuilder
     private var contextMenuContent: some View {
         Button {
-            let setMinimized = !note.isMinimized
-            for n in contextTargets {
-                n.isMinimized = setMinimized
-            }
-            isCollapsed = note.isMinimized
-        } label: {
-            Label(
-                minimizeMaximizeMenuTitle,
-                systemImage: note.isMinimized
-                    ? "arrow.up.left.and.arrow.down.right" : "arrow.down.right.and.arrow.up.left"
-            )
-        }
-
-        Toggle(
-            isOn: Binding(
-                get: {
-                    if contextTargets.count <= 1 { return note.showOnAllSpaces }
-                    return contextTargets.allSatisfy(\.showOnAllSpaces)
-                },
-                set: { newValue in
-                    for n in contextTargets {
-                        n.showOnAllSpaces = newValue
-                        AppState.shared.applyShowOnAllSpaces(note: n)
-                    }
-                }
-            )
-        ) {
-            Label("Show on all spaces", systemImage: "eye")
-        }
-
-        Divider()
-
-        Button {
             AppState.shared.copyNotesToClipboard(contextTargets)
         } label: {
             Label(copyMenuTitle, systemImage: "doc.on.doc")
@@ -486,26 +463,6 @@ struct NoteView: View {
                 Label("Recognize Text (OCR)…", systemImage: "text.viewfinder")
             }
             .disabled(isBulkContextMenu || isOCRRunning)
-        }
-
-        if allTargetsNonImageForMarkdownToggle {
-            Toggle(
-                isOn: Binding(
-                    get: {
-                        if contextTargets.count <= 1 { return note.isMarkdown }
-                        return contextTargets.allSatisfy(\.isMarkdown)
-                    },
-                    set: { newValue in
-                        for n in contextTargets {
-                            n.isMarkdown = newValue
-                            n.markdownAutoDisabledByUser = !newValue
-                        }
-                        updateWindowSize()
-                    }
-                )
-            ) {
-                Label("Markdown", systemImage: "doc.richtext")
-            }
         }
 
         if allTargetsPlainTextForTextTools {
@@ -542,11 +499,73 @@ struct NoteView: View {
 
         Divider()
 
+        if allTargetsNonImageForMarkdownToggle {
+            Toggle(
+                isOn: Binding(
+                    get: {
+                        if contextTargets.count <= 1 { return note.isMarkdown }
+                        return contextTargets.allSatisfy(\.isMarkdown)
+                    },
+                    set: { newValue in
+                        for n in contextTargets {
+                            n.isMarkdown = newValue
+                            n.markdownAutoDisabledByUser = !newValue
+                        }
+                        updateWindowSize()
+                    }
+                )
+            ) {
+                Label("Markdown", systemImage: "doc.richtext")
+            }
+        }
+
+        if !isBulkContextMenu, !note.isImageNote {
+            Toggle(
+                isOn: Binding(
+                    get: { note.isInbox },
+                    set: { $0 ? AppState.shared.setInbox(note) : AppState.shared.clearInbox(for: note) }
+                )
+            ) {
+                Label("Inbox", systemImage: "tray")
+            }
+        }
+
+        Toggle(
+            isOn: Binding(
+                get: {
+                    if contextTargets.count <= 1 { return note.showOnAllSpaces }
+                    return contextTargets.allSatisfy(\.showOnAllSpaces)
+                },
+                set: { newValue in
+                    for n in contextTargets {
+                        n.showOnAllSpaces = newValue
+                        AppState.shared.applyShowOnAllSpaces(note: n)
+                    }
+                }
+            )
+        ) {
+            Label("Show on all spaces", systemImage: "eye")
+        }
+
         Menu("Layout", systemImage: "textformat") {
             LayoutMenu(note: $note, bulkApplyTargets: isBulkContextMenu ? contextTargets : nil)
         }
 
         Divider()
+
+        Button {
+            let setMinimized = !note.isMinimized
+            for n in contextTargets {
+                n.isMinimized = setMinimized
+            }
+            isCollapsed = note.isMinimized
+        } label: {
+            Label(
+                minimizeMaximizeMenuTitle,
+                systemImage: note.isMinimized
+                    ? "arrow.up.left.and.arrow.down.right" : "arrow.down.right.and.arrow.up.left"
+            )
+        }
 
         Button {
             for n in contextTargets {
@@ -558,30 +577,33 @@ struct NoteView: View {
 
         Menu(hideUntilMenuTitle, systemImage: "calendar.badge.clock") {
             Button {
-                let until = Date.now.addingTimeInterval(60 * 60)
-                for n in contextTargets {
-                    AppState.shared.hideNote(n, hiddenUntil: until)
-                }
+                hideTargets(until: Date.now.addingTimeInterval(30 * 60))
+            } label: {
+                Label("For 30 Minutes", systemImage: "clock")
+            }
+
+            Button {
+                hideTargets(until: Date.now.addingTimeInterval(60 * 60))
             } label: {
                 Label("For 1 Hour", systemImage: "clock")
             }
 
+            let tomorrow = hideUntilTomorrowMorning()
             Button {
-                let until = hideUntilTomorrowMorning()
-                for n in contextTargets {
-                    AppState.shared.hideNote(n, hiddenUntil: until)
-                }
+                hideTargets(until: tomorrow)
             } label: {
-                Label("Until Tomorrow", systemImage: "sunrise")
+                Label(
+                    "Until Tomorrow, \(tomorrow.formatted(date: .omitted, time: .shortened))",
+                    systemImage: "sunrise")
             }
 
+            let nextWeek = hideUntilNextWeekMorning()
             Button {
-                let until = hideUntilNextWeekMorning()
-                for n in contextTargets {
-                    AppState.shared.hideNote(n, hiddenUntil: until)
-                }
+                hideTargets(until: nextWeek)
             } label: {
-                Label("Until Next Week", systemImage: "calendar")
+                Label(
+                    "Until Next Week, \(nextWeek.formatted(.dateTime.weekday(.abbreviated).hour().minute()))",
+                    systemImage: "calendar")
             }
 
             Button {
@@ -619,6 +641,8 @@ struct NoteView: View {
                 NSApplication.shared.terminate(nil)
             }
         }
+
+        Divider()
 
         Button(role: .destructive) {
             handleDelete()
@@ -680,6 +704,12 @@ struct NoteView: View {
             for n in contextTargets {
                 AppState.shared.deleteNote(n)
             }
+        }
+    }
+
+    private func hideTargets(until date: Date) {
+        for n in contextTargets {
+            AppState.shared.hideNote(n, hiddenUntil: date)
         }
     }
 

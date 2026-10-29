@@ -8,7 +8,6 @@ StickNote incorporates open-source libraries distributed under the licenses belo
 |--------|---------|---------|--------|
 | [Defaults](https://github.com/sindresorhus/Defaults) (includes DefaultsMacros) | 9.0.2 | MIT | [license](https://github.com/sindresorhus/Defaults/blob/main/license) |
 | [Down](https://github.com/johnxnguyen/Down) | 0.11.0 | MIT (project bundles additional notices for cmark, CommonMark tests, and other upstream components) | [LICENSE](https://github.com/johnxnguyen/Down/blob/v0.11.0/LICENSE) |
-| [FontPicker](https://github.com/tyagishi/FontPicker) | 1.2.0 | MIT | [LICENSE](https://github.com/tyagishi/FontPicker/blob/1.2.0/LICENSE) |
 | [KeyboardShortcuts](https://github.com/sindresorhus/KeyboardShortcuts) | 2.2.3 | MIT | [license](https://github.com/sindresorhus/KeyboardShortcuts/blob/main/license) |
 | [LaunchAtLogin-Modern](https://github.com/sindresorhus/LaunchAtLogin-Modern) | main @ `a04ec1c` | MIT | [license](https://github.com/sindresorhus/LaunchAtLogin-Modern/blob/main/license) |
 | [MenuBarExtraAccess](https://github.com/orchetect/MenuBarExtraAccess) | 1.2.2 | MIT | [LICENSE](https://github.com/orchetect/MenuBarExtraAccess/blob/main/LICENSE) |

@@ -1,3 +1,4 @@
+import AppKit
 import SwiftData
 import SwiftUI
 
@@ -17,28 +18,18 @@ struct LayoutMenu: View {
     }
 
     var body: some View {
-        VStack {
+        Group {
             ForEach(layouts.sorted { a, b in a.isDefault }, id: \.self) { layout in
-                Button {
-                    for n in notesToApplyLayout {
-                        n.apply(layout: layout)
+                let sameLayout = notesToApplyLayout.allSatisfy { $0.isSameAppearance(layout) }
+                Toggle(isOn: Binding(
+                    get: { sameLayout },
+                    set: { _ in
+                        for n in notesToApplyLayout {
+                            n.apply(layout: layout)
+                        }
                     }
-                } label: {
-                    let sameLayout = notesToApplyLayout.allSatisfy { $0.isSameAppearance(layout) }
-                    let swatch = NoteDisplayColors.displayColors(
-                        storedBgHex: layout.color,
-                        storedFgHex: layout.fontColor,
-                        colorScheme: colorScheme
-                    )
-                    Image(
-                        systemName: sameLayout
-                            ? "checkmark.square.fill" : "square.fill"
-                    )
-                    .foregroundStyle(
-                        sameLayout ? .primary : swatch.background,
-                        swatch.background)
-
-                    Text(layout.name)
+                )) {
+                    layoutTitle(layout)
                 }
             }
             Divider()
@@ -46,6 +37,56 @@ struct LayoutMenu: View {
                 openWindow(value: note.persistentModelID)
             }
         }
+    }
+
+    private func layoutTitle(_ layout: NoteLayout) -> Text {
+        let swatch = Image(nsImage: LayoutMenuSwatch.image(
+            storedBgHex: layout.color,
+            isDark: colorScheme == .dark
+        ))
+        return Text("\(swatch) \(layout.name)")
+    }
+}
+
+/// Pixels, not a symbol: AppKit menu items retint template images and the color disappears.
+enum LayoutMenuSwatch {
+    static func image(storedBgHex: String, isDark: Bool) -> NSImage {
+        let color = NoteDisplayColors.displayBackgroundNSColor(storedBgHex: storedBgHex, isDark: isDark)
+        let points: CGFloat = 12
+        let scale: CGFloat = 2
+        let pixels = Int(points * scale)
+        guard
+            let rep = NSBitmapImageRep(
+                bitmapDataPlanes: nil,
+                pixelsWide: pixels,
+                pixelsHigh: pixels,
+                bitsPerSample: 8,
+                samplesPerPixel: 4,
+                hasAlpha: true,
+                isPlanar: false,
+                colorSpaceName: .deviceRGB,
+                bytesPerRow: 0,
+                bitsPerPixel: 0
+            )
+        else {
+            return NSImage()
+        }
+        rep.size = NSSize(width: points, height: points)
+        NSGraphicsContext.saveGraphicsState()
+        NSGraphicsContext.current = NSGraphicsContext(bitmapImageRep: rep)
+        let rect = NSRect(x: 0.5, y: 0.5, width: points - 1, height: points - 1)
+        let path = NSBezierPath(roundedRect: rect, xRadius: 2, yRadius: 2)
+        color.setFill()
+        path.fill()
+        NSColor.black.withAlphaComponent(0.35).setStroke()
+        path.lineWidth = 1
+        path.stroke()
+        NSGraphicsContext.restoreGraphicsState()
+
+        let image = NSImage(size: NSSize(width: points, height: points))
+        image.addRepresentation(rep)
+        image.isTemplate = false
+        return image
     }
 }
 

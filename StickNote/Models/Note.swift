@@ -46,8 +46,17 @@ final class Note: NoteAppearance, Identifiable {
     var markdownFrameHeight: Double?
     /// When non-nil and in the future, the note is treated as hidden until this instant (then shown again).
     var hiddenUntil: Date?
+    /// Window translucency (1 = opaque). Clamped when applied to ``NSWindow/alphaValue``.
+    var opacity: Double = 1.0
+    /// At most one note should be inbox; pasted text is appended to it when available.
+    var isInbox: Bool = false
     var createdAt: Date = Date()
     var updatedAt: Date = Date()
+
+    /// Clamped opacity for ``NSWindow/alphaValue``.
+    var windowAlpha: CGFloat {
+        CGFloat(min(1, max(0.25, opacity)))
+    }
 
     init(
         x: CGFloat? = nil, y: CGFloat? = nil, isMinimized: Bool = false,
@@ -68,6 +77,7 @@ final class Note: NoteAppearance, Identifiable {
         self.init(
             text: text, color: layout.color, fontName: layout.fontName, fontSize: layout.fontSize,
             fontColor: layout.fontColor)
+        self.opacity = layout.opacity
     }
 
     func apply(layout: NoteLayout) {
@@ -75,6 +85,7 @@ final class Note: NoteAppearance, Identifiable {
         self.fontColor = layout.fontColor
         self.fontName = layout.fontName
         self.fontSize = layout.fontSize
+        self.opacity = layout.opacity
     }
     
     func clearMarkdownDisplayFrame() {

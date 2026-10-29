@@ -14,25 +14,13 @@ struct LayoutPickerView: View {
     var body: some View {
         return Picker(title, selection: $selectedLayout) {
             ForEach(layouts) { layout in
-                let nsFont = layout.nsFont.withSize(NSFont.systemFontSize)
-                let swatch = NoteDisplayColors.displayColors(
+                let swatch = Image(nsImage: LayoutMenuSwatch.image(
                     storedBgHex: layout.color,
-                    storedFgHex: layout.fontColor,
-                    colorScheme: colorScheme
-                )
-
-                HStack {
-                    Image(
-                        systemName: "square.fill"
-                    )
-                    .foregroundStyle(
-                        swatch.background,
-                        swatch.background)
-
-                    Text(layout.name)
-                        .font(Font(nsFont))
-
-                }.tag(layout)
+                    isDark: colorScheme == .dark
+                ))
+                Text("\(swatch) \(layout.name)")
+                    .font(Font(layout.nsFont.withSize(NSFont.systemFontSize)))
+                    .tag(layout)
             }
             if selectedLayout == nil {
                 Divider()
