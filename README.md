@@ -70,7 +70,6 @@ StickNote is built with **Swift**, **SwiftUI**, **SwiftData**, and **AppKit** (s
 |--------|---------|
 | [Defaults](https://github.com/sindresorhus/Defaults) | MIT |
 | [Down](https://github.com/johnxnguyen/Down) | MIT (see upstream for bundled components) |
-| [FontPicker](https://github.com/tyagishi/FontPicker) | MIT |
 | [KeyboardShortcuts](https://github.com/sindresorhus/KeyboardShortcuts) | MIT |
 | [LaunchAtLogin-Modern](https://github.com/sindresorhus/LaunchAtLogin-Modern) | MIT |
 | [MenuBarExtraAccess](https://github.com/orchetect/MenuBarExtraAccess) | MIT |

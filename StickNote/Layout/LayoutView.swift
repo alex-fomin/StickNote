@@ -64,7 +64,7 @@ struct LayoutView: View {
             }
 
             Section {
-                NoteFontButton(font: $font)
+                FontListPicker(font: $font)
                 ColorPicker("Background", selection: $color)
                 ColorPicker("Font color", selection: $fontColor)
                 LabeledContent("Opacity") {
@@ -197,42 +197,6 @@ struct LayoutView: View {
             selectedLayoutIndex = Int.max
         }
     }
-}
-
-/// Compact stand-in for FontPicker. That control's icon is resizable and grows to fill the form.
-private struct NoteFontButton: View {
-    @Binding var font: NSFont
-    @State private var panelDelegate: FontPanelDelegate?
-
-    var body: some View {
-        LabeledContent("Font") {
-            Button(fontLabel) { openPanel() }
-                .buttonStyle(.bordered)
-                .lineLimit(1)
-        }
-    }
-
-    private var fontLabel: String {
-        let name = font.displayName ?? font.fontName
-        return "\(name)  \(Int(font.pointSize.rounded()))"
-    }
-
-    private func openPanel() {
-        let binding = $font
-        let delegate = FontPanelDelegate {
-            binding.wrappedValue = NSFontPanel.shared.convert(binding.wrappedValue)
-        }
-        panelDelegate = delegate
-        NSFontManager.shared.target = delegate
-        NSFontPanel.shared.setPanelFont(font, isMultiple: false)
-        NSFontPanel.shared.orderBack(nil)
-    }
-}
-
-private final class FontPanelDelegate: NSObject {
-    let onChange: () -> Void
-    init(onChange: @escaping () -> Void) { self.onChange = onChange }
-    @objc func changeFont(_ sender: Any?) { onChange() }
 }
 
 #Preview {

@@ -10,7 +10,6 @@
 		2450DA942D11EB4800F0FB0F /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 2450DA932D11EB4800F0FB0F /* Defaults */; };
 		2450DA962D11EB4800F0FB0F /* DefaultsMacros in Frameworks */ = {isa = PBXBuildFile; productRef = 2450DA952D11EB4800F0FB0F /* DefaultsMacros */; };
 		2450DA992D11EBA100F0FB0F /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 2450DA982D11EBA100F0FB0F /* LaunchAtLogin */; };
-		245B77452D103C0E00AC8ECF /* FontPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 245B77442D103C0E00AC8ECF /* FontPicker */; };
 		249FA1252EC6279600596F74 /* MenuBarExtraAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 249FA1242EC6279600596F74 /* MenuBarExtraAccess */; };
 		24F832122D0C484C00285731 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 24F832112D0C484C00285731 /* KeyboardShortcuts */; };
 		A4E8F0012F00484C00910E03 /* Textual in Frameworks */ = {isa = PBXBuildFile; productRef = A4E8F0012F00484C00910E02 /* Textual */; };
@@ -56,7 +55,6 @@
 			files = (
 				2450DA942D11EB4800F0FB0F /* Defaults in Frameworks */,
 				24F832122D0C484C00285731 /* KeyboardShortcuts in Frameworks */,
-				245B77452D103C0E00AC8ECF /* FontPicker in Frameworks */,
 				2450DA992D11EBA100F0FB0F /* LaunchAtLogin in Frameworks */,
 				249FA1252EC6279600596F74 /* MenuBarExtraAccess in Frameworks */,
 				2450DA962D11EB4800F0FB0F /* DefaultsMacros in Frameworks */,
@@ -122,7 +120,6 @@
 			name = StickNote;
 			packageProductDependencies = (
 				24F832112D0C484C00285731 /* KeyboardShortcuts */,
-				245B77442D103C0E00AC8ECF /* FontPicker */,
 				2450DA932D11EB4800F0FB0F /* Defaults */,
 				2450DA952D11EB4800F0FB0F /* DefaultsMacros */,
 				2450DA982D11EBA100F0FB0F /* LaunchAtLogin */,
@@ -209,7 +206,6 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				24F832102D0C484C00285731 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
-				245B77432D103C0E00AC8ECF /* XCRemoteSwiftPackageReference "FontPicker" */,
 				2450DA922D11EB4800F0FB0F /* XCRemoteSwiftPackageReference "Defaults" */,
 				2450DA972D11EBA100F0FB0F /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */,
 				249FA1232EC6279600596F74 /* XCRemoteSwiftPackageReference "MenuBarExtraAccess" */,
@@ -613,14 +609,6 @@
 				kind = branch;
 			};
 		};
-		245B77432D103C0E00AC8ECF /* XCRemoteSwiftPackageReference "FontPicker" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/tyagishi/FontPicker";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.2.0;
-			};
-		};
 		249FA1232EC6279600596F74 /* XCRemoteSwiftPackageReference "MenuBarExtraAccess" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/orchetect/MenuBarExtraAccess";
@@ -678,11 +666,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 2450DA972D11EBA100F0FB0F /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */;
 			productName = LaunchAtLogin;
-		};
-		245B77442D103C0E00AC8ECF /* FontPicker */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 245B77432D103C0E00AC8ECF /* XCRemoteSwiftPackageReference "FontPicker" */;
-			productName = FontPicker;
 		};
 		249FA1242EC6279600596F74 /* MenuBarExtraAccess */ = {
 			isa = XCSwiftPackageProductDependency;
