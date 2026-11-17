@@ -14,8 +14,7 @@ Prebuilt downloads: **[Releases](https://github.com/alex-fomin/StickNote/release
 
 Release builds are not notarized by Apple yet, so macOS quarantines the downloaded app and blocks the first launch with “Apple could not verify StickNote…”. Drag **StickNote** from the DMG to **Applications**, then do one of:
 
-- **Right-click** StickNote in Applications → **Open** → **Open**.
-- Try to open it once, then go to **System Settings → Privacy & Security** and click **Open Anyway**.
+- Try to open it once, then go to **System Settings → Privacy & Security** and click **Open Anyway**. (On macOS 15, right-click → Open no longer bypasses this.)
 - Remove the quarantine flag in Terminal:
 
   ```bash
