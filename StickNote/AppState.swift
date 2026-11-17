@@ -255,9 +255,10 @@ final class AppState {
         self.updateNotesCount()
         self.windows.append(window);
 
-        applyFullscreenSuppressionToOpenWindowsIfNeeded()
-        if model.areNotesEffectivelyHidden {
+        if model.isNotesHidden {
             window.orderOut(nil)
+        } else {
+            applyFullscreenSuppressionToOpenWindowsIfNeeded()
         }
     }
 
@@ -595,16 +596,22 @@ final class AppState {
         let effectivelyHidden = model.areNotesEffectivelyHidden
         if !effectivelyHidden {
             clearSelection()
-        }
-        for window in self.windows {
-            if effectivelyHidden {
-                window.orderFront(nil)
-            } else {
+            for window in self.windows {
                 window.orderOut(nil)
             }
+            model.isNotesHidden = true
+            model.suppressedByFullscreen = false
+            fullscreenSuppressionPaused = false
+            return
         }
-        model.isNotesHidden = effectivelyHidden ? false : true
+        model.isNotesHidden = false
         model.suppressedByFullscreen = false
+        // Temporary override until every fullscreen screen clears (Settings footer).
+        fullscreenSuppressionPaused = Defaults[.hideNotesWhenFullscreenApp]
+            && !FullscreenAppDetector.screensWithActiveFullscreenApp().isEmpty
+        for window in self.windows {
+            window.orderFront(nil)
+        }
     }
 
     func updateFullscreenSuppression() {
@@ -613,44 +620,60 @@ final class AppState {
             return
         }
         guard Defaults[.hideNotesWhenFullscreenApp] else {
+            fullscreenSuppressionPaused = false
             restoreFromFullscreenSuppression()
             return
         }
-        if FullscreenAppDetector.isActiveFullscreenAppPresent() {
-            suppressForFullscreenIfNeeded()
-        } else {
+        let fsScreens = FullscreenAppDetector.screensWithActiveFullscreenApp()
+        if fsScreens.isEmpty {
+            fullscreenSuppressionPaused = false
             restoreFromFullscreenSuppression()
+            return
         }
+        if fullscreenSuppressionPaused { return }
+        applyPerScreenFullscreenHiding(on: fsScreens)
     }
 
-    private func suppressForFullscreenIfNeeded() {
-        guard !model.isNotesHidden else { return }
-        guard !model.suppressedByFullscreen else { return }
-        for window in windows {
-            window.orderOut(nil)
+    private var fullscreenSuppressionPaused = false
+
+    private func applyPerScreenFullscreenHiding(on fsScreens: [NSScreen]) {
+        guard !model.isNotesHidden else {
+            model.suppressedByFullscreen = false
+            return
         }
-        model.suppressedByFullscreen = true
+        var hiddenCount = 0
+        for window in windows {
+            if Self.window(window, isOnAnyOf: fsScreens) {
+                window.orderOut(nil)
+                hiddenCount += 1
+            } else {
+                window.orderFront(nil)
+            }
+        }
+        model.suppressedByFullscreen = !windows.isEmpty && hiddenCount == windows.count
     }
 
     private func restoreFromFullscreenSuppression() {
-        guard model.suppressedByFullscreen else { return }
         model.suppressedByFullscreen = false
-        if !model.isNotesHidden {
-            for window in windows {
-                window.orderFront(nil)
-            }
+        guard !model.isNotesHidden else { return }
+        for window in windows {
+            window.orderFront(nil)
         }
     }
 
     private func applyFullscreenSuppressionToOpenWindowsIfNeeded() {
-        guard Defaults[.hideNotesWhenFullscreenApp],
-              FullscreenAppDetector.isActiveFullscreenAppPresent(),
-              !model.isNotesHidden
-        else { return }
-        for window in windows {
-            window.orderOut(nil)
+        guard Defaults[.hideNotesWhenFullscreenApp], !fullscreenSuppressionPaused else { return }
+        let fsScreens = FullscreenAppDetector.screensWithActiveFullscreenApp()
+        guard !fsScreens.isEmpty else { return }
+        applyPerScreenFullscreenHiding(on: fsScreens)
+    }
+
+    private static func window(_ window: NSWindow, isOnAnyOf screens: [NSScreen]) -> Bool {
+        if let screen = window.screen {
+            return screens.contains(where: { $0 === screen })
         }
-        model.suppressedByFullscreen = true
+        // Off-screen / no screen yet: match by frame intersection.
+        return screens.contains { window.frame.intersects($0.frame) }
     }
 
     func applyShowOnAllSpaces(note: Note) {

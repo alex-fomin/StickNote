@@ -71,7 +71,7 @@ struct SettingsView: View {
                         Text("Fullscreen")
                     } footer: {
                         Self.footer(
-                            "Use Show/Hide notes or the menu bar icon to bring them back temporarily."
+                            "Only notes on the fullscreen display are hidden. Use Show/Hide notes or the menu bar icon to bring them back temporarily."
                         )
                     }
                 }

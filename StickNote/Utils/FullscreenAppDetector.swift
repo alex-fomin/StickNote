@@ -2,23 +2,24 @@ import AppKit
 import CoreGraphics
 
 enum FullscreenAppDetector {
-    /// True when the frontmost app (other than StickNote) has a layer-0 window covering a screen frame.
-    static func isActiveFullscreenAppPresent() -> Bool {
-        guard let frontApp = NSWorkspace.shared.frontmostApplication else { return false }
+    /// Screens where the frontmost app (other than StickNote) has a layer-0 window covering the display.
+    static func screensWithActiveFullscreenApp() -> [NSScreen] {
+        guard let frontApp = NSWorkspace.shared.frontmostApplication else { return [] }
         let frontPID = frontApp.processIdentifier
         let ourPID = ProcessInfo.processInfo.processIdentifier
-        if frontPID == ourPID { return false }
-        return hasFullscreenWindow(forPID: frontPID)
+        if frontPID == ourPID { return [] }
+        return screensWithFullscreenWindow(forPID: frontPID)
     }
 
-    private static func hasFullscreenWindow(forPID pid: pid_t) -> Bool {
+    private static func screensWithFullscreenWindow(forPID pid: pid_t) -> [NSScreen] {
         let options: CGWindowListOption = [.optionOnScreenOnly, .excludeDesktopElements]
         guard let list = CGWindowListCopyWindowInfo(options, kCGNullWindowID) as? [[String: Any]],
               let primaryHeight = NSScreen.screens.first?.frame.height
         else {
-            return false
+            return []
         }
 
+        var matched: [NSScreen] = []
         for info in list {
             guard let ownerPID = info[kCGWindowOwnerPID as String] as? pid_t, ownerPID == pid else {
                 continue
@@ -35,16 +36,17 @@ enum FullscreenAppDetector {
                 width: cgBounds.width, height: cgBounds.height)
 
             for screen in NSScreen.screens {
+                if matched.contains(where: { $0 === screen }) { continue }
                 let frame = screen.frame
                 // Fullscreen windows may stop below the camera notch.
                 let minHeight = frame.height - screen.safeAreaInsets.top - 2
                 if abs(bounds.minX - frame.minX) < 2, abs(bounds.width - frame.width) < 2,
                    abs(bounds.minY - frame.minY) < 2, bounds.height >= minHeight
                 {
-                    return true
+                    matched.append(screen)
                 }
             }
         }
-        return false
+        return matched
     }
 }
