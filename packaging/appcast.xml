@@ -6,6 +6,20 @@
         <description>StickNote application updates</description>
         <language>en</language>
         <item>
+            <title>1.5.0</title>
+            <pubDate>Tue, 17 Nov 2026 17:56:57 +0300</pubDate>
+            <sparkle:version>1.5.0</sparkle:version>
+            <sparkle:shortVersionString>1.5.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <enclosure url="https://github.com/alex-fomin/StickNote/releases/download/v1.5.0/StickNote-1.5.0.dmg" length="9395454" type="application/octet-stream" sparkle:edSignature="ZVlLY+geUf1SAWPHAoFU219biTiOM9g88JFOW+9QyDKTRNJbT5pNbfF7QKKX/0pBKMWDXBWtYdG9KwTKVWBECA=="/>
+            <sparkle:deltas>
+                <enclosure url="https://github.com/alex-fomin/StickNote/releases/download/v1.5.0/StickNote1.5.0-1.4.0.delta" sparkle:deltaFrom="1.4.0" length="367546" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="977824" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,uk" sparkle:edSignature="vdC8Aa+s+H+UYdwjzpwQInST+N3WAK72eVO65F764X/dhKrH6HW5qLxDpekJOziUM7CdMlJ0YGifuJfakDiTDQ=="/>
+                <enclosure url="https://github.com/alex-fomin/StickNote/releases/download/v1.5.0/StickNote1.5.0-1.3.2.delta" sparkle:deltaFrom="1.3.2" length="1273326" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="977824" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,uk" sparkle:edSignature="8eg94rGkzMZLgnEbdr80AJ5lo2xMSYGH9GMaeBq2gTuVL/hxoKrLYzbsukp4ukchcc2oE9DX9tUtj1b4RVvTAw=="/>
+                <enclosure url="https://github.com/alex-fomin/StickNote/releases/download/v1.5.0/StickNote1.5.0-1.3.1.delta" sparkle:deltaFrom="1.3.1" length="1279530" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="977824" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,uk" sparkle:edSignature="opStMV5v9uvHZmSLQOIuGkTLeXoLZBLannuDW/SPqR1MT2mfpOryWZjQu+tSRwLo8xqAU465PZkUP3LqeMJyCQ=="/>
+            </sparkle:deltas>
+        </item>
+        <item>
             <title>1.4.0</title>
             <pubDate>Thu, 29 Oct 2026 11:52:30 +0300</pubDate>
             <sparkle:version>1.4.0</sparkle:version>
